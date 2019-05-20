@@ -7,5 +7,4 @@ namespace StronglyTypedId
 {
     [StronglyTypedId]
     public partial struct GeneratedId2 { }
-
 }

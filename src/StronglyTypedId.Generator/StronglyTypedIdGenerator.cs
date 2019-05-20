@@ -12,9 +12,12 @@ namespace StronglyTypedId.Generator
 {
     public class StronglyTypedIdGenerator : IRichCodeGenerator
     {
+        private readonly bool _generateJsonConverter;
+
         public StronglyTypedIdGenerator(AttributeData attributeData)
         {
             if (attributeData == null) throw new ArgumentNullException(nameof(attributeData));
+            _generateJsonConverter = (bool)attributeData.ConstructorArguments[0].Value;
         }
 
         public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken)
@@ -26,7 +29,7 @@ namespace StronglyTypedId.Generator
         {
             var applyToClass = (StructDeclarationSyntax)context.ProcessingNode;
 
-            var stronglyTypedId = SyntaxTreeGenerator.CreateStronglyTypedIdSyntax(applyToClass);
+            var stronglyTypedId = SyntaxTreeGenerator.CreateStronglyTypedIdSyntax(applyToClass, _generateJsonConverter);
 
             // Figure out ancestry for the generated type, including nesting types and namespaces.
             var wrappedMembers = stronglyTypedId.WrapWithAncestors(context.ProcessingNode);

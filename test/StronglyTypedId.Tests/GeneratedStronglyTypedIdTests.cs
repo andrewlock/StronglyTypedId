@@ -82,5 +82,18 @@ namespace StronglyTypedId
 
             Assert.Equal(foo, deserializedFoo);
         }
+        
+        
+        [Fact]
+        public void WhenNoJsonConverter_SerializesWithValueProperty()
+        {
+            var foo = NoJsonGeneratedId.New();
+
+            var serialized = JsonConvert.SerializeObject(foo);
+            var expected = "{\"Value\":\"" + foo.Value + "\"}";
+
+            Assert.Equal(expected, serialized);
+        }
+
     }
 }
