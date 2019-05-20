@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsTool>true</IsTool>
+    <DevelopmentDependency>True</DevelopmentDependency>
+    <LangVersion>7.2</LangVersion>
+
+    <Description>Contains code generator for strongly-typed IDs. See project site for installation instructions and more details.</Description>
+    <PackageTags>strongly-typed IDs attribute generator generators generation code codegen codegenerator codegeneration</PackageTags>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="FooId.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodeGeneration.Roslyn" Version="0.5.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="build\StronglyTypedId.Generator.props" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

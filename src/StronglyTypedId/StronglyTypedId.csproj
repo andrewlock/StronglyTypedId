@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>StronglyTypedId.nuspec</NuspecFile>
+    <NuspecProperties>releaseNotes=$(PackageReleaseNotes);version=$(PackageVersion);authors=$(Authors);licenseUrl=$(PackageLicenseUrl);projectUrl=$(PackageProjectUrl);iconUrl=$(PackageIconUrl);copyright=$(Copyright);tags=$(PackageTags);versionOfCodegenRoslyn=$(CodeGenerationRoslynPackagesVersion);requireLicenseAcceptance=false</NuspecProperties>
+  </PropertyGroup>
+
+</Project>

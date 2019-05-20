@@ -1,0 +1,29 @@
+<Project>
+
+  <Import Project="version.props" />
+
+
+  <PropertyGroup>
+    <Authors>Andrew Lock</Authors>
+    <Copyright>Copyright © AndrewLock</Copyright>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/andrewlock/StronglyTypedId</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/andrewlock/StronglyTypedId</PackageIconUrl>
+    <PackageTags>stronglytypedid attribute generator generation codegen codegenerator codegeneration netescapades</PackageTags>
+    <RepositoryUrl>https://github.com/andrewlock/StronglyTypedId</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DebugType>embedded</DebugType>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <LangVersion>7.3</LangVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <CodeGenerationRoslynPackagesVersion>0.5.13</CodeGenerationRoslynPackagesVersion>
+  </PropertyGroup>
+
+  <Import Project="releasenotes.props" />
+
+</Project>
