@@ -17,6 +17,13 @@ namespace StronglyTypedId
         }
 
         [Fact]
+        public void EmptyValueIsEmpty()
+        {
+            Assert.Equal(GeneratedId1.Empty.Value, Guid.Empty);
+        }
+
+
+        [Fact]
         public void DifferentValuesAreUnequal()
         {
             var foo1 = GeneratedId1.New();

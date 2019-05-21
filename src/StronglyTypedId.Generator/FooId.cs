@@ -10,7 +10,7 @@ readonly partial struct FooId : System.IComparable<FooId>, System.IEquatable<Foo
     }
 
     public static FooId New() => new FooId(System.Guid.NewGuid());
-    public static FooId Empty { get; } = new FooId(System.Guid.Empty);
+    public static readonly FooId Empty = new FooId(System.Guid.Empty);
 
     public bool Equals(FooId other) => this.Value.Equals(other.Value);
     public int CompareTo(FooId other) => Value.CompareTo(other.Value);

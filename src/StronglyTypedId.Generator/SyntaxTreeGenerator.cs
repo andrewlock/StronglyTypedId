@@ -147,40 +147,34 @@ namespace StronglyTypedId.Generator
                                                     IdentifierName("NewGuid")))))))))
                 .WithSemicolonToken(
                     Token(SyntaxKind.SemicolonToken));
-            yield return PropertyDeclaration(
-                    IdentifierName(idName),
-                    Identifier("Empty"))
-                .WithModifiers(
-                    TokenList(
-                        new[]
-                        {
-                            Token(SyntaxKind.PublicKeyword),
-                            Token(SyntaxKind.StaticKeyword)
-                        }))
-                .WithAccessorList(
-                    AccessorList(
-                        SingletonList<AccessorDeclarationSyntax>(
-                            AccessorDeclaration(
-                                    SyntaxKind.GetAccessorDeclaration)
-                                .WithSemicolonToken(
-                                    Token(SyntaxKind.SemicolonToken)))))
-                .WithInitializer(
-                    EqualsValueClause(
-                        ObjectCreationExpression(
-                                IdentifierName(idName))
-                            .WithArgumentList(
-                                ArgumentList(
-                                    SingletonSeparatedList<ArgumentSyntax>(
-                                        Argument(
-                                            MemberAccessExpression(
-                                                SyntaxKind.SimpleMemberAccessExpression,
-                                                MemberAccessExpression(
-                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                    IdentifierName("System"),
-                                                    IdentifierName("Guid")),
-                                                IdentifierName("Empty"))))))))
-                .WithSemicolonToken(
-                    Token(SyntaxKind.SemicolonToken));
+            yield return FieldDeclaration(
+                        VariableDeclaration(
+                            IdentifierName(idName))
+                        .WithVariables(
+                            SingletonSeparatedList<VariableDeclaratorSyntax>(
+                                VariableDeclarator(
+                                    Identifier("Empty"))
+                                .WithInitializer(
+                                    EqualsValueClause(
+                                        ObjectCreationExpression(
+                                            IdentifierName(idName))
+                                        .WithArgumentList(
+                                            ArgumentList(
+                                                SingletonSeparatedList<ArgumentSyntax>(
+                                                    Argument(
+                                                        MemberAccessExpression(
+                                                            SyntaxKind.SimpleMemberAccessExpression,
+                                                            MemberAccessExpression(
+                                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                                IdentifierName("System"),
+                                                                IdentifierName("Guid")),
+                                                            IdentifierName("Empty")))))))))))
+                        .WithModifiers(
+                            TokenList(
+                                new[]{
+                                    Token(SyntaxKind.PublicKeyword),
+                                    Token(SyntaxKind.StaticKeyword),
+                                    Token(SyntaxKind.ReadOnlyKeyword)}));
             yield return MethodDeclaration(
                     PredefinedType(
                         Token(SyntaxKind.BoolKeyword)),
