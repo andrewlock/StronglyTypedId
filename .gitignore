@@ -246,3 +246,5 @@ ModelManifest.xml
 .fake/
 tools/*
 !tools/packages.config
+
+! src/StronglyTypedId.Generator/build/
