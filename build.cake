@@ -23,7 +23,7 @@ var buildNumber =
 // Assume we're building on appveyor for publishing NuGets
 // So always add a beta prefix if not doing a tag
 var isTag = EnvironmentVariable("APPVEYOR_REPO_TAG") != null && EnvironmentVariable("APPVEYOR_REPO_TAG") == "true" ;
-var revision = isTag ? null : "beta-" +buildNumber.ToString("D4");
+var revision = isTag ? null : "beta-" + buildNumber.ToString("D4");
 // A directory path to an Artifacts directory.
 var artifactsDirectory = Directory("./artifacts");
  
@@ -31,6 +31,7 @@ var artifactsDirectory = Directory("./artifacts");
 Task("Clean")
     .Does(() =>
     {
+		DotNetCoreClean(".");
         CleanDirectory(artifactsDirectory);
     });
  
@@ -63,7 +64,6 @@ Task("Restore")
     });
  
 // Look under a 'Tests' folder and run dotnet test against all of those projects.
-// Then drop the XML test results file in the Artifacts folder at the root.
 Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
