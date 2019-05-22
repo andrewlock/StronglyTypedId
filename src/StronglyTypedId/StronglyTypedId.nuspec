@@ -13,7 +13,6 @@
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
     <dependencies>
-      <dependency id="StronglyTypedId.Analyzers" version="$version$" />
       <dependency id="StronglyTypedId.Attributes" version="$version$" />
       <dependency id="StronglyTypedId.Generator" version="$version$" />
       <dependency id="CodeGeneration.Roslyn.BuildTime" version="$versionOfCodegenRoslyn$" />

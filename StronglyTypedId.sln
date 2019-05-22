@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StronglyTypedId.Tests", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StronglyTypedId", "src\StronglyTypedId\StronglyTypedId.csproj", "{DC4EFCCE-0BD2-4C69-8A50-0A29A1235AB4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StronglyTypedId.Analyzers", "src\StronglyTypedId.Analyzers\StronglyTypedId.Analyzers.csproj", "{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StronglyTypedId.Attributes", "src\StronglyTypedId.Attributes\StronglyTypedId.Attributes.csproj", "{E4EFCFC3-BA40-4B6B-9AAB-4CCA65A0438B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C4F0391-8A5A-4225-B356-01EFA94672AB}"
@@ -22,9 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		build.cake = build.cake
 		Directory.Build.props = Directory.Build.props
+		README.md = README.md
 		releasenotes.props = releasenotes.props
 		version.props = version.props
-		README.md = README.md
 	EndProjectSection
 EndProject
 Global
@@ -73,18 +71,6 @@ Global
 		{DC4EFCCE-0BD2-4C69-8A50-0A29A1235AB4}.Release|x64.Build.0 = Release|Any CPU
 		{DC4EFCCE-0BD2-4C69-8A50-0A29A1235AB4}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC4EFCCE-0BD2-4C69-8A50-0A29A1235AB4}.Release|x86.Build.0 = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|x64.Build.0 = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Debug|x86.Build.0 = Debug|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|x64.ActiveCfg = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|x64.Build.0 = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|x86.ActiveCfg = Release|Any CPU
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B}.Release|x86.Build.0 = Release|Any CPU
 		{E4EFCFC3-BA40-4B6B-9AAB-4CCA65A0438B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4EFCFC3-BA40-4B6B-9AAB-4CCA65A0438B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4EFCFC3-BA40-4B6B-9AAB-4CCA65A0438B}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -105,7 +91,6 @@ Global
 		{1BEC77EF-3F57-41A2-B252-CDB76E7E06D9} = {EE1258BD-3422-4F55-B9CF-B4D6C95DAD68}
 		{E603CFBB-A04C-4BB3-BED9-EF206E61F94F} = {D1907D86-8FFC-4178-A3DB-0ADBDD282C64}
 		{DC4EFCCE-0BD2-4C69-8A50-0A29A1235AB4} = {EE1258BD-3422-4F55-B9CF-B4D6C95DAD68}
-		{A8AD7FE1-C28F-4A5E-BD4C-AC1873B6A18B} = {EE1258BD-3422-4F55-B9CF-B4D6C95DAD68}
 		{E4EFCFC3-BA40-4B6B-9AAB-4CCA65A0438B} = {EE1258BD-3422-4F55-B9CF-B4D6C95DAD68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
