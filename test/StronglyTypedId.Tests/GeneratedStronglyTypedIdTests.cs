@@ -101,6 +101,5 @@ namespace StronglyTypedId
 
             Assert.Equal(expected, serialized);
         }
-
     }
 }

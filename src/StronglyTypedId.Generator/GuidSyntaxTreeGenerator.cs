@@ -9,7 +9,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace StronglyTypedId.Generator
 {
-    public static class SyntaxTreeGenerator
+    public static class GuidSyntaxTreeGenerator
     {
         // Generated using https://roslynquoter.azurewebsites.net/
         public static SyntaxList<MemberDeclarationSyntax> CreateStronglyTypedIdSyntax(StructDeclarationSyntax original, bool generateJsonConverter)

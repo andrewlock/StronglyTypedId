@@ -1,33 +1,33 @@
-﻿[System.ComponentModel.TypeConverter(typeof(FooIdTypeConverter))]
-[Newtonsoft.Json.JsonConverter(typeof(FooIdJsonConverter))]
-readonly partial struct FooId : System.IComparable<FooId>, System.IEquatable<FooId>
+﻿[System.ComponentModel.TypeConverter(typeof(GuidIdTypeConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(GuidIdJsonConverter))]
+readonly partial struct GuidId : System.IComparable<GuidId>, System.IEquatable<GuidId>
 {
     public System.Guid Value { get; }
 
-    public FooId(System.Guid value)
+    public GuidId(System.Guid value)
     {
         Value = value;
     }
 
-    public static FooId New() => new FooId(System.Guid.NewGuid());
-    public static readonly FooId Empty = new FooId(System.Guid.Empty);
+    public static GuidId New() => new GuidId(System.Guid.NewGuid());
+    public static readonly GuidId Empty = new GuidId(System.Guid.Empty);
 
-    public bool Equals(FooId other) => this.Value.Equals(other.Value);
-    public int CompareTo(FooId other) => Value.CompareTo(other.Value);
+    public bool Equals(GuidId other) => this.Value.Equals(other.Value);
+    public int CompareTo(GuidId other) => Value.CompareTo(other.Value);
 
     public override bool Equals(object obj)
     {
         if (ReferenceEquals(null, obj)) return false;
-        return obj is FooId other && Equals(other);
+        return obj is GuidId other && Equals(other);
     }
 
     public override int GetHashCode() => Value.GetHashCode();
 
     public override string ToString() => Value.ToString();
-    public static bool operator ==(FooId a, FooId b) => a.CompareTo(b) == 0;
-    public static bool operator !=(FooId a, FooId b) => !(a == b);
+    public static bool operator ==(GuidId a, GuidId b) => a.CompareTo(b) == 0;
+    public static bool operator !=(GuidId a, GuidId b) => !(a == b);
 
-    class FooIdTypeConverter : System.ComponentModel.TypeConverter
+    class GuidIdTypeConverter : System.ComponentModel.TypeConverter
     {
         public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
         {
@@ -40,30 +40,30 @@ readonly partial struct FooId : System.IComparable<FooId>, System.IEquatable<Foo
             if (!string.IsNullOrEmpty(stringValue)
                 && System.Guid.TryParse(stringValue, out var guid))
             {
-                return new FooId(guid);
+                return new GuidId(guid);
             }
 
             return base.ConvertFrom(context, culture, value);
         }
     }
 
-    class FooIdJsonConverter : Newtonsoft.Json.JsonConverter
+    class GuidIdJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public override bool CanConvert(System.Type objectType)
         {
-            return objectType == typeof(FooId);
+            return objectType == typeof(GuidId);
         }
 
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
         {
-            var id = (FooId)value;
+            var id = (GuidId)value;
             serializer.Serialize(writer, id.Value);
         }
 
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             var guid = serializer.Deserialize<System.Guid>(reader);
-            return new FooId(guid);
+            return new GuidId(guid);
         }
     }
 }

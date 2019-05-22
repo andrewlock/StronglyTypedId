@@ -11,9 +11,13 @@ public class StronglyTypedIdAttribute : Attribute
     /// Make the struct a strongly typed ID 
     /// </summary>
     /// <param name="generateJsonConverter">If true generates a JsonConverter for the strongly typed ID (requires a reference to Newtonsoft.Json in the project)</param>
-    public StronglyTypedIdAttribute(bool generateJsonConverter = true)
+    /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value. Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
+    public StronglyTypedIdAttribute(
+        bool generateJsonConverter = true, 
+        StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Guid)
     {
         GenerateJsonConverter = generateJsonConverter;
+        BackingType = backingType;
     }
 
     /// <summary>
@@ -21,4 +25,10 @@ public class StronglyTypedIdAttribute : Attribute
     /// (requires a reference to Newtonsoft.Json in the project)
     /// </summary>
     public bool GenerateJsonConverter { get; }
+
+    /// <summary>
+    /// The <see cref="Type"/> to use to store the strongly-typed ID value
+    /// </summary>
+    public StronglyTypedIdBackingType BackingType { get; }
+
 }
