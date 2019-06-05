@@ -8,6 +8,7 @@
     <licenseUrl>$licenseUrl$</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
     <iconUrl>$iconUrl$</iconUrl>
+    <releaseNotes>$releaseNotes$</releaseNotes>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <description>Code generator for [StronglyTypedId]-marked types. Automatically creates backing code for strongly typed IDs. This package references all required and recommended (analyzers) packages. See project site for installation instructions and more details.</description>
     <copyright>$copyright$</copyright>
