@@ -4,7 +4,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/jx3xrd33tc6vo1vn/branch/master?svg=true)](https://ci.appveyor.com/project/andrewlock/stronglytypedid/branch/master)
 [![NuGet](https://img.shields.io/nuget/v/StronglyTypedId.svg)](https://www.nuget.org/packages/StronglyTypedId/)
-[![MyGet CI](https://img.shields.io/myget/andrewlock-ci/v/StronglyTypedId.svg)](http://myget.org/gallery/acndrewlock-ci)
+[![MyGet CI](https://img.shields.io/myget/andrewlock-ci/v/StronglyTypedId.svg)](http://myget.org/gallery/andrewlock-ci)
 
 StronglyTypedId makes creating strongly-typed IDs as easy as adding an attribute! No more [accidentally passing arguments in the wrong order to methods](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem) - StronglyTypedId uses Roslyn-powered build-time code generation to generate [the boilerplate](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#a-full-example-implementation) required to use strongly-typed IDs.
 
