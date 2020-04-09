@@ -7,10 +7,5 @@
     <NuspecFile>StronglyTypedId.nuspec</NuspecFile>
     <NuspecProperties>releaseNotes=$(PackageReleaseNotes);version=$(PackageVersion);authors=$(Authors);licenseUrl=$(PackageLicenseUrl);projectUrl=$(PackageProjectUrl);iconUrl=$(PackageIconUrl);copyright=$(Copyright);tags=$(PackageTags);versionOfCodegenRoslyn=$(CodeGenerationRoslynPackagesVersion);requireLicenseAcceptance=false</NuspecProperties>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="../StronglyTypedId.Attributes/StronglyTypedId.Attributes.csproj" />
-    <NupkgAdditionalDependency Include="StronglyTypedId.Generator" IncludeAssets="all" />
-  </ItemGroup>
-
+  
 </Project>
