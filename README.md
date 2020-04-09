@@ -47,10 +47,7 @@ To install the packages, add the references to your _csproj_ file so that it loo
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="StronglyTypedId" Version="0.2.0" />
-    <PackageReference Include="CodeGeneration.Roslyn.Tool" Version="0.7.63">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="CodeGeneration.Roslyn.Tool" Version="0.7.63" PrivateAssets="all" />
   </ItemGroup>
   <!-- -->
 
@@ -59,7 +56,7 @@ To install the packages, add the references to your _csproj_ file so that it loo
 
 Restore the tools using `dotnet restore`. 
 
-> Note that StronglyTypedId and dotnet-codegen are **build time** dependencies - no extra dll's are added to your project's output! It's as though you wrote standard C# code yourself!
+> Note that StronglyTypedId and CodeGeneration.Roslyn.Tool are **build time** dependencies - no extra dll's are added to your project's output! It's as though you wrote standard C# code yourself!
 
 ## Usage
 
@@ -130,7 +127,7 @@ You can see see example implementations in [the templates folder](/src/StronglyT
 
 The StronglyTypedId NuGet package is a .NET Standard 2.0 package. 
 
-The code generation DotNetCliTool (`dotnet-codegen`) is also required. These kind of tools are only supported in SDK-format _csproj_ projects
+The code generation tool (`CodeGeneration.Roslyn.Tool`) is also required. These kind of tools are only supported in SDK-format _csproj_ projects
 
 The `struct`s you decorate with the `StronglyTypedId` attribute must be marked `partial`.
 
