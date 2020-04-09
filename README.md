@@ -30,7 +30,7 @@ and Roslyn magically generates the backing code when you save the file! Use _Go 
 To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/StronglyTypedId) you must add three packages:
 
 * [StronglyTypedId](https://www.nuget.org/packages/StronglyTypedId)
-* The `dotnet-codegen` .NET Core tool
+* [CodeGeneration.Roslyn.Tool](https://www.nuget.org/packages/CodeGeneration.Roslyn.Tool/)
 * [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/) (optional, only required if [generating a custom `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in ASP.NET Core apps, you will likely already reference this project via transitive dependencies.
 
 To install the packages, add the references to your _csproj_ file so that it looks something like the following:
@@ -40,14 +40,17 @@ To install the packages, add the references to your _csproj_ file so that it loo
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   
   <!-- Add these three packages-->
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="StronglyTypedId" Version="0.1.2" />
-    <DotNetCliToolReference Include="dotnet-codegen" Version="0.5.13" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="StronglyTypedId" Version="0.2.0" />
+    <PackageReference Include="CodeGeneration.Roslyn.Tool" Version="0.7.63">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <!-- -->
 
