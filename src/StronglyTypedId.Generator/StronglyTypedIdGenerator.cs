@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CodeGeneration.Roslyn;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CodeGeneration.Roslyn;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace StronglyTypedId.Generator
 {
@@ -14,12 +11,14 @@ namespace StronglyTypedId.Generator
     {
         private readonly bool _generateJsonConverter;
         private readonly StronglyTypedIdBackingType _backingType;
+        private readonly StronglyTypedIdJsonConverter _jsonProvider;
 
         public StronglyTypedIdGenerator(AttributeData attributeData)
         {
             if (attributeData == null) throw new ArgumentNullException(nameof(attributeData));
             _generateJsonConverter = (bool)attributeData.ConstructorArguments[0].Value;
             _backingType = (StronglyTypedIdBackingType)attributeData.ConstructorArguments[1].Value;
+            _jsonProvider = (StronglyTypedIdJsonConverter)attributeData.ConstructorArguments[2].Value;
         }
 
         public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken)
@@ -43,15 +42,20 @@ namespace StronglyTypedId.Generator
 
         private SyntaxList<MemberDeclarationSyntax> GetSyntax(StructDeclarationSyntax applyToClass)
         {
+            return GetGenerator().CreateStronglyTypedIdSyntax(applyToClass, _generateJsonConverter, _jsonProvider);
+        }
+
+        private BaseSyntaxTreeGenerator GetGenerator()
+        {
             switch (_backingType)
             {
                 case StronglyTypedIdBackingType.Int:
-                    return IntSyntaxTreeGenerator.CreateStronglyTypedIdSyntax(applyToClass, _generateJsonConverter);
+                    return new IntSyntaxTreeGenerator();
                 case StronglyTypedIdBackingType.String:
-                    return StringSyntaxTreeGenerator.CreateStronglyTypedIdSyntax(applyToClass, _generateJsonConverter);
+                    return new StringSyntaxTreeGenerator();
                 case StronglyTypedIdBackingType.Guid:
                 default:
-                    return GuidSyntaxTreeGenerator.CreateStronglyTypedIdSyntax(applyToClass, _generateJsonConverter);
+                    return new GuidSyntaxTreeGenerator();
             }
         }
     }

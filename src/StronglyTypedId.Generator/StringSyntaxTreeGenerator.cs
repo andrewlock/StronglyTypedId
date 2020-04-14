@@ -1,87 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace StronglyTypedId.Generator
 {
-
-    public static class StringSyntaxTreeGenerator
+    public class StringSyntaxTreeGenerator : BaseSyntaxTreeGenerator
     {
-        // Generated using https://roslynquoter.azurewebsites.net/
-        public static SyntaxList<MemberDeclarationSyntax> CreateStronglyTypedIdSyntax(StructDeclarationSyntax original, bool generateJsonConverter)
-        {
-            // Get the name of the decorated member
-            var idName = original.Identifier.ValueText;
-            var typeConverterName = idName + "TypeConverter";
-            var jsonConverterName = idName + "JsonConverter";
-
-            var typeConverterAttribute = GetTypeConverterAttribute(typeConverterName);
-
-            var attributes = generateJsonConverter
-                ? List<AttributeListSyntax>(
-                    new AttributeListSyntax[]
-                    {
-                        typeConverterAttribute,
-                        GetJsonConverterAttribute(jsonConverterName)
-                    })
-                : SingletonList<AttributeListSyntax>(typeConverterAttribute);
-
-            var members = GetMembers(idName)
-                .Append(GetTypeConverter(typeConverterName, idName));
-            if (generateJsonConverter)
-            {
-                members = members.Append(GetJsonConverter(jsonConverterName, idName));
-            }
-
-            return SingletonList<MemberDeclarationSyntax>(
-                StructDeclaration(idName)
-                    .WithAttributeLists(attributes)
-                    .WithModifiers(
-                        TokenList(
-                            new[]
-                            {
-                                Token(SyntaxKind.ReadOnlyKeyword),
-                                Token(SyntaxKind.PartialKeyword)
-                            }))
-                    .WithBaseList(
-                        BaseList(
-                            SeparatedList<BaseTypeSyntax>(
-                                new SyntaxNodeOrToken[]
-                                {
-                                    SimpleBaseType(
-                                        QualifiedName(
-                                            IdentifierName("System"),
-                                            GenericName(
-                                                    Identifier("IComparable"))
-                                                .WithTypeArgumentList(
-                                                    TypeArgumentList(
-                                                        SingletonSeparatedList<TypeSyntax>(
-                                                            IdentifierName(idName)))))),
-                                    Token(SyntaxKind.CommaToken),
-                                    SimpleBaseType(
-                                        QualifiedName(
-                                            IdentifierName("System"),
-                                            GenericName(
-                                                    Identifier("IEquatable"))
-                                                .WithTypeArgumentList(
-                                                    TypeArgumentList(
-                                                        SingletonSeparatedList<TypeSyntax>(
-                                                            IdentifierName(idName))))))
-                                })))
-                    .WithMembers(List<MemberDeclarationSyntax>(members))
-                    .WithCloseBraceToken(
-                        Token(
-                            TriviaList(),
-                            SyntaxKind.CloseBraceToken,
-                            TriviaList())));
-        }
-
-        private static IEnumerable<MemberDeclarationSyntax> GetMembers(string idName)
+        protected override IEnumerable<MemberDeclarationSyntax> GetMembers(string idName)
         {
             yield return PropertyDeclaration(
                         PredefinedType
@@ -547,7 +474,7 @@ namespace StronglyTypedId.Generator
                         Token(SyntaxKind.SemicolonToken));
         }
 
-        private static ClassDeclarationSyntax GetJsonConverter(string jsonConverterName, string idName)
+        protected override ClassDeclarationSyntax GetNewtonsoftJsonConverter(string jsonConverterName, string idName)
         {
             return ClassDeclaration(jsonConverterName)
         .WithBaseList
@@ -835,9 +762,152 @@ namespace StronglyTypedId.Generator
                                                                 Argument
                                                                 (
                                                                     IdentifierName("reader")))))))))))))}));
-            }
+        }
 
-        private static ClassDeclarationSyntax GetTypeConverter(string typeConverterName, string idName)
+        protected override ClassDeclarationSyntax GetSystemTextJsonConverter(string jsonConverterName, string idName)
+        {
+            return ClassDeclaration(jsonConverterName)
+                .WithModifiers(
+                    TokenList(
+                        Token(SyntaxKind.PublicKeyword)))
+                .WithBaseList(
+                    BaseList(
+                        SingletonSeparatedList<BaseTypeSyntax>(
+                            SimpleBaseType(
+                                QualifiedName(
+                                    QualifiedName(
+                                        QualifiedName(
+                                            QualifiedName(
+                                                IdentifierName("System"),
+                                                IdentifierName("Text")),
+                                            IdentifierName("Json")),
+                                        IdentifierName("Serialization")),
+                                    GenericName(
+                                        Identifier("JsonConverter"))
+                                    .WithTypeArgumentList(
+                                        TypeArgumentList(
+                                            SingletonSeparatedList<TypeSyntax>(
+                                                IdentifierName(idName)))))))))
+                .WithMembers(
+                    List<MemberDeclarationSyntax>(
+                        new MemberDeclarationSyntax[]{
+                            MethodDeclaration(
+                                IdentifierName(idName),
+                                Identifier("Read"))
+                            .WithModifiers(
+                                TokenList(
+                                    new []{
+                                        Token(SyntaxKind.PublicKeyword),
+                                        Token(SyntaxKind.OverrideKeyword)}))
+                            .WithParameterList(
+                                ParameterList(
+                                    SeparatedList<ParameterSyntax>(
+                                        new SyntaxNodeOrToken[]{
+                                            Parameter(
+                                                Identifier("reader"))
+                                            .WithModifiers(
+                                                TokenList(
+                                                    Token(SyntaxKind.RefKeyword)))
+                                            .WithType(
+                                                QualifiedName(
+                                                    QualifiedName(
+                                                        QualifiedName(
+                                                            IdentifierName("System"),
+                                                            IdentifierName("Text")),
+                                                        IdentifierName("Json")),
+                                                    IdentifierName("Utf8JsonReader"))),
+                                            Token(SyntaxKind.CommaToken),
+                                            Parameter(
+                                                Identifier("typeToConvert"))
+                                            .WithType(
+                                                QualifiedName(
+                                                    IdentifierName("System"),
+                                                    IdentifierName("Type"))),
+                                            Token(SyntaxKind.CommaToken),
+                                            Parameter(
+                                                Identifier("options"))
+                                            .WithType(
+                                                QualifiedName(
+                                                    QualifiedName(
+                                                        QualifiedName(
+                                                            IdentifierName("System"),
+                                                            IdentifierName("Text")),
+                                                        IdentifierName("Json")),
+                                                    IdentifierName("JsonSerializerOptions")))})))
+                            .WithBody(
+                                Block(
+                                    SingletonList<StatementSyntax>(
+                                        ReturnStatement(
+                                            ObjectCreationExpression(
+                                                IdentifierName(idName))
+                                            .WithArgumentList(
+                                                ArgumentList(
+                                                    SingletonSeparatedList<ArgumentSyntax>(
+                                                        Argument(
+                                                            InvocationExpression(
+                                                                MemberAccessExpression(
+                                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                                    IdentifierName("reader"),
+                                                                    IdentifierName("GetString"))))))))))),
+                            MethodDeclaration(
+                                PredefinedType(
+                                    Token(SyntaxKind.VoidKeyword)),
+                                Identifier("Write"))
+                            .WithModifiers(
+                                TokenList(
+                                    new []{
+                                        Token(SyntaxKind.PublicKeyword),
+                                        Token(SyntaxKind.OverrideKeyword)}))
+                            .WithParameterList(
+                                ParameterList(
+                                    SeparatedList<ParameterSyntax>(
+                                        new SyntaxNodeOrToken[]{
+                                            Parameter(
+                                                Identifier("writer"))
+                                            .WithType(
+                                                QualifiedName(
+                                                    QualifiedName(
+                                                        QualifiedName(
+                                                            IdentifierName("System"),
+                                                            IdentifierName("Text")),
+                                                        IdentifierName("Json")),
+                                                    IdentifierName("Utf8JsonWriter"))),
+                                            Token(SyntaxKind.CommaToken),
+                                            Parameter(
+                                                Identifier("value"))
+                                            .WithType(
+                                                IdentifierName(idName)),
+                                            Token(SyntaxKind.CommaToken),
+                                            Parameter(
+                                                Identifier("options"))
+                                            .WithType(
+                                                QualifiedName(
+                                                    QualifiedName(
+                                                        QualifiedName(
+                                                            IdentifierName("System"),
+                                                            IdentifierName("Text")),
+                                                        IdentifierName("Json")),
+                                                    IdentifierName("JsonSerializerOptions")))})))
+                            .WithBody(
+                                Block(
+                                    SingletonList<StatementSyntax>(
+                                        ExpressionStatement(
+                                            InvocationExpression(
+                                                MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName("writer"),
+                                                    IdentifierName("WriteStringValue")))
+                                            .WithArgumentList(
+                                                ArgumentList(
+                                                    SingletonSeparatedList<ArgumentSyntax>(
+                                                        Argument(
+                                                            MemberAccessExpression(
+                                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                                IdentifierName("value"),
+                                                                IdentifierName("Value"))))))))))}));
+        }
+
+        protected override ClassDeclarationSyntax GetTypeConverter(string typeConverterName, string idName)
         {
             return ClassDeclaration(typeConverterName)
         .WithBaseList(
@@ -1000,42 +1070,6 @@ namespace StronglyTypedId.Generator
                                                 Token(SyntaxKind.CommaToken),
                                                 Argument(
                                                     IdentifierName("value"))}))))))}));
-        }
-
-        private static AttributeListSyntax GetJsonConverterAttribute(string jsonConverterName)
-        {
-            return AttributeList(
-                SingletonSeparatedList<AttributeSyntax>(
-                    Attribute(
-                            QualifiedName(
-                                QualifiedName(
-                                    IdentifierName("Newtonsoft"),
-                                    IdentifierName("Json")),
-                                IdentifierName("JsonConverter")))
-                        .WithArgumentList(
-                            AttributeArgumentList(
-                                SingletonSeparatedList<AttributeArgumentSyntax>(
-                                    AttributeArgument(
-                                        TypeOfExpression(
-                                            IdentifierName(jsonConverterName))))))));
-        }
-
-        private static AttributeListSyntax GetTypeConverterAttribute(string typeConverterName)
-        {
-            return AttributeList(
-                SingletonSeparatedList<AttributeSyntax>(
-                    Attribute(
-                            QualifiedName(
-                                QualifiedName(
-                                    IdentifierName("System"),
-                                    IdentifierName("ComponentModel")),
-                                IdentifierName("TypeConverter")))
-                        .WithArgumentList(
-                            AttributeArgumentList(
-                                SingletonSeparatedList<AttributeArgumentSyntax>(
-                                    AttributeArgument(
-                                        TypeOfExpression(
-                                            IdentifierName(typeConverterName))))))));
         }
     }
 }
