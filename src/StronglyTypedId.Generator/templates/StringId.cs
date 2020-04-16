@@ -65,7 +65,7 @@ readonly partial struct StringId : System.IComparable<StringId>, System.IEquatab
         }
     }
 	
-	public class StringIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<StringId>
+    class StringIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<StringId>
     {
         public override StringId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
         {

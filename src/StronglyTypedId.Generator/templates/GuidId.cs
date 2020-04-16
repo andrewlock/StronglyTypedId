@@ -68,7 +68,7 @@ readonly partial struct GuidId : System.IComparable<GuidId>, System.IEquatable<G
         }
     }
 	
-	public class GuidIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<GuidId>
+    class GuidIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<GuidId>
     {
         public override GuidId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
         {
