@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// JSON framework used to serialize/deserialize strongly-typed ID value
+/// JSON library used to serialize/deserialize strongly-typed ID value
 /// </summary>
 [Flags]
 public enum StronglyTypedIdJsonConverter
