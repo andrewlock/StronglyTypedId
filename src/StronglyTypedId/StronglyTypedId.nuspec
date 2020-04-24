@@ -16,7 +16,6 @@
     <dependencies>
       <dependency id="StronglyTypedId.Attributes" version="$version$" />
       <dependency id="StronglyTypedId.Generator" version="$version$" />
-      <dependency id="CodeGeneration.Roslyn.BuildTime" version="$versionOfCodegenRoslyn$" />
     </dependencies>
   </metadata>
   <files></files>
