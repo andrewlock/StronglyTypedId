@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Sdk Name="CodeGeneration.Roslyn.PluginMetapackage.Sdk" Version="0.7.63" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>StronglyTypedId.nuspec</NuspecFile>
     <NuspecProperties>releaseNotes=$(PackageReleaseNotes);version=$(PackageVersion);authors=$(Authors);licenseUrl=$(PackageLicenseUrl);projectUrl=$(PackageProjectUrl);iconUrl=$(PackageIconUrl);copyright=$(Copyright);tags=$(PackageTags);versionOfCodegenRoslyn=$(CodeGenerationRoslynPackagesVersion);requireLicenseAcceptance=false</NuspecProperties>
   </PropertyGroup>
-
+  
 </Project>
