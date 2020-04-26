@@ -1,5 +1,6 @@
 ﻿[System.ComponentModel.TypeConverter(typeof(IntIdTypeConverter))]
-[Newtonsoft.Json.JsonConverter(typeof(IntIdJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(IntIdNewtonsoftJsonConverter))]
+[System.Text.Json.Serialization.JsonConverter(typeof(IntIdSystemTextJsonConverter))]
 readonly partial struct IntId : System.IComparable<IntId>, System.IEquatable<IntId>
 {
     public int Value { get; }
@@ -44,7 +45,7 @@ readonly partial struct IntId : System.IComparable<IntId>, System.IEquatable<Int
         }
     }
 
-    class IntIdJsonConverter : Newtonsoft.Json.JsonConverter
+    class IntIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public override bool CanConvert(System.Type objectType)
         {
@@ -60,6 +61,19 @@ readonly partial struct IntId : System.IComparable<IntId>, System.IEquatable<Int
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             return new IntId(serializer.Deserialize<int>(reader));
+        }
+    }
+	
+    class IntIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<IntId>
+    {
+        public override IntId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        {
+            return new IntId(reader.GetInt32());
+        }
+
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, IntId value, System.Text.Json.JsonSerializerOptions options)
+        {
+            writer.WriteNumberValue(value.Value);
         }
     }
 }

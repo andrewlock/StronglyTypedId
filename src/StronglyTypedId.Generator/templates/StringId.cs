@@ -1,5 +1,6 @@
 ﻿[System.ComponentModel.TypeConverter(typeof(StringIdTypeConverter))]
-[Newtonsoft.Json.JsonConverter(typeof(StringIdJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(StringIdNewtonsoftJsonConverter))]
+[System.Text.Json.Serialization.JsonConverter(typeof(StringIdSystemTextJsonConverter))]
 readonly partial struct StringId : System.IComparable<StringId>, System.IEquatable<StringId>
 {
     public string Value { get; }
@@ -45,7 +46,7 @@ readonly partial struct StringId : System.IComparable<StringId>, System.IEquatab
         }
     }
 
-    class StringIdJsonConverter : Newtonsoft.Json.JsonConverter
+    class StringIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public override bool CanConvert(System.Type objectType)
         {
@@ -61,6 +62,19 @@ readonly partial struct StringId : System.IComparable<StringId>, System.IEquatab
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             return new StringId(serializer.Deserialize<string>(reader));
+        }
+    }
+	
+    class StringIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<StringId>
+    {
+        public override StringId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        {
+            return new StringId(reader.GetString());
+        }
+
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, StringId value, System.Text.Json.JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.Value);
         }
     }
 }

@@ -12,17 +12,20 @@ public class StronglyTypedIdAttribute : Attribute
     /// </summary>
     /// <param name="generateJsonConverter">If true generates a JsonConverter for the strongly typed ID (requires a reference to Newtonsoft.Json in the project)</param>
     /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value. Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
+    /// <param name="jsonConverter">JSON library used to serialize/deserialize strongly-typed ID value. Defaults to <see cref="StronglyTypedIdJsonConverter.NewtonsoftJson"/></param>
     public StronglyTypedIdAttribute(
         bool generateJsonConverter = true, 
-        StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Guid)
+        StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Guid,
+        StronglyTypedIdJsonConverter jsonConverter = StronglyTypedIdJsonConverter.NewtonsoftJson)
     {
         GenerateJsonConverter = generateJsonConverter;
         BackingType = backingType;
+        JsonConverter = jsonConverter;
     }
 
     /// <summary>
-    /// If true generates a JsonConverter for the strongly typed ID 
-    /// (requires a reference to Newtonsoft.Json in the project)
+    /// If true generates a JsonConverter for the strongly-typed ID 
+    /// (requires a reference to Newtonsoft.Json and/or System.Text.Json in the project)
     /// </summary>
     public bool GenerateJsonConverter { get; }
 
@@ -30,5 +33,10 @@ public class StronglyTypedIdAttribute : Attribute
     /// The <see cref="Type"/> to use to store the strongly-typed ID value
     /// </summary>
     public StronglyTypedIdBackingType BackingType { get; }
+
+    /// <summary>
+    /// JSON library used to serialize/deserialize strongly-typed ID value
+    /// </summary>
+    public StronglyTypedIdJsonConverter JsonConverter { get; }
 
 }

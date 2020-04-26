@@ -1,5 +1,6 @@
 ﻿[System.ComponentModel.TypeConverter(typeof(GuidIdTypeConverter))]
-[Newtonsoft.Json.JsonConverter(typeof(GuidIdJsonConverter))]
+[Newtonsoft.Json.JsonConverter(typeof(GuidIdNewtonsoftJsonConverter))]
+[System.Text.Json.Serialization.JsonConverter(typeof(GuidIdSystemTextJsonConverter))]
 readonly partial struct GuidId : System.IComparable<GuidId>, System.IEquatable<GuidId>
 {
     public System.Guid Value { get; }
@@ -47,7 +48,7 @@ readonly partial struct GuidId : System.IComparable<GuidId>, System.IEquatable<G
         }
     }
 
-    class GuidIdJsonConverter : Newtonsoft.Json.JsonConverter
+    class GuidIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public override bool CanConvert(System.Type objectType)
         {
@@ -64,6 +65,19 @@ readonly partial struct GuidId : System.IComparable<GuidId>, System.IEquatable<G
         {
             var guid = serializer.Deserialize<System.Guid>(reader);
             return new GuidId(guid);
+        }
+    }
+	
+    class GuidIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<GuidId>
+    {
+        public override GuidId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        {
+            return new GuidId(System.Guid.Parse(reader.GetString()));
+        }
+
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GuidId value, System.Text.Json.JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.Value);
         }
     }
 }

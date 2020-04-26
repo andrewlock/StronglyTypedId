@@ -1,8 +1,9 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using StronglyTypedId.Tests.Types;
 using Xunit;
+using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
+using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace StronglyTypedId
+namespace StronglyTypedId.Tests
 {
     public class StringIdTests
     {
@@ -49,48 +50,86 @@ namespace StronglyTypedId
         [Fact]
         public void DifferentTypesAreUnequal()
         {
-            var bar = GeneratedId2.New();
+            var bar = GuidId2.New();
             var foo = new StringId("Value");
 
             //Assert.NotEqual(bar, foo); // does not compile
             Assert.NotEqual((object)bar, (object)foo);
         }
-        
-        [Fact]
-        public void CanSerializeToString()
-        {
-            var value = "value1";
-            var foo = new StringId(value);
 
-            var serializedFoo = JsonConvert.SerializeObject(foo);
-            var serializedString = JsonConvert.SerializeObject(value);
+        [Fact]
+        public void CanSerializeToString_WithNewtonsoftJsonProvider()
+        {
+            var foo = new NewtonsoftJsonStringId("123");
+
+            var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
+            var serializedString = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
 
             Assert.Equal(serializedFoo, serializedString);
         }
 
         [Fact]
-        public void CanSerializeFromString()
+        public void CanSerializeToString_WithSystemTextJsonProvider()
         {
-            var value = "value1";
-            var foo = new StringId(value);
+            var foo = new SystemTextJsonStringId("123");
 
-            var serializedValue = JsonConvert.SerializeObject(value);
-            var deserializedFoo = JsonConvert.DeserializeObject<StringId>(serializedValue);
+            var serializedFoo = SystemTextJsonSerializer.Serialize(foo);
+            var serializedString = SystemTextJsonSerializer.Serialize(foo.Value);
+
+            Assert.Equal(serializedFoo, serializedString);
+        }
+
+        [Fact]
+        public void CanDeserializeFromString_WithNewtonsoftJsonProvider()
+        {
+            var value = "123";
+            var foo = new NewtonsoftJsonStringId(value);
+            var serializedString = NewtonsoftJsonSerializer.SerializeObject(value);
+
+            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<NewtonsoftJsonStringId>(serializedString);
 
             Assert.Equal(foo, deserializedFoo);
         }
 
+        [Fact]
+        public void CanDeserializeFromString_WithSystemTextJsonProvider()
+        {
+            var value = "123";
+            var foo = new SystemTextJsonStringId(value);
+            var serializedString = SystemTextJsonSerializer.Serialize(value);
+
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<SystemTextJsonStringId>(serializedString);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact]
+        public void CanSerializeToString_WithBothJsonConverters()
+        {
+            var foo = new BothJsonStringId("123");
+
+            var serializedFoo1 = NewtonsoftJsonSerializer.SerializeObject(foo);
+            var serializedString1 = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
+
+            var serializedFoo2 = SystemTextJsonSerializer.Serialize(foo);
+            var serializedString2 = SystemTextJsonSerializer.Serialize(foo.Value);
+
+            Assert.Equal(serializedFoo1, serializedString1);
+            Assert.Equal(serializedFoo2, serializedString2);
+        }
 
         [Fact]
         public void WhenNoJsonConverter_SerializesWithValueProperty()
         {
-            var foo = new NoJsonStringId("the value");
+            var foo = new NoJsonStringId("123");
 
-            var serialized = JsonConvert.SerializeObject(foo);
-            var expected = "{\"Value\":\"the value\"}";
+            var serialized1 = NewtonsoftJsonSerializer.SerializeObject(foo);
+            var serialized2 = SystemTextJsonSerializer.Serialize(foo);
 
-            Assert.Equal(expected, serialized);
+            var expected = "{\"Value\":\"" + foo.Value + "\"}";
+
+            Assert.Equal(expected, serialized1);
+            Assert.Equal(expected, serialized2);
         }
-
     }
 }
