@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.0.0]
+## [v0.2.0]
 
 Features:
 
@@ -13,4 +13,4 @@ Features:
 
 Initial release
 
-[v2.0.0]: https://github.com/andrewlock/NetEscapades.AspNetCore.SecurityHeaders/compare/v0.1.0...0.2.0
+[v0.2.0]: https://github.com/andrewlock/NetEscapades.AspNetCore.SecurityHeaders/compare/v0.1.0...0.2.0
