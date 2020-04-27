@@ -6,6 +6,7 @@
 [Flags]
 public enum StronglyTypedIdJsonConverter
 {
-    NewtonsoftJson = 0,
-    SystemTextJson = 1
+    // Used with HasFlag, so needs to be 1, 2, 4 etc
+    NewtonsoftJson = 1,
+    SystemTextJson = 2,
 }
