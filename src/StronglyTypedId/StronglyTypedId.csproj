@@ -1,11 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Add the following element above any others: -->
   <Sdk Name="CodeGeneration.Roslyn.PluginMetapackage.Sdk" Version="0.7.63" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <NuspecFile>StronglyTypedId.nuspec</NuspecFile>
-    <NuspecProperties>releaseNotes=$(PackageReleaseNotes);version=$(PackageVersion);authors=$(Authors);licenseUrl=$(PackageLicenseUrl);projectUrl=$(PackageProjectUrl);iconUrl=$(PackageIconUrl);copyright=$(Copyright);tags=$(PackageTags);versionOfCodegenRoslyn=$(CodeGenerationRoslynPackagesVersion);requireLicenseAcceptance=false</NuspecProperties>
+    <!-- Declare the TargetFramework(s) the same as in your Attributes package -->
+    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <!-- Reference your Attributes project normally -->
+    <ProjectReference Include="../StronglyTypedId.Attributes/StronglyTypedId.Attributes.csproj" />
+    <!--
+      Reference your generators package by adding an item to NupkgAdditionalDependency
+      with IncludeAssets="all" to flow "build" assets.
+      Version used will be the PackageVersion Pack resolves,
+      but you can specify Version metadata to override it.
+
+      This is necessary to do like that, because it ensures the dependency is setup
+      correctly (e.g. simple transient dependency), and skips validation of TFM (Plugin is a tool,
+      it's TFM has no meaning for the consumer).
+    -->
+    <NupkgAdditionalDependency
+        Include="StronglyTypedId.Generator"
+        IncludeAssets="all" />
+  </ItemGroup>
 </Project>
