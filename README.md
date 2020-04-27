@@ -30,8 +30,8 @@ and Roslyn magically generates the backing code when you save the file! Use _Go 
 To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/StronglyTypedId) you must add three packages:
 
 * [StronglyTypedId](https://www.nuget.org/packages/StronglyTypedId)
-* [CodeGeneration.Roslyn.Tool](https://www.nuget.org/packages/CodeGeneration.Roslyn.Tool/)
 * [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/) (optional, only required if [generating a custom `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in ASP.NET Core apps, you will likely already reference this project via transitive dependencies.
+* [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/) (optional, only required if [generating a custom `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in .NET Core apps, you will likely already reference this project via transitive dependencies.
 
 To install the packages, add the references to your _csproj_ file so that it looks something like the following:
 
@@ -47,7 +47,6 @@ To install the packages, add the references to your _csproj_ file so that it loo
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="StronglyTypedId" Version="0.2.0" />
-    <PackageReference Include="CodeGeneration.Roslyn.Tool" Version="0.7.63" PrivateAssets="all" />
   </ItemGroup>
   <!-- -->
 
@@ -67,12 +66,12 @@ To create a strongly-typed ID, create a `partial struct` with the desired name, 
 public partial struct FooId { }
 ```
 
-This generates the "default" strongly-typed ID using a `Guid` backing field, a custom `TypeConverter`, and a custom `JsonConverter`. 
+This generates the "default" strongly-typed ID using a `Guid` backing field, a custom `TypeConverter`, and a custom `JsonConverter` based on Newtonsoft.Json. 
 
 
 ### Removing the Newtonsoft.Json dependency
 
-If you don't want to generate a custom `JsonConverter`, set `generateJsonConverter = false` in the attribute constructor:
+If you don't want to generate custom `JsonConverter`s, set `generateJsonConverter = false` in the attribute constructor:
 
 ```csharp
 [StronglyTypedId(generateJsonConverter: false)] 
@@ -80,6 +79,22 @@ public partial struct NoJsonConverterId { }
 ```
 
 If you don't generate a `JsonConverter`, you don't need the Newtonsoft.Json package dependency, and can remove it from your _.csproj_.
+
+### Generating a System.Text.Json `JsonConverter`
+
+If you wish to generate a _System.Text.Json_ `JsonConverter`s, set `jsonConverter = StronglyTypedIdJsonConverter.SystemTextJson` in the attribute constructor:
+
+```csharp
+[StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)] 
+public partial struct SystemTextJsonConverterId { }
+```
+
+If you wish, you can generate both a _System.Text.Json_ and _Newtonsoft.Json_ converter:
+
+```csharp
+[StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson)] 
+public partial struct BothJsonConverterId { }
+```
 
 ### Using different types as a backing fields
 
