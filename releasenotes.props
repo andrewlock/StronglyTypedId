@@ -1,9 +1,12 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.1.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
       <![CDATA[
 
-Initial release
+Features:
+
+* Added support for .NET Core 3.1, and converted to using CodeGeneration.Roslyn.Tool instead of dotnet-codegen (thanks Bartłomiej Oryszak!)
+* Added support for generating System.Text.Json JsonConverters (thanks Bartłomiej Oryszak!)
 
 ]]>
     </PackageReleaseNotes>
