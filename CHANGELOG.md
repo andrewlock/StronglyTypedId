@@ -8,6 +8,8 @@ Features:
 ](https://github.com/vebbo2))
 * Added support for generating System.Text.Json `JsonConverters` (thanks [Bartłomiej Oryszak
 ](https://github.com/vebbo2))
+* Added support for long backing type (thanks [Bartłomiej Oryszak
+](https://github.com/vebbo2))
 
 ## [v0.1.0]
 
