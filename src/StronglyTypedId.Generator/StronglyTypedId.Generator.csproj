@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Remove="templates\GuidId.cs" />
+    <Compile Remove="templates\LongId.cs" />
     <Compile Remove="templates\StringId.cs" />
     <Compile Remove="templates\IntId.cs" />
   </ItemGroup>

@@ -7,4 +7,5 @@ public enum StronglyTypedIdBackingType
     Guid = 0,
     Int = 1,
     String = 2,
+    Long = 3
 }
