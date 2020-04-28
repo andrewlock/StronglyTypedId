@@ -115,14 +115,14 @@ public partial struct FooId { }
 
 var id = new FooId("my-id-value");
 ```
-Currently supported values are `Guid` (the default), `int`, and `string`.
+Currently supported values are `Guid` (the default), `int`, `long`, and `string`.
 
 
 ## Why do I need this library?
 
 I have [written a blog-post series](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/) on strongly-typed IDs that explains the issues and rational behind this library. For a detailed view, I suggest starting there, but I provide a brief introduction here.
 
-This library is designed to tackle a specific instance of [_primitive obsession_](https://lostechies.com/jimmybogard/2007/12/03/dealing-with-primitive-obsession/), whereby we use primitive objects (`Guid`/`string`/`int` etc) to represent the IDs of domain objects. The problem is that these IDs are all interchangeable - an order ID can be assigned to a product ID, despite the fact that is likely nonsensical from the domain point of view. [See here for a more concrete example](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem).
+This library is designed to tackle a specific instance of [_primitive obsession_](https://lostechies.com/jimmybogard/2007/12/03/dealing-with-primitive-obsession/), whereby we use primitive objects (`Guid`/`string`/`int`/`long` etc) to represent the IDs of domain objects. The problem is that these IDs are all interchangeable - an order ID can be assigned to a product ID, despite the fact that is likely nonsensical from the domain point of view. [See here for a more concrete example](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem).
 
 By using strongly-typed IDs, we give each ID its own `Type` which _wraps_ the underlying primitive value. This ensures you can only use the ID where it makes sense: `ProductId`s can only be assigned to products, or you can only search for products using a `ProductId`, not an `OrderId`.
 
@@ -136,6 +136,7 @@ You can see see example implementations in [the templates folder](/src/StronglyT
 
 * [`Guid` StronglyTypedId](/src/StronglyTypedId.Generator/templates/GuidId.cs)
 * [`int` StronglyTypedId](/src/StronglyTypedId.Generator/templates/IntId.cs)
+* [`long` StronglyTypedId](/src/StronglyTypedId.Generator/templates/LongId.cs)
 * [`String` StronglyTypedId](/src/StronglyTypedId.Generator/templates/StringId.cs)
 
 ## Requirements
