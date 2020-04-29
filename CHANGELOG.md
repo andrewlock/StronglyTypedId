@@ -15,4 +15,4 @@ Features:
 
 Initial release
 
-[v0.2.0]: https://github.com/andrewlock/NetEscapades.AspNetCore.SecurityHeaders/compare/v0.1.0...v0.2.0
+[v0.2.0]: https://github.com/andrewlock/StronglyTypedId/compare/v0.1.0...v0.2.0
