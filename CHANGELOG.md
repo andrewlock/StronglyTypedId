@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.1]
+
+Features:
+
+* Fix Package description
+
 ## [v0.2.0]
 
 Features:
