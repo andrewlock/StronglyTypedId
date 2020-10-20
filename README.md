@@ -46,7 +46,7 @@ To install the packages, add the references to your _csproj_ file so that it loo
   <!-- Add these three packages-->
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="StronglyTypedId" Version="0.2.0" />
+    <PackageReference Include="StronglyTypedId" Version="0.2.2" />
   </ItemGroup>
   <!-- -->
 

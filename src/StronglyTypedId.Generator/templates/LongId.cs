@@ -31,7 +31,7 @@ readonly partial struct LongId : System.IComparable<LongId>, System.IEquatable<L
     {
         public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
         {
-            return sourceType == typeof(int) || base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
         }
 
         public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
@@ -39,6 +39,11 @@ readonly partial struct LongId : System.IComparable<LongId>, System.IEquatable<L
             if (value is int intValue)
             {
                 return new LongId(intValue);
+            }
+
+            if (value is string stringValue && long.TryParse(stringValue, out var parseValue)
+            {
+                return new LongId(parseValue);
             }
 
             return base.ConvertFrom(context, culture, value);
