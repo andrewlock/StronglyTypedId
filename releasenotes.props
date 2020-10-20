@@ -1,13 +1,11 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.2'">
       <![CDATA[
 
-Features:
+Fix:
 
-* Added support for .NET Core 3.1, and converted to using CodeGeneration.Roslyn.Tool instead of dotnet-codegen (thanks Bartłomiej Oryszak!)
-* Added support for generating System.Text.Json JsonConverters (thanks Bartłomiej Oryszak!)
-* Added support for long backing type (thanks Bartłomiej Oryszak!)
+* Fix error using int and long IDs in routing
 
 ]]>
     </PackageReleaseNotes>
