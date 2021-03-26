@@ -12,8 +12,31 @@ readonly partial struct StringId : System.IComparable<StringId>, System.IEquatab
 
     public static readonly StringId Empty = new StringId(string.Empty);
 
-    public bool Equals(StringId other) => this.Value.Equals(other.Value);
-    public int CompareTo(StringId other) => Value.CompareTo(other.Value);
+    public bool Equals(StringId other) 
+    {
+        if (this.Value == null && other.Value == null)
+        {
+            return true;
+        }
+        return Value?.Equals(other.Value) == true;
+    }
+
+    public int CompareTo(StringId other)
+    {
+        if (this.Value == null && other.Value == null)
+        {
+            return 0;
+        }
+        if (this.Value == null)
+        {
+            return -1;
+        }
+        if (other.Value == null)
+        {
+            return 1;
+        }
+        return this.Value.CompareTo(other.Value);
+    }
 
     public override bool Equals(object obj)
     {
@@ -21,9 +44,10 @@ readonly partial struct StringId : System.IComparable<StringId>, System.IEquatab
         return obj is StringId other && Equals(other);
     }
 
-    public override int GetHashCode() => Value.GetHashCode();
+    public override int GetHashCode() => Value == null ? 0 : Value.GetHashCode();
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value?.ToString();
+    
     public static bool operator ==(StringId a, StringId b) => a.CompareTo(b) == 0;
     public static bool operator !=(StringId a, StringId b) => !(a == b);
 
