@@ -1,7 +1,5 @@
-﻿namespace Some.Namespace
-{
-[Newtonsoft.Json.JsonConverter(typeof(MyTestIdNewtonsoftJsonConverter))]
-[System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
+﻿    [Newtonsoft.Json.JsonConverter(typeof(MyTestIdNewtonsoftJsonConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
     [System.ComponentModel.TypeConverter(typeof(MyTestIdTypeConverter))]
     readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>
     {
@@ -83,4 +81,3 @@
             }
         }
     }
-}

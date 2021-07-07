@@ -17,8 +17,8 @@ namespace StronglyTypedIds
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is StructDeclarationSyntax structDeclarationSyntax
-                && structDeclarationSyntax.AttributeLists.Count > 0
+            if (syntaxNode is StructDeclarationSyntax structDeclarationSyntax)
+                if (structDeclarationSyntax.AttributeLists.Count > 0
                 && structDeclarationSyntax.AttributeLists
                     .SelectMany(attrList => attrList.Attributes)
                     .Select(attr => attr.Name.ToString())

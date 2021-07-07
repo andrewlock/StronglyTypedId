@@ -1,5 +1,5 @@
+using System;
 using System.Threading.Tasks;
-using VerifyTests;
 using VerifyXunit;
 using Xunit;
 
@@ -10,9 +10,19 @@ namespace StronglyTypedIds.Tests
     {
         [Theory]
         [InlineData(null)]
-        [InlineData(StronglyTypedIdJsonConverter.NewtonsoftJson)]
-        [InlineData(StronglyTypedIdJsonConverter.SystemTextJson)]
-        [InlineData(StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson)]
+        [InlineData("")]
+        public void ThrowsWhenClassNameIsNullOrEmpty(string idName)
+        {
+            const string idNamespace = "Some.Namespace";
+            Assert.Throws<ArgumentException>(() => Sources.CreateGuidId(
+                idName: idName,
+                idNamespace: idNamespace,
+                jsonConverter: null
+            ));
+        }
+
+        [Theory]
+        [MemberData(nameof(Converters))]
         public Task GeneratesGuidCorrectly(StronglyTypedIdJsonConverter? converter)
         {
             const string idNamespace = "Some.Namespace";
@@ -24,7 +34,32 @@ namespace StronglyTypedIds.Tests
             );
 
             return Verifier.Verify(result)
+                .UseDirectory("Snapshots")
                 .UseParameters(converter);
         }
+
+        [Theory]
+        [MemberData(nameof(Converters))]
+        public Task GeneratesGuidInGlobalNamespaceCorrectly(StronglyTypedIdJsonConverter? converter)
+        {
+            const string idName = "MyTestId";
+            var result = Sources.CreateGuidId(
+                idName: idName,
+                idNamespace: string.Empty,
+                jsonConverter: converter
+            );
+
+            return Verifier.Verify(result)
+                .UseDirectory("Snapshots")
+                .UseParameters(converter);
+        }
+
+        public static TheoryData<StronglyTypedIdJsonConverter?> Converters => new()
+        {
+            null,
+            StronglyTypedIdJsonConverter.NewtonsoftJson,
+            StronglyTypedIdJsonConverter.SystemTextJson,
+            StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson,
+        };
     }
 }

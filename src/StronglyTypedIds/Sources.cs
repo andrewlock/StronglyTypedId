@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -17,42 +16,8 @@ namespace StronglyTypedIds
         private static readonly string GuidNewtonsoftBase = LoadEmbeddedResource($"{nameof(StronglyTypedIds)}.Templates.Guid.Guid_NewtonsoftJsonConverter.cs");
         private static readonly string GuidSystemTextJsonBase = LoadEmbeddedResource($"{nameof(StronglyTypedIds)}.Templates.Guid.Guid_SystemTextJsonConverter.cs");
 
-        private const string NewtonsoftJsonAttributeSource = "[Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
-        private const string SystemTextJsonAttributeSource = "[System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
-
-        public static string CreateTagsList(
-            string classNamespace,
-            string className,
-            IList<(string Property, string Tag)> propertyNames)
-        {
-            var sb = new StringBuilder();
-            sb.Append("namespace ").Append(classNamespace).Append(@"
-{
-    partial class " + className + @"
-    {
-        public string GetTag(string key)
-        {
-            ");
-
-            for (int i = 0; i < propertyNames.Count; i++)
-            {
-                var (property, tag) = propertyNames[i];
-                sb.Append(i == 0 ? "if" : "else if");
-                sb.Append($@" (key == ""{tag}"")");
-                sb.Append($@"
-            {{
-                return {property};
-            }}
-            ");
-            }
-
-            sb.Append(@"
-            return GetTagFromDictionary(key);
-        }
-    }
-}");
-            return sb.ToString();
-        }
+        private const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
+        private const string SystemTextJsonAttributeSource = "    [System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
 
         public static string CreateGuidId(
             string idNamespace,
@@ -60,15 +25,25 @@ namespace StronglyTypedIds
             StronglyTypedIdJsonConverter? jsonConverter
         )
         {
+            if (string.IsNullOrEmpty(idName))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(idName));
+            }
+
+            var hasNamespace = !string.IsNullOrEmpty(idNamespace);
+
             var useNewtonsoftJson = jsonConverter is not null && jsonConverter.Value.HasFlag(StronglyTypedIdJsonConverter.NewtonsoftJson);
             var useSystemTextJson = jsonConverter is not null && jsonConverter.Value.HasFlag(StronglyTypedIdJsonConverter.SystemTextJson);
             var sb = new StringBuilder();
-            sb
-                .Append("namespace ")
-                .Append(idNamespace)
-                .Append(@"
-{
-");
+            if (hasNamespace)
+            {
+                sb
+                    .Append("namespace ")
+                    .Append(idNamespace)
+                    .AppendLine(@"
+{");
+            }
+
             if (useNewtonsoftJson)
             {
                 sb.AppendLine(NewtonsoftJsonAttributeSource);
@@ -92,8 +67,11 @@ namespace StronglyTypedIds
             }
 
             sb.Replace("TESTID", idName);
-            sb.AppendLine(@"    }
-}");
+            sb.AppendLine(@"    }");
+            if (hasNamespace)
+            {
+                sb.Append('}').AppendLine();
+            }
             return sb.ToString();
         }
 
