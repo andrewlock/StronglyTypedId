@@ -20,7 +20,7 @@ namespace StronglyTypedIds.Tests
                 receiver.OnVisitSyntaxNode(node);
             }
 
-            Assert.Equal(expectedPropertyCounts, receiver.StronglyTypedIdStructs.Count);
+            Assert.Equal(expectedPropertyCounts, receiver.Targets.Count);
         }
 
         public static class Data

@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using StronglyTypedIds.Diagnostics;
+using StronglyTypedIds.Tests.Diagnostics;
 using Xunit;
 
 namespace StronglyTypedIds.Tests
@@ -77,6 +79,47 @@ public partial struct TestId2 {}
             var information = GetInformation(code);
 
             Assert.Empty(information.Ids);
+        }
+
+        [Fact]
+        public void AddsDiagnosticWhenNoPartial()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[StronglyTypedId]
+public struct TestId1 {}
+";
+
+            var information = GetInformation(code);
+
+            var id = Assert.Single(information.Ids);
+            Assert.Equal("TestId1", id.Key.Name);
+            var diag = id.Value.Diagnostics;
+            Assert.NotEmpty(diag);
+            Assert.Single(diag, x => x.Id == NotPartialDiagnostic.Id);
+        }
+
+        [Fact]
+        public void AddsDiagnosticWhenNested()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+public class Outer
+{
+    [StronglyTypedId]
+    public partial struct TestId1 {}
+}
+";
+
+            var information = GetInformation(code);
+
+            var id = Assert.Single(information.Ids);
+            Assert.Equal("TestId1", id.Key.Name);
+            var diag = id.Value.Diagnostics;
+            Assert.NotEmpty(diag);
+            Assert.Single(diag, x => x.Id == NestedTypeDiagnostic.Id);
         }
 
         private static StronglyTypedIdInformation GetInformation(string source)

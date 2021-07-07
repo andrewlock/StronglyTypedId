@@ -13,7 +13,7 @@ namespace StronglyTypedIds
         public static readonly string StronglyTypedIdAttributeShortName = nameof(StronglyTypedIdAttribute)
             .Replace(nameof(Attribute), string.Empty);
 
-        public List<StructDeclarationSyntax> StronglyTypedIdStructs { get; } = new();
+        public List<(SyntaxNode Origin, StructDeclarationSyntax Declaration)> Targets { get; } = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -23,9 +23,9 @@ namespace StronglyTypedIds
                     .SelectMany(attrList => attrList.Attributes)
                     .Select(attr => attr.Name.ToString())
                     .Any(attrName => attrName == StronglyTypedIdAttributeShortName || attrName == StronglyTypedIdAttributeName))
-            {
-                StronglyTypedIdStructs.Add(structDeclarationSyntax);
-            }
+                {
+                    Targets.Add((syntaxNode, structDeclarationSyntax));
+                }
         }
     }
 }

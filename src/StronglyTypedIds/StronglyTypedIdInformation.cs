@@ -2,9 +2,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using StronglyTypedIds.Diagnostics;
 using IdInfo = System.Collections.Immutable.ImmutableDictionary<Microsoft.CodeAnalysis.ITypeSymbol,
-    (bool GenerateJsonConverter, StronglyTypedIds.StronglyTypedIdBackingType BackingType, StronglyTypedIds.StronglyTypedIdJsonConverter JsonConverter)>;
+    (System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.Diagnostic> Diagnostics,
+    bool GenerateJsonConverter,
+    StronglyTypedIds.StronglyTypedIdBackingType BackingType,
+    StronglyTypedIds.StronglyTypedIdJsonConverter JsonConverter)>;
 
 namespace StronglyTypedIds
 {
@@ -19,13 +24,13 @@ namespace StronglyTypedIds
 
         public static StronglyTypedIdInformation Create(StronglyTypedIdReceiver receiver, Compilation compilation)
         {
-            var builder = ImmutableDictionary.CreateBuilder<ITypeSymbol, (bool, StronglyTypedIdBackingType, StronglyTypedIdJsonConverter)>(SymbolEqualityComparer.Default);
-            PopulateIdInfo(receiver.StronglyTypedIdStructs, compilation, builder);
+            var builder = ImmutableDictionary.CreateBuilder<ITypeSymbol, (ImmutableArray<Diagnostic>, bool, StronglyTypedIdBackingType, StronglyTypedIdJsonConverter)>(SymbolEqualityComparer.Default);
+            PopulateIdInfo(receiver.Targets, compilation, builder);
             return new StronglyTypedIdInformation(builder.ToImmutable());
         }
 
         private static void PopulateIdInfo(
-            List<StructDeclarationSyntax> structDeclarations,
+            List<(SyntaxNode Origin, StructDeclarationSyntax Declaration)> targets,
             Compilation compilation,
             IdInfo.Builder idInfo)
         {
@@ -36,10 +41,12 @@ namespace StronglyTypedIds
                 return;
             }
 
-            foreach (var structDeclaration in structDeclarations)
+            foreach (var target in targets)
             {
+                var structDeclaration = target.Declaration;
                 var model = compilation.GetSemanticModel(structDeclaration.SyntaxTree);
-                var source = model.GetDeclaredSymbol(structDeclaration);
+                var source = ModelExtensions.GetDeclaredSymbol(model, structDeclaration);
+                var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
                 if (source is ITypeSymbol structSymbol)
                 {
@@ -51,13 +58,24 @@ namespace StronglyTypedIds
                         return; // name clash, or error
                     }
 
+                    if (structDeclaration.Modifiers.Any(x => !x.IsKind(SyntaxKind.PartialKeyword))
+                        && structSymbol.Locations.Length == 1)
+                    {
+                        diagnostics.Add(NotPartialDiagnostic.Create(target.Origin));
+                    }
+
+                    if (structSymbol.ContainingType is not null)
+                    {
+                        diagnostics.Add(NestedTypeDiagnostic.Create(target.Origin));
+                    }
+
                     var positionalArgs = stronglyTypedIdAttribute.ConstructorArguments;
                     var namedArgs = stronglyTypedIdAttribute.NamedArguments;
                     var generateJsonConverter = GetValueFromConstructorArguments(positionalArgs, namedArgs, true, 0, "generateJsonConverter");
                     var backingType = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdBackingType.Guid, 1, "backingType");
                     var jsonConverter = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdJsonConverter.NewtonsoftJson, 2, "backingType");
 
-                    idInfo.Add(structSymbol, (generateJsonConverter, backingType, jsonConverter));
+                    idInfo.Add(structSymbol, (diagnostics.ToImmutable(), generateJsonConverter, backingType, jsonConverter));
                 }
             }
         }
