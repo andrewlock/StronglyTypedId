@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -31,6 +33,21 @@ namespace StronglyTypedIds.Tests
             var trees = outputCompilation.SyntaxTrees.ToList();
 
             return (diagnostics, trees.Count != originalTreeCount ? trees[^1].ToString() : string.Empty);
+        }
+
+        internal static string LoadEmbeddedResource(string resourceName)
+        {
+            var assembly = typeof(TestHelpers).Assembly;
+            var resourceStream = assembly.GetManifestResourceStream(resourceName);
+            if (resourceStream is null)
+            {
+                var existingResources = assembly.GetManifestResourceNames();
+                throw new ArgumentException($"Could not find embedded resource {resourceName}. Available names: {string.Join(", ", existingResources)}");
+            }
+
+            using var reader = new StreamReader(resourceStream, Encoding.UTF8);
+
+            return reader.ReadToEnd();
         }
     }
 }

@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Sources\*.cs" Link="Sources\%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>
