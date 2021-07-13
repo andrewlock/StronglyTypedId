@@ -131,17 +131,27 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void WhenNoJsonConverter_SerializesWithValueProperty()
+        public void WhenNoJsonConverter_SystemTextJsonSerializesWithValueProperty()
         {
             var foo = NoJsonGuidId.New();
 
-            var serialized1 = NewtonsoftJsonSerializer.SerializeObject(foo);
-            var serialized2 = SystemTextJsonSerializer.Serialize(foo);
+            var serialized = SystemTextJsonSerializer.Serialize(foo);
 
             var expected = "{\"Value\":\"" + foo.Value + "\"}";
 
-            Assert.Equal(expected, serialized1);
-            Assert.Equal(expected, serialized2);
+            Assert.Equal(expected, serialized);
+        }
+
+        [Fact]
+        public void WhenNoJsonConverter_NewtonsoftSerializesWithoutValueProperty()
+        {
+            var foo = NoJsonGuidId.New();
+
+            var serialized = NewtonsoftJsonSerializer.SerializeObject(foo);
+
+            var expected =  $"\"{foo.Value}\"";
+
+            Assert.Equal(expected, serialized);
         }
     }
 }

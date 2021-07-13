@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using StronglyTypedIds.Diagnostics;
-using StronglyTypedIds.Tests.Diagnostics;
+using StronglyTypedIds.Sources;
 using Xunit;
 
 namespace StronglyTypedIds.Tests
@@ -124,14 +124,14 @@ public class Outer
 
         private static StronglyTypedIdInformation GetInformation(string source)
         {
-            var attributeSyntaxTree = CSharpSyntaxTree.ParseText(Sources.StronglyTypedIdAttributeSource);
-            var backingTypeSyntaxTree = CSharpSyntaxTree.ParseText(Sources.StronglyTypedIdBackingTypeSource);
-            var converterTree = CSharpSyntaxTree.ParseText(Sources.StronglyTypedIdJsonConverterSource);
+            var attributeSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdAttributeSource);
+            var backingTypeSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdBackingTypeSource);
+            var converterTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdJsonConverterSource);
             var sourceSyntaxTree = CSharpSyntaxTree.ParseText(source);
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
                 .Select(_ => MetadataReference.CreateFromFile(_.Location))
-                .Concat(new[] { MetadataReference.CreateFromFile(typeof(Sources).Assembly.Location) });
+                .Concat(new[] { MetadataReference.CreateFromFile(typeof(EmbeddedSources).Assembly.Location) });
 
             var compilation = CSharpCompilation.Create(
                 "generator",

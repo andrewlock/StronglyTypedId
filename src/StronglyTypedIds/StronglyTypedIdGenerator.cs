@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using StronglyTypedIds.Sources;
 
 namespace StronglyTypedIds
 {
@@ -16,9 +17,9 @@ namespace StronglyTypedIds
             // Register the attribute and enum sources
             context.RegisterForPostInitialization((i) =>
             {
-                i.AddSource("StronglyTypedIdAttribute", Sources.StronglyTypedIdAttributeSource);
-                i.AddSource("StronglyTypedIdBackingType", Sources.StronglyTypedIdBackingTypeSource);
-                i.AddSource("StronglyTypedIdJsonConverter", Sources.StronglyTypedIdJsonConverterSource);
+                i.AddSource("StronglyTypedIdAttribute", EmbeddedSources.StronglyTypedIdAttributeSource);
+                i.AddSource("StronglyTypedIdBackingType", EmbeddedSources.StronglyTypedIdBackingTypeSource);
+                i.AddSource("StronglyTypedIdJsonConverter", EmbeddedSources.StronglyTypedIdJsonConverterSource);
             });
 
             // Register a syntax receiver that will be created for each generation pass
@@ -72,7 +73,7 @@ namespace StronglyTypedIds
                 var converter = info.GenerateJsonConverter ? info.JsonConverter : (StronglyTypedIdJsonConverter?) null;
                 var source = info.BackingType switch
                 {
-                    StronglyTypedIdBackingType.Guid => Sources.CreateGuidId(classNameSpace, className, converter),
+                    StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, converter),
                     _ => string.Empty,
                 };
 

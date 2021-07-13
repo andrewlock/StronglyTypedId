@@ -5,11 +5,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using StronglyTypedIds.Diagnostics;
+using StronglyTypedIds.Sources;
 using IdInfo = System.Collections.Immutable.ImmutableDictionary<Microsoft.CodeAnalysis.ITypeSymbol,
     (System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.Diagnostic> Diagnostics,
     bool GenerateJsonConverter,
-    StronglyTypedIds.StronglyTypedIdBackingType BackingType,
-    StronglyTypedIds.StronglyTypedIdJsonConverter JsonConverter)>;
+    StronglyTypedIds.Sources.StronglyTypedIdBackingType BackingType,
+    StronglyTypedIds.Sources.StronglyTypedIdJsonConverter JsonConverter)>;
 
 namespace StronglyTypedIds
 {

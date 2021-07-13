@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using StronglyTypedIds.Sources;
 using VerifyXunit;
 using Xunit;
 
@@ -14,7 +15,7 @@ namespace StronglyTypedIds.Tests
         public void ThrowsWhenClassNameIsNullOrEmpty(string idName)
         {
             const string idNamespace = "Some.Namespace";
-            Assert.Throws<ArgumentException>(() => Sources.CreateGuidId(
+            Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateGuidId(
                 idName: idName,
                 idNamespace: idNamespace,
                 jsonConverter: null
@@ -27,7 +28,7 @@ namespace StronglyTypedIds.Tests
         {
             const string idNamespace = "Some.Namespace";
             const string idName = "MyTestId";
-            var result = Sources.CreateGuidId(
+            var result = SourceGenerationHelper.CreateGuidId(
                 idName: idName,
                 idNamespace: idNamespace,
                 jsonConverter: converter
@@ -43,7 +44,7 @@ namespace StronglyTypedIds.Tests
         public Task GeneratesGuidInGlobalNamespaceCorrectly(StronglyTypedIdJsonConverter? converter)
         {
             const string idName = "MyTestId";
-            var result = Sources.CreateGuidId(
+            var result = SourceGenerationHelper.CreateGuidId(
                 idName: idName,
                 idNamespace: string.Empty,
                 jsonConverter: converter

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StronglyTypedIds.Sources
+namespace StronglyTypedIds
 {
     /// <summary>
     /// The <see cref="Type"/> to use to store the value of a strongly-typed ID

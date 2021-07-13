@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

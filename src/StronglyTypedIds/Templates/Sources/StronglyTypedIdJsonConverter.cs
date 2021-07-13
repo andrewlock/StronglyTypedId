@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StronglyTypedIds.Sources
+namespace StronglyTypedIds
 {
     /// <summary>
     /// JSON library used to serialize/deserialize strongly-typed ID value
