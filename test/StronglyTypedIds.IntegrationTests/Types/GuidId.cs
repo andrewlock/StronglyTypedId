@@ -1,5 +1,4 @@
 ﻿using StronglyTypedIds;
-using StronglyTypedIds.Sources;
 
 namespace StronglyTypedIds.IntegrationTests.Types
 {

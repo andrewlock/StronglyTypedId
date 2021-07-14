@@ -6,11 +6,31 @@ namespace StronglyTypedIds
 {
     internal static class SourceGenerationHelper
     {
-        public static string CreateGuidId(
+        public static string CreateGuidId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+            CreateId(
+                idNamespace,
+                idName,
+                jsonConverter,
+                EmbeddedSources.GuidBase,
+                EmbeddedSources.GuidNewtonsoftBase,
+                EmbeddedSources.GuidSystemTextJsonBase);
+
+        public static string CreateIntId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+            CreateId(
+                idNamespace,
+                idName,
+                jsonConverter,
+                EmbeddedSources.IntBase,
+                EmbeddedSources.IntNewtonsoftBase,
+                EmbeddedSources.IntSystemTextJsonBase);
+
+        static string CreateId(
             string idNamespace,
             string idName,
-            StronglyTypedIdJsonConverter? jsonConverter
-        )
+            StronglyTypedIdJsonConverter? jsonConverter,
+            string baseSource,
+            string newtonsoftSource,
+            string systemTextSource)
         {
             if (string.IsNullOrEmpty(idName))
             {
@@ -41,16 +61,16 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.SystemTextJsonAttributeSource);
             }
 
-            sb.Append(EmbeddedSources.GuidBase);
+            sb.Append(baseSource);
 
             if (useNewtonsoftJson)
             {
-                sb.AppendLine(EmbeddedSources.GuidNewtonsoftBase);
+                sb.AppendLine(newtonsoftSource);
             }
 
             if (useSystemTextJson)
             {
-                sb.AppendLine(EmbeddedSources.GuidSystemTextJsonBase);
+                sb.AppendLine(systemTextSource);
             }
 
             sb.Replace("TESTID", idName);
@@ -59,6 +79,7 @@ namespace StronglyTypedIds
             {
                 sb.Append('}').AppendLine();
             }
+
             return sb.ToString();
         }
     }

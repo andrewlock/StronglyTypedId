@@ -74,6 +74,7 @@ namespace StronglyTypedIds
                 var source = info.BackingType switch
                 {
                     StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, converter),
+                    StronglyTypedIdBackingType.Int => SourceGenerationHelper.CreateIntId(classNameSpace, className, converter),
                     _ => string.Empty,
                 };
 
