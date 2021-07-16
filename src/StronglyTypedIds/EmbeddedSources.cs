@@ -20,6 +20,10 @@ namespace StronglyTypedIds
         internal static readonly string IntNewtonsoftBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_NewtonsoftJsonConverter.cs");
         internal static readonly string IntSystemTextJsonBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SystemTextJsonConverter.cs");
 
+        internal static readonly string LongBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Base.cs");
+        internal static readonly string LongNewtonsoftBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_NewtonsoftJsonConverter.cs");
+        internal static readonly string LongSystemTextJsonBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SystemTextJsonConverter.cs");
+
         internal const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
         internal const string SystemTextJsonAttributeSource = "    [System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
 
