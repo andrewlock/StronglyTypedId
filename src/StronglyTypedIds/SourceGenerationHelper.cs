@@ -33,6 +33,15 @@ namespace StronglyTypedIds
                 EmbeddedSources.LongNewtonsoftBase,
                 EmbeddedSources.LongSystemTextJsonBase);
 
+        public static string CreateStringId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+            CreateId(
+                idNamespace,
+                idName,
+                jsonConverter,
+                EmbeddedSources.StringBase,
+                EmbeddedSources.StringNewtonsoftBase,
+                EmbeddedSources.StringSystemTextJsonBase);
+
         static string CreateId(
             string idNamespace,
             string idName,

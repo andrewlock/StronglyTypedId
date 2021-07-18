@@ -21,6 +21,7 @@ namespace StronglyTypedIds.Tests
 
             Assert.Equal(embeddedInGenerator, compiledInGenerator);
         }
+
         [Fact]
         public void StronglyTypedIdJsonConverterSource_IsSameAsCompiledSource()
         {
@@ -29,7 +30,6 @@ namespace StronglyTypedIds.Tests
 
             Assert.Equal(embeddedInGenerator, compiledInGenerator);
         }
-
 
         static string GetCompiledResource(string filename)
         {

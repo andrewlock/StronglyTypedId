@@ -76,6 +76,7 @@ namespace StronglyTypedIds
                     StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, converter),
                     StronglyTypedIdBackingType.Int => SourceGenerationHelper.CreateIntId(classNameSpace, className, converter),
                     StronglyTypedIdBackingType.Long => SourceGenerationHelper.CreateLongId(classNameSpace, className, converter),
+                    StronglyTypedIdBackingType.String => SourceGenerationHelper.CreateStringId(classNameSpace, className, converter),
                     _ => string.Empty,
                 };
 
