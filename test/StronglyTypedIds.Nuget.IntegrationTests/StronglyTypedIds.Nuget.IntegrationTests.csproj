@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <Compile Include="..\StronglyTypedIds.IntegrationTests\*.cs" Link="%(Filename)%(Extension)" />
+    <Compile Include="..\StronglyTypedIds.IntegrationTests\Types\*.cs" Link="Types\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="StronglyTypedIds" Version="1.0.0-beta01" />
     <PackageReference Include="System.Text.Json" Version="4.7.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />

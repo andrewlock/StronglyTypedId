@@ -21,7 +21,7 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageOutputPath>$(SolutionDir)/artifacts</PackageOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)\artifacts</PackageOutputPath>
   </PropertyGroup>
 
   <Import Project="releasenotes.props" />
