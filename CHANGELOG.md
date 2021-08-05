@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.0.0-beta01]
+
+Features: 
+
+* Convert package to use source generators instead of CodeGeneration.Roslyn
+
+Breaking Changes
+* `[StronglyTypedId]` attribute now exists in the `StronglyTypedIds` namespace, so you must add a `using` statement to your app
+* Requires .NET Core 5 SDK+ 
+
 ## [v0.2.1]
 
 Features:

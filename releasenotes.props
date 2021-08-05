@@ -1,13 +1,15 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">
       <![CDATA[
 
 Features:
 
-* Added support for .NET Core 3.1, and converted to using CodeGeneration.Roslyn.Tool instead of dotnet-codegen (thanks Bartłomiej Oryszak!)
-* Added support for generating System.Text.Json JsonConverters (thanks Bartłomiej Oryszak!)
-* Added support for long backing type (thanks Bartłomiej Oryszak!)
+* Convert package to use source generators instead of CodeGeneration.Roslyn
+
+Breaking Changes
+* `[StronglyTypedId]` attribute now exists in the `StronglyTypedIds` namespace, so you must add a `using` statement to your app
+* Requires .NET Core 5 SDK+
 
 ]]>
     </PackageReleaseNotes>
