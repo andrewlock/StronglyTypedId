@@ -141,5 +141,19 @@ namespace StronglyTypedIds.IntegrationTests
 
             Assert.Equal(expected, serialized);
         }
+
+        [Fact]
+        public void WhenNoTypeConverter_SerializesWithValueProperty()
+        {
+            var foo = new NoConverterLongId(123);
+
+            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
+            var systemText = SystemTextJsonSerializer.Serialize(foo);
+
+            var expected = "{\"Value\":" + foo.Value + "}";
+
+            Assert.Equal(expected, newtonsoft);
+            Assert.Equal(expected, systemText);
+        }
     }
 }

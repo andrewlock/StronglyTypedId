@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using StronglyTypedIds.Sources;
 using VerifyXunit;
@@ -18,20 +20,20 @@ namespace StronglyTypedIds.Tests
             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateIntId(
                 idName: idName,
                 idNamespace: idNamespace,
-                jsonConverter: null
+                converters: StronglyTypedIdConverter.None
             ));
         }
 
         [Theory]
         [MemberData(nameof(Converters))]
-        public Task GeneratesIntCorrectly(StronglyTypedIdJsonConverter? converter)
+        public Task GeneratesIntCorrectly(StronglyTypedIdConverter converter)
         {
             const string idNamespace = "Some.Namespace";
             const string idName = "MyTestId";
             var result = SourceGenerationHelper.CreateIntId(
                 idName: idName,
                 idNamespace: idNamespace,
-                jsonConverter: converter
+                converters: converter
             );
 
             return Verifier.Verify(result)
@@ -41,13 +43,13 @@ namespace StronglyTypedIds.Tests
 
         [Theory]
         [MemberData(nameof(Converters))]
-        public Task GeneratesIntInGlobalNamespaceCorrectly(StronglyTypedIdJsonConverter? converter)
+        public Task GeneratesIntInGlobalNamespaceCorrectly(StronglyTypedIdConverter converter)
         {
             const string idName = "MyTestId";
             var result = SourceGenerationHelper.CreateIntId(
                 idName: idName,
                 idNamespace: string.Empty,
-                jsonConverter: converter
+                converters: converter
             );
 
             return Verifier.Verify(result)
@@ -55,12 +57,7 @@ namespace StronglyTypedIds.Tests
                 .UseParameters(converter);
         }
 
-        public static TheoryData<StronglyTypedIdJsonConverter?> Converters => new()
-        {
-            null,
-            StronglyTypedIdJsonConverter.NewtonsoftJson,
-            StronglyTypedIdJsonConverter.SystemTextJson,
-            StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson,
-        };
+        public static IEnumerable<object[]> Converters =>
+            EnumHelper.AllConverters(includeDefault: false).Select(x => new object[] { x });
     }
 }

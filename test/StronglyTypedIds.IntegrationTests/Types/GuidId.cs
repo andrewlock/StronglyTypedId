@@ -8,15 +8,18 @@ namespace StronglyTypedIds.IntegrationTests.Types
     [StronglyTypedId]
     public partial struct GuidId2 { }
 
-    [StronglyTypedId(generateJsonConverter: false)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.None)]
+    public partial struct NoConverterGuidId { }
+
+    [StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter)]
     public partial struct NoJsonGuidId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.NewtonsoftJson)]
     public partial struct NewtonsoftJsonGuidId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson)]
     public partial struct SystemTextJsonGuidId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson)]
     public partial struct BothJsonGuidId { }
 }

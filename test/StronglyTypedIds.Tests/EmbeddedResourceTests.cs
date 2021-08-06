@@ -14,6 +14,15 @@ namespace StronglyTypedIds.Tests
         }
 
         [Fact]
+        public void StronglyTypedIdDefaultsAttributeSource_IsSameAsCompiledSource()
+        {
+            var embeddedInGenerator = EmbeddedSources.StronglyTypedIdDefaultsAttributeSource;
+            var compiledInGenerator = GetCompiledResource("StronglyTypedIdDefaultsAttribute");
+
+            Assert.Equal(embeddedInGenerator, compiledInGenerator);
+        }
+
+        [Fact]
         public void StronglyTypedIdBackingTypeSource_IsSameAsCompiledSource()
         {
             var embeddedInGenerator = EmbeddedSources.StronglyTypedIdBackingTypeSource;
@@ -23,10 +32,10 @@ namespace StronglyTypedIds.Tests
         }
 
         [Fact]
-        public void StronglyTypedIdJsonConverterSource_IsSameAsCompiledSource()
+        public void StronglyTypedIdConverterSource_IsSameAsCompiledSource()
         {
-            var embeddedInGenerator = EmbeddedSources.StronglyTypedIdJsonConverterSource;
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdJsonConverter");
+            var embeddedInGenerator = EmbeddedSources.StronglyTypedIdConverterSource;
+            var compiledInGenerator = GetCompiledResource("StronglyTypedIdConverter");
 
             Assert.Equal(embeddedInGenerator, compiledInGenerator);
         }

@@ -5,15 +5,18 @@ namespace StronglyTypedIds.IntegrationTests.Types
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long)]
     partial struct LongId { }
 
-    [StronglyTypedId(generateJsonConverter: false, backingType: StronglyTypedIdBackingType.Long)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.None, backingType: StronglyTypedIdBackingType.Long)]
+    public partial struct NoConverterLongId { }
+
+    [StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct NoJsonLongId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson, backingType: StronglyTypedIdBackingType.Long)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.NewtonsoftJson, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct NewtonsoftJsonLongId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson, backingType: StronglyTypedIdBackingType.Long)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.SystemTextJson, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct SystemTextJsonLongId { }
 
-    [StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson, backingType: StronglyTypedIdBackingType.Long)]
+    [StronglyTypedId(converters: StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct BothJsonLongId { }
 }

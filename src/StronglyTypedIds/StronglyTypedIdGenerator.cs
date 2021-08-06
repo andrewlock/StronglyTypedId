@@ -18,14 +18,14 @@ namespace StronglyTypedIds
             context.RegisterForPostInitialization((i) =>
             {
                 i.AddSource("StronglyTypedIdAttribute", EmbeddedSources.StronglyTypedIdAttributeSource);
+                i.AddSource("StronglyTypedIdDefaultsAttribute", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
                 i.AddSource("StronglyTypedIdBackingType", EmbeddedSources.StronglyTypedIdBackingTypeSource);
-                i.AddSource("StronglyTypedIdJsonConverter", EmbeddedSources.StronglyTypedIdJsonConverterSource);
+                i.AddSource("StronglyTypedIdConverter", EmbeddedSources.StronglyTypedIdConverterSource);
             });
 
             // Register a syntax receiver that will be created for each generation pass
             context.RegisterForSyntaxNotifications(() => new StronglyTypedIdReceiver());
         }
-
 
         /// <inheritdoc />
         public void Execute(GeneratorExecutionContext context)
@@ -59,6 +59,11 @@ namespace StronglyTypedIds
         {
             var results = ImmutableArray.CreateBuilder<GenerationResult>();
             var information = StronglyTypedIdInformation.Create(receiver, compilation);
+            var globalDefaults = information.Defaults.Defaults ;
+            if (!information.Defaults.Diagnostics.IsDefaultOrEmpty)
+            {
+                results.Add(new GenerationResult(information.Defaults.Diagnostics, null, null));
+            }
 
             foreach (var stronglyTypedIdInfo in information.Ids)
             {
@@ -70,13 +75,14 @@ namespace StronglyTypedIds
                     : structType.ContainingNamespace.ToDisplayString();
 
                 var className = structType.Name;
-                var converter = info.GenerateJsonConverter ? info.JsonConverter : (StronglyTypedIdJsonConverter?) null;
-                var source = info.BackingType switch
+
+                var values = StronglyTypedIdConfiguration.Combine(info.Configuration, globalDefaults);
+                var source = values.BackingType switch
                 {
-                    StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, converter),
-                    StronglyTypedIdBackingType.Int => SourceGenerationHelper.CreateIntId(classNameSpace, className, converter),
-                    StronglyTypedIdBackingType.Long => SourceGenerationHelper.CreateLongId(classNameSpace, className, converter),
-                    StronglyTypedIdBackingType.String => SourceGenerationHelper.CreateStringId(classNameSpace, className, converter),
+                    StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, values.Converters),
+                    StronglyTypedIdBackingType.Int => SourceGenerationHelper.CreateIntId(classNameSpace, className, values.Converters),
+                    StronglyTypedIdBackingType.Long => SourceGenerationHelper.CreateLongId(classNameSpace, className, values.Converters),
+                    StronglyTypedIdBackingType.String => SourceGenerationHelper.CreateStringId(classNameSpace, className, values.Converters),
                     _ => string.Empty,
                 };
 
@@ -84,7 +90,7 @@ namespace StronglyTypedIds
                 {
                     var sourceText = SourceText.From(source, Encoding.UTF8);
                     var sourceFileName = $"{className}_id.g.cs";
-                    results.Add(new GenerationResult(ImmutableArray<Diagnostic>.Empty, sourceFileName, sourceText));
+                    results.Add(new GenerationResult(info.Diagnostics, sourceFileName, sourceText));
                 }
             }
 

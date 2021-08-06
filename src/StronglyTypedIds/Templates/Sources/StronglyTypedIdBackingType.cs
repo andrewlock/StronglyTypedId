@@ -7,9 +7,14 @@ namespace StronglyTypedIds
     /// </summary>
     public enum StronglyTypedIdBackingType
     {
-        Guid = 0,
-        Int = 1,
-        String = 2,
-        Long = 3
+        /// <summary>
+        /// Use the default backing type (either the globally configured default, or Guid)
+        /// </summary>
+        Default = 0,
+        
+        Guid = 1,
+        Int = 2,
+        String = 3,
+        Long = 4,
     }
 }

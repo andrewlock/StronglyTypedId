@@ -32,15 +32,31 @@ public partial struct MyId {}";
                 .UseDirectory("Snapshots");
         }
 
+        [Fact]
+        public Task CanOverrideDefaultsUsingGlobalAttribute()
+        {
+            const string input = @"using StronglyTypedIds;
+[assembly:StronglyTypedIdDefaults(backingType: StronglyTypedIdBackingType.Int, converters: StronglyTypedIdConverter.None)]
+
+[StronglyTypedId]
+public partial struct MyId {}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
         [Theory]
         [MemberData(nameof(GetData))]
-        public Task CanGenerateIdWithNamedParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdJsonConverter? converter)
+        public Task CanGenerateIdWithNamedParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdConverter? converter)
         {
             var type = $"backingType: {nameof(StronglyTypedIdBackingType)}.{backingType.ToString()}";
-            var json = converter.HasValue
-                ? $"jsonConverter: {ToArgument(converter.Value)}"
-                : "generateJsonConverter: false";
-            var attribute = $"[StronglyTypedId({type}, {json})]";
+            var converters = converter.HasValue
+                ? $", converters: {ToArgument(converter.Value)}"
+                : string.Empty;
+            var attribute = $"[StronglyTypedId({type}{converters})]";
 
             _output.WriteLine(attribute);
 
@@ -53,6 +69,8 @@ namespace MyTests.TestNameSpace
 }";
             var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
 
+            Assert.Empty(diagnostics);
+
             return Verifier.Verify(output)
                 .UseParameters(backingType, converter)
                 .UseDirectory("Snapshots");
@@ -60,10 +78,10 @@ namespace MyTests.TestNameSpace
 
         [Theory]
         [MemberData(nameof(GetData))]
-        public Task CanGenerateIdWithPositionalParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdJsonConverter? converter)
+        public Task CanGenerateIdWithPositionalParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdConverter? converter)
         {
             var type = $"{nameof(StronglyTypedIdBackingType)}.{backingType.ToString()}";
-            var args = converter.HasValue ? $"true, {type}, {ToArgument(converter.Value)}" : $"false, {type}";
+            var args = converter.HasValue ? $"{type}, {ToArgument(converter.Value)}" : $"{type}";
             var attribute = $"[StronglyTypedId({args})]";
 
             _output.WriteLine(attribute);
@@ -77,27 +95,31 @@ namespace MyTests.TestNameSpace
 }";
             var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
 
+            Assert.Empty(diagnostics);
+
             return Verifier.Verify(output)
                 .UseParameters(backingType, converter)
                 .UseDirectory("Snapshots");
         }
 
-        public static TheoryData<StronglyTypedIdBackingType, StronglyTypedIdJsonConverter?> GetData => new()
+        public static TheoryData<StronglyTypedIdBackingType, StronglyTypedIdConverter?> GetData => new()
         {
             {StronglyTypedIdBackingType.Guid, null},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdJsonConverter.NewtonsoftJson},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdJsonConverter.SystemTextJson},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdJsonConverter.SystemTextJson | StronglyTypedIdJsonConverter.NewtonsoftJson},
+            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.NewtonsoftJson},
+            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.SystemTextJson},
+            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.TypeConverter},
+            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson},
         };
 
-        public static string ToArgument(StronglyTypedIdJsonConverter converter) =>
+        public static string ToArgument(StronglyTypedIdConverter converter) =>
             converter switch
             {
-                StronglyTypedIdJsonConverter.NewtonsoftJson => "StronglyTypedIdJsonConverter.NewtonsoftJson",
-                StronglyTypedIdJsonConverter.SystemTextJson => "StronglyTypedIdJsonConverter.SystemTextJson",
-                _ when converter.HasFlag(StronglyTypedIdJsonConverter.NewtonsoftJson) &&
-                       converter.HasFlag(StronglyTypedIdJsonConverter.SystemTextJson) =>
-                    "StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson",
+                StronglyTypedIdConverter.NewtonsoftJson => "StronglyTypedIdConverter.NewtonsoftJson",
+                StronglyTypedIdConverter.SystemTextJson => "StronglyTypedIdConverter.SystemTextJson",
+                StronglyTypedIdConverter.TypeConverter => "StronglyTypedIdConverter.TypeConverter",
+                _ when converter.HasFlag(StronglyTypedIdConverter.NewtonsoftJson) &&
+                       converter.HasFlag(StronglyTypedIdConverter.SystemTextJson) =>
+                    "StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson",
                 _ => throw new InvalidOperationException("Unknown converter " + converter),
             };
     }

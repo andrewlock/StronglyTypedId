@@ -11,6 +11,7 @@ namespace StronglyTypedIds.Tests
     public class StronglyTypedIdInformationTests
     {
         private static readonly StronglyTypedIdAttribute DefaultAttribute = new();
+        private static readonly StronglyTypedIdDefaultsAttribute DefaultDefaultsAttribute = new();
 
         [Theory]
         [InlineData("public")]
@@ -28,9 +29,8 @@ using StronglyTypedIds;
 
             var kvp = Assert.Single(information.Ids);
             Assert.Equal("TestId", kvp.Key.Name);
-            Assert.Equal(DefaultAttribute.GenerateJsonConverter, kvp.Value.GenerateJsonConverter);
-            Assert.Equal(DefaultAttribute.JsonConverter, kvp.Value.JsonConverter);
-            Assert.Equal(DefaultAttribute.GenerateJsonConverter, kvp.Value.GenerateJsonConverter);
+            Assert.Equal(DefaultAttribute.Converters, kvp.Value.Configuration.Converters);
+            Assert.Equal(DefaultAttribute.BackingType, kvp.Value.Configuration.BackingType);
         }
 
         [Fact]
@@ -122,11 +122,89 @@ public class Outer
             Assert.Single(diag, x => x.Id == NestedTypeDiagnostic.Id);
         }
 
+        [Fact]
+        public void AddsDiagnosticWhenInvalidConverter()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[StronglyTypedId(converters: (StronglyTypedIdConverter)21)]
+public partial struct TestId1 {}
+";
+
+            var information = GetInformation(code);
+
+            var id = Assert.Single(information.Ids);
+            Assert.Equal("TestId1", id.Key.Name);
+            var diag = id.Value.Diagnostics;
+            Assert.NotEmpty(diag);
+            Assert.Single(diag, x => x.Id == InvalidConverterDiagnostic.Id);
+        }
+
+        [Fact]
+        public void CreatesDefaultsForAssemblyAttribute()
+        {
+            var code = @"
+using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults]";
+
+            var information = GetInformation(code);
+
+            Assert.NotNull(information.Defaults.Defaults);
+            var defaults = information.Defaults.Defaults.Value;
+            Assert.Equal(DefaultDefaultsAttribute.Converters, defaults.Converters);
+            Assert.Equal(DefaultDefaultsAttribute.BackingType, defaults.BackingType);
+        }
+
+        [Fact]
+        public void DoesNotCreateDefaultsWhenCompilationErrorDueToMissingNamespace()
+        {
+            const string code = @"
+// using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults]";
+
+            var information = GetInformation(code);
+
+            Assert.Null(information.Defaults.Defaults);
+        }
+
+        [Fact]
+        public void DoesNotCreateDefaultsWhenNoAttributes()
+        {
+            const string code = @"
+public partial struct TestId1 {}
+
+public partial struct TestId2 {}
+";
+
+            var information = GetInformation(code);
+
+            Assert.Null(information.Defaults.Defaults);
+        }
+
+        [Fact]
+        public void ReturnsResultsWhenMultiple()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults]
+[assembly:StronglyTypedIdDefaults]
+";
+
+            var information = GetInformation(code);
+
+            Assert.NotNull(information.Defaults.Defaults);
+        }
+
         private static StronglyTypedIdInformation GetInformation(string source)
         {
             var attributeSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdAttributeSource);
+            var defaultsSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
             var backingTypeSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdBackingTypeSource);
-            var converterTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdJsonConverterSource);
+            var converterTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdConverterSource);
             var sourceSyntaxTree = CSharpSyntaxTree.ParseText(source);
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
@@ -135,7 +213,7 @@ public class Outer
 
             var compilation = CSharpCompilation.Create(
                 "generator",
-                new[] { attributeSyntaxTree, backingTypeSyntaxTree, converterTree, sourceSyntaxTree },
+                new[] { attributeSyntaxTree, defaultsSyntaxTree, backingTypeSyntaxTree, converterTree, sourceSyntaxTree },
                 references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

@@ -82,17 +82,17 @@ If you don't generate a `JsonConverter`, you don't need the Newtonsoft.Json pack
 
 ### Generating a System.Text.Json `JsonConverter`
 
-If you wish to generate a _System.Text.Json_ `JsonConverter`s, set `jsonConverter = StronglyTypedIdJsonConverter.SystemTextJson` in the attribute constructor:
+If you wish to generate a _System.Text.Json_ `JsonConverter`s, set `jsonConverter = StronglyTypedIdConverter.SystemTextJson` in the attribute constructor:
 
 ```csharp
-[StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)] 
+[StronglyTypedId(jsonConverter: StronglyTypedIdConverter.SystemTextJson)] 
 public partial struct SystemTextJsonConverterId { }
 ```
 
 If you wish, you can generate both a _System.Text.Json_ and _Newtonsoft.Json_ converter:
 
 ```csharp
-[StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.NewtonsoftJson | StronglyTypedIdJsonConverter.SystemTextJson)] 
+[StronglyTypedId(jsonConverter: StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson)] 
 public partial struct BothJsonConverterId { }
 ```
 

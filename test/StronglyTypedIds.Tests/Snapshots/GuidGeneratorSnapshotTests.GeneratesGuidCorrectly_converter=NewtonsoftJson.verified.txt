@@ -1,7 +1,6 @@
 ﻿namespace Some.Namespace
 {
     [Newtonsoft.Json.JsonConverter(typeof(MyTestIdNewtonsoftJsonConverter))]
-    [System.ComponentModel.TypeConverter(typeof(MyTestIdTypeConverter))]
     readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>
     {
         public System.Guid Value { get; }
@@ -28,26 +27,6 @@
         public override string ToString() => Value.ToString();
         public static bool operator ==(MyTestId a, MyTestId b) => a.CompareTo(b) == 0;
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
-
-        class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
-        {
-            public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
-            {
-                return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
-            }
-
-            public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
-            {
-                var stringValue = value as string;
-                if (!string.IsNullOrEmpty(stringValue)
-                    && System.Guid.TryParse(stringValue, out var guid))
-                {
-                    return new MyTestId(guid);
-                }
-
-                return base.ConvertFrom(context, culture, value);
-            }
-        }
 
         class MyTestIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
         {

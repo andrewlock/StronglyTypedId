@@ -6,59 +6,71 @@ namespace StronglyTypedIds
 {
     internal static class SourceGenerationHelper
     {
-        public static string CreateGuidId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+        public static string CreateGuidId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
             CreateId(
                 idNamespace,
                 idName,
-                jsonConverter,
+                converters,
                 EmbeddedSources.GuidBase,
-                EmbeddedSources.GuidNewtonsoftBase,
-                EmbeddedSources.GuidSystemTextJsonBase);
+                EmbeddedSources.GuidNewtonsoft,
+                EmbeddedSources.GuidSystemTextJson,
+                EmbeddedSources.GuidTypeConverter);
 
-        public static string CreateIntId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+        public static string CreateIntId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
             CreateId(
                 idNamespace,
                 idName,
-                jsonConverter,
+                converters,
                 EmbeddedSources.IntBase,
-                EmbeddedSources.IntNewtonsoftBase,
-                EmbeddedSources.IntSystemTextJsonBase);
+                EmbeddedSources.IntNewtonsoft,
+                EmbeddedSources.IntSystemTextJson,
+                EmbeddedSources.IntTypeConverter);
 
-        public static string CreateLongId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+        public static string CreateLongId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
             CreateId(
                 idNamespace,
                 idName,
-                jsonConverter,
+                converters,
                 EmbeddedSources.LongBase,
-                EmbeddedSources.LongNewtonsoftBase,
-                EmbeddedSources.LongSystemTextJsonBase);
+                EmbeddedSources.LongNewtonsoft,
+                EmbeddedSources.LongSystemTextJson,
+                EmbeddedSources.LongTypeConverter);
 
-        public static string CreateStringId(string idNamespace, string idName, StronglyTypedIdJsonConverter? jsonConverter) =>
+        public static string CreateStringId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
             CreateId(
                 idNamespace,
                 idName,
-                jsonConverter,
+                converters,
                 EmbeddedSources.StringBase,
-                EmbeddedSources.StringNewtonsoftBase,
-                EmbeddedSources.StringSystemTextJsonBase);
+                EmbeddedSources.StringNewtonsoft,
+                EmbeddedSources.StringSystemTextJson,
+                EmbeddedSources.StringTypeConverter);
 
         static string CreateId(
             string idNamespace,
             string idName,
-            StronglyTypedIdJsonConverter? jsonConverter,
+            StronglyTypedIdConverter converters,
             string baseSource,
             string newtonsoftSource,
-            string systemTextSource)
+            string systemTextSource,
+            string typeConverterSource)
         {
             if (string.IsNullOrEmpty(idName))
             {
                 throw new ArgumentException("Value cannot be null or empty.", nameof(idName));
             }
 
+            if (converters == StronglyTypedIdConverter.Default)
+            {
+                throw new ArgumentException("Cannot use default converter - must provide concrete values or None", nameof(idName));
+            }
+
             var hasNamespace = !string.IsNullOrEmpty(idNamespace);
 
-            var useNewtonsoftJson = jsonConverter is not null && jsonConverter.Value.HasFlag(StronglyTypedIdJsonConverter.NewtonsoftJson);
-            var useSystemTextJson = jsonConverter is not null && jsonConverter.Value.HasFlag(StronglyTypedIdJsonConverter.SystemTextJson);
+            var useTypeConverter = converters.IsSet(StronglyTypedIdConverter.TypeConverter);
+            var useNewtonsoftJson = converters.IsSet(StronglyTypedIdConverter.NewtonsoftJson);
+            var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
+
             var sb = new StringBuilder();
             if (hasNamespace)
             {
@@ -79,7 +91,17 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.SystemTextJsonAttributeSource);
             }
 
+            if (useTypeConverter)
+            {
+                sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
+            }
+
             sb.Append(baseSource);
+
+            if (useTypeConverter)
+            {
+                sb.AppendLine(typeConverterSource);
+            }
 
             if (useNewtonsoftJson)
             {

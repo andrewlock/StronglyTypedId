@@ -1,0 +1,26 @@
+    readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>
+    {
+        public string Value { get; }
+
+        public MyTestId(string value)
+        {
+            Value = value;
+        }
+
+        public static readonly MyTestId Empty = new MyTestId(string.Empty);
+
+        public bool Equals(MyTestId other) => this.Value.Equals(other.Value);
+        public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is MyTestId other && Equals(other);
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override string ToString() => Value.ToString();
+        public static bool operator ==(MyTestId a, MyTestId b) => a.CompareTo(b) == 0;
+        public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
+    }

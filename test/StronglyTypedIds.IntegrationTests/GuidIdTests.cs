@@ -70,7 +70,7 @@ namespace StronglyTypedIds.IntegrationTests
 
 
         [Fact]
-        public void CanSerializeToGuid_WithNewtonsoftJsonProvider()
+        public void CanSerializeToGuid_WithTypeConverter()
         {
             var foo = NewtonsoftJsonGuidId.New();
 
@@ -152,6 +152,20 @@ namespace StronglyTypedIds.IntegrationTests
             var expected =  $"\"{foo.Value}\"";
 
             Assert.Equal(expected, serialized);
+        }
+
+        [Fact]
+        public void WhenNoTypeConverter_SerializesWithValueProperty()
+        {
+            var foo = NoConverterGuidId.New();
+
+            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
+            var systemText = SystemTextJsonSerializer.Serialize(foo);
+
+            var expected = "{\"Value\":\"" + foo.Value + "\"}";
+
+            Assert.Equal(expected, newtonsoft);
+            Assert.Equal(expected, systemText);
         }
     }
 }
