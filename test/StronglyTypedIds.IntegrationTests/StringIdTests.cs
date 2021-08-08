@@ -1,4 +1,8 @@
-﻿using StronglyTypedIds.IntegrationTests.Types;
+﻿using System;
+using System.Linq;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
 using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
@@ -154,6 +158,60 @@ namespace StronglyTypedIds.IntegrationTests
 
             Assert.Equal(expected, newtonsoft);
             Assert.Equal(expected, systemText);
+        }
+
+        [Fact]
+        public void WhenEfCoreValueConverterUsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<TestDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var original = new TestEntity { Id = Guid.NewGuid(), Name = new EfCoreStringId("some name") };
+            using (var context = new TestDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities.Add(original);
+                context.SaveChanges();
+            }
+
+            using (var context = new TestDbContext(options))
+            {
+                var all = context.Entities.ToList();
+                var retrieved = Assert.Single(all);
+                Assert.Equal(original.Id, retrieved.Id);
+                Assert.Equal(original.Name, retrieved.Name);
+            }
+        }
+
+        public class TestDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public TestDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Name)
+                            .HasConversion(EfCoreStringId.EfCoreValueConverter)
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+
+        public class TestEntity
+        {
+            public Guid Id { get; set; }
+            public EfCoreStringId Name { get; set; }
         }
     }
 }

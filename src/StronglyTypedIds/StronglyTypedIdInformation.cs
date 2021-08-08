@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -81,6 +82,11 @@ namespace StronglyTypedIds
                         diagnostics.Add(InvalidConverterDiagnostic.Create(target.Origin));
                     }
 
+                    if (!Enum.IsDefined(typeof(StronglyTypedIdBackingType), backingType))
+                    {
+                        diagnostics.Add(InvalidBackingTypeDiagnostic.Create(target.Origin));
+                    }
+
                     idInfo.Add(structSymbol, (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter)));
                 }
             }
@@ -113,9 +119,23 @@ namespace StronglyTypedIds
             var backingType = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdBackingType.Default, 0, "backingType");
             var converter = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdConverter.Default, 1, "converters");
 
+            SyntaxNode? syntax = null;
             if (!converter.IsValidFlags())
             {
-                diagnostics.Add(InvalidConverterDiagnostic.Create(assemblyAttribute.ApplicationSyntaxReference.GetSyntax()));
+                syntax = assemblyAttribute.ApplicationSyntaxReference?.GetSyntax();
+                if (syntax is not null)
+                {
+                    diagnostics.Add(InvalidConverterDiagnostic.Create(syntax));
+                }
+            }
+
+            if (!Enum.IsDefined(typeof(StronglyTypedIdBackingType), backingType))
+            {
+                syntax ??= assemblyAttribute.ApplicationSyntaxReference?.GetSyntax();
+                if (syntax is not null)
+                {
+                    diagnostics.Add(InvalidBackingTypeDiagnostic.Create(syntax));
+                }
             }
 
             return (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter));

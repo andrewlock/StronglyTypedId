@@ -1,0 +1,74 @@
+namespace Some.Namespace
+{
+    [System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
+    [System.ComponentModel.TypeConverter(typeof(MyTestIdTypeConverter))]
+    readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>
+    {
+        public int Value { get; }
+
+        public MyTestId(int value)
+        {
+            Value = value;
+        }
+
+        public static readonly MyTestId Empty = new MyTestId(0);
+
+        public bool Equals(MyTestId other) => this.Value.Equals(other.Value);
+        public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is MyTestId other && Equals(other);
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override string ToString() => Value.ToString();
+        public static bool operator ==(MyTestId a, MyTestId b) => a.CompareTo(b) == 0;
+        public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
+
+        public static readonly MyTestIdEfCoreValueConverter EfCoreValueConverter = new MyTestIdEfCoreValueConverter();
+
+        public class MyTestIdEfCoreValueConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyTestId, int>
+        {
+            public MyTestIdEfCoreValueConverter(Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints mappingHints = null)
+                : base(
+                    id => id.Value,
+                    value => new MyTestId(value),
+                    mappingHints
+                ) { }
+        }
+
+        class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
+        {
+            public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            {
+                return sourceType == typeof(int) || base.CanConvertFrom(context, sourceType);
+            }
+
+            public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+            {
+                if (value is int intValue)
+                {
+                    return new MyTestId(intValue);
+                }
+
+                return base.ConvertFrom(context, culture, value);
+            }
+        }
+
+        class MyTestIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<MyTestId>
+        {
+            public override MyTestId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+            {
+                return new MyTestId(reader.GetInt32());
+            }
+
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, MyTestId value, System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteNumberValue(value.Value);
+            }
+        }
+    }
+}

@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -166,6 +169,56 @@ namespace StronglyTypedIds.IntegrationTests
 
             Assert.Equal(expected, newtonsoft);
             Assert.Equal(expected, systemText);
+        }
+
+        [Fact]
+        public void WhenEfCoreValueConverterUsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<TestDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new TestDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities.Add(
+                    new TestEntity { Id = EfCoreGuidId.New() });
+                context.SaveChanges();
+            }
+            using (var context = new TestDbContext(options))
+            {
+                var all = context.Entities.ToList();
+                Assert.Single(all);
+            }
+        }
+
+        public class TestDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public TestDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .HasConversion(EfCoreGuidId.EfCoreValueConverter)
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+
+        public class TestEntity
+        {
+            public EfCoreGuidId Id { get; set; }
         }
     }
 }

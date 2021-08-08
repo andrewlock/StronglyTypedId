@@ -6,54 +6,29 @@ namespace StronglyTypedIds
 {
     internal static class SourceGenerationHelper
     {
-        public static string CreateGuidId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
-            CreateId(
-                idNamespace,
-                idName,
-                converters,
-                EmbeddedSources.GuidBase,
-                EmbeddedSources.GuidNewtonsoft,
-                EmbeddedSources.GuidSystemTextJson,
-                EmbeddedSources.GuidTypeConverter);
+        public static string CreateId(
+            string idNamespace,
+            string idName,
+            StronglyTypedIdConverter converters,
+            StronglyTypedIdBackingType backingType)
+        {
+            var resources = backingType switch
+            {
+                StronglyTypedIdBackingType.Guid => EmbeddedSources.GuidResources,
+                StronglyTypedIdBackingType.Int => EmbeddedSources.IntResources,
+                StronglyTypedIdBackingType.Long => EmbeddedSources.LongResources,
+                StronglyTypedIdBackingType.String => EmbeddedSources.StringResources,
+                _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
+            };
 
-        public static string CreateIntId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
-            CreateId(
-                idNamespace,
-                idName,
-                converters,
-                EmbeddedSources.IntBase,
-                EmbeddedSources.IntNewtonsoft,
-                EmbeddedSources.IntSystemTextJson,
-                EmbeddedSources.IntTypeConverter);
-
-        public static string CreateLongId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
-            CreateId(
-                idNamespace,
-                idName,
-                converters,
-                EmbeddedSources.LongBase,
-                EmbeddedSources.LongNewtonsoft,
-                EmbeddedSources.LongSystemTextJson,
-                EmbeddedSources.LongTypeConverter);
-
-        public static string CreateStringId(string idNamespace, string idName, StronglyTypedIdConverter converters) =>
-            CreateId(
-                idNamespace,
-                idName,
-                converters,
-                EmbeddedSources.StringBase,
-                EmbeddedSources.StringNewtonsoft,
-                EmbeddedSources.StringSystemTextJson,
-                EmbeddedSources.StringTypeConverter);
+            return CreateId(idNamespace, idName, converters, resources);
+        }
 
         static string CreateId(
             string idNamespace,
             string idName,
             StronglyTypedIdConverter converters,
-            string baseSource,
-            string newtonsoftSource,
-            string systemTextSource,
-            string typeConverterSource)
+            EmbeddedSources.ResourceCollection resources)
         {
             if (string.IsNullOrEmpty(idName))
             {
@@ -70,6 +45,7 @@ namespace StronglyTypedIds
             var useTypeConverter = converters.IsSet(StronglyTypedIdConverter.TypeConverter);
             var useNewtonsoftJson = converters.IsSet(StronglyTypedIdConverter.NewtonsoftJson);
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
+            var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
 
             var sb = new StringBuilder();
             if (hasNamespace)
@@ -96,21 +72,26 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
             }
 
-            sb.Append(baseSource);
+            sb.Append(resources.BaseId);
+
+            if (useEfCoreValueConverter)
+            {
+                sb.AppendLine(resources.EfCoreValueConverter);
+            }
 
             if (useTypeConverter)
             {
-                sb.AppendLine(typeConverterSource);
+                sb.AppendLine(resources.TypeConverter);
             }
 
             if (useNewtonsoftJson)
             {
-                sb.AppendLine(newtonsoftSource);
+                sb.AppendLine(resources.Newtonsoft);
             }
 
             if (useSystemTextJson)
             {
-                sb.AppendLine(systemTextSource);
+                sb.AppendLine(resources.SystemTextJson);
             }
 
             sb.Replace("TESTID", idName);

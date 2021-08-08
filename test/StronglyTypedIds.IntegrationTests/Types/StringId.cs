@@ -19,4 +19,7 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(converters: StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson, backingType: StronglyTypedIdBackingType.String)]
     public partial struct BothJsonStringId { }
+
+    [StronglyTypedId(converters: StronglyTypedIdConverter.EfCoreValueConverter, backingType: StronglyTypedIdBackingType.String)]
+    public partial struct EfCoreStringId { }
 }

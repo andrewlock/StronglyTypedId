@@ -128,7 +128,7 @@ public class Outer
             const string code = @"
 using StronglyTypedIds;
 
-[StronglyTypedId(converters: (StronglyTypedIdConverter)21)]
+[StronglyTypedId(converters: (StronglyTypedIdConverter)1923)]
 public partial struct TestId1 {}
 ";
 
@@ -139,6 +139,25 @@ public partial struct TestId1 {}
             var diag = id.Value.Diagnostics;
             Assert.NotEmpty(diag);
             Assert.Single(diag, x => x.Id == InvalidConverterDiagnostic.Id);
+        }
+
+        [Fact]
+        public void AddsDiagnosticWhenInvalidBackingType()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[StronglyTypedId(backingType: (StronglyTypedIdBackingType)1923)]
+public partial struct TestId1 {}
+";
+
+            var information = GetInformation(code);
+
+            var id = Assert.Single(information.Ids);
+            Assert.Equal("TestId1", id.Key.Name);
+            var diag = id.Value.Diagnostics;
+            Assert.NotEmpty(diag);
+            Assert.Single(diag, x => x.Id == InvalidBackingTypeDiagnostic.Id);
         }
 
         [Fact]
@@ -185,7 +204,7 @@ public partial struct TestId2 {}
         }
 
         [Fact]
-        public void ReturnsResultsWhenMultiple()
+        public void ReturnsResultsWhenMultipleAssemblyAttributes()
         {
             const string code = @"
 using StronglyTypedIds;
@@ -197,6 +216,38 @@ using StronglyTypedIds;
             var information = GetInformation(code);
 
             Assert.NotNull(information.Defaults.Defaults);
+        }
+
+        [Fact]
+        public void AddsDiagnosticWhenInvalidConverterInAssemblyAttribute()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults(converters: (StronglyTypedIdConverter)1923)]
+";
+
+            var information = GetInformation(code);
+
+            Assert.NotNull(information.Defaults.Defaults);
+            Assert.NotEmpty(information.Defaults.Diagnostics);
+            Assert.Single(information.Defaults.Diagnostics, x => x.Id == InvalidConverterDiagnostic.Id);
+        }
+
+        [Fact]
+        public void AddsDiagnosticWhenInvalidBackingTypeInBackingTypes()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults(backingType: (StronglyTypedIdBackingType)1923)]
+";
+
+            var information = GetInformation(code);
+
+            Assert.NotNull(information.Defaults.Defaults);
+            Assert.NotEmpty(information.Defaults.Diagnostics);
+            Assert.Single(information.Defaults.Diagnostics, x => x.Id == InvalidBackingTypeDiagnostic.Id);
         }
 
         private static StronglyTypedIdInformation GetInformation(string source)

@@ -9,8 +9,18 @@
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.17"/>
+  </ItemGroup>
+  
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="xunit" Version="2.4.1" />

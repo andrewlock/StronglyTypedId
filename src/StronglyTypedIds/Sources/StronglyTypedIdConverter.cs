@@ -36,5 +36,10 @@ namespace StronglyTypedIds.Sources
         /// Creates a System.Text.Json.Serialization.JsonConverter for serializing the strongly typed id to its primitive value
         /// </summary>
         SystemTextJson = 8,
+
+        /// <summary>
+        /// Creates an EF Core Value Converter for extracting the primitive value
+        /// </summary>
+        EfCoreValueConverter = 16,
     }
 }

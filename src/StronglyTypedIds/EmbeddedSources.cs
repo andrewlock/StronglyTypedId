@@ -13,25 +13,37 @@ namespace StronglyTypedIds
         internal static readonly string StronglyTypedIdBackingTypeSource = LoadEmbeddedResource("StronglyTypedIds.Templates.Sources.StronglyTypedIdBackingType.cs");
         internal static readonly string StronglyTypedIdConverterSource = LoadEmbeddedResource("StronglyTypedIds.Templates.Sources.StronglyTypedIdConverter.cs");
 
-        internal static readonly string GuidBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_Base.cs");
-        internal static readonly string GuidNewtonsoft = LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_NewtonsoftJsonConverter.cs");
-        internal static readonly string GuidSystemTextJson = LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SystemTextJsonConverter.cs");
-        internal static readonly string GuidTypeConverter = LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_TypeConverter.cs");
+        internal static readonly ResourceCollection GuidResources = new(
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_Base.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_NewtonsoftJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SystemTextJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_TypeConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs")
+        );
 
-        internal static readonly string IntBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_Base.cs");
-        internal static readonly string IntNewtonsoft = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_NewtonsoftJsonConverter.cs");
-        internal static readonly string IntSystemTextJson = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SystemTextJsonConverter.cs");
-        internal static readonly string IntTypeConverter = LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_TypeConverter.cs");
+        internal static readonly ResourceCollection IntResources = new(
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_Base.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_NewtonsoftJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SystemTextJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_TypeConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs")
+        );
 
-        internal static readonly string LongBase = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Base.cs");
-        internal static readonly string LongNewtonsoft = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_NewtonsoftJsonConverter.cs");
-        internal static readonly string LongSystemTextJson = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SystemTextJsonConverter.cs");
-        internal static readonly string LongTypeConverter = LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_TypeConverter.cs");
+        internal static readonly ResourceCollection LongResources = new(
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Base.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_NewtonsoftJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SystemTextJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_TypeConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs")
+        );
 
-        internal static readonly string StringBase = LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_Base.cs");
-        internal static readonly string StringNewtonsoft = LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_NewtonsoftJsonConverter.cs");
-        internal static readonly string StringSystemTextJson = LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SystemTextJsonConverter.cs");
-        internal static readonly string StringTypeConverter = LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_TypeConverter.cs");
+        internal static readonly ResourceCollection StringResources = new(
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_Base.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_NewtonsoftJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SystemTextJsonConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_TypeConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs")
+        );
 
         internal const string TypeConverterAttributeSource = "    [System.ComponentModel.TypeConverter(typeof(TESTIDTypeConverter))]";
         internal const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
@@ -49,6 +61,24 @@ namespace StronglyTypedIds
             using var reader = new StreamReader(resourceStream, Encoding.UTF8);
 
             return reader.ReadToEnd();
+        }
+
+        public readonly struct ResourceCollection
+        {
+            public string BaseId { get; }
+            public string Newtonsoft { get; }
+            public string SystemTextJson { get; }
+            public string TypeConverter { get; }
+            public string EfCoreValueConverter { get; }
+
+            public ResourceCollection(string baseId, string newtonsoft, string systemTextJson, string typeConverter, string efCoreValueConverter)
+            {
+                BaseId = baseId;
+                Newtonsoft = newtonsoft;
+                SystemTextJson = systemTextJson;
+                TypeConverter = typeConverter;
+                EfCoreValueConverter = efCoreValueConverter;
+            }
         }
     }
 }

@@ -77,14 +77,7 @@ namespace StronglyTypedIds
                 var className = structType.Name;
 
                 var values = StronglyTypedIdConfiguration.Combine(info.Configuration, globalDefaults);
-                var source = values.BackingType switch
-                {
-                    StronglyTypedIdBackingType.Guid => SourceGenerationHelper.CreateGuidId(classNameSpace, className, values.Converters),
-                    StronglyTypedIdBackingType.Int => SourceGenerationHelper.CreateIntId(classNameSpace, className, values.Converters),
-                    StronglyTypedIdBackingType.Long => SourceGenerationHelper.CreateLongId(classNameSpace, className, values.Converters),
-                    StronglyTypedIdBackingType.String => SourceGenerationHelper.CreateStringId(classNameSpace, className, values.Converters),
-                    _ => string.Empty,
-                };
+                var source = SourceGenerationHelper.CreateId(classNameSpace, className, values.Converters, values.BackingType);
 
                 if (!string.IsNullOrEmpty(source))
                 {
