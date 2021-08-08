@@ -9,11 +9,29 @@
             public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
             {
                 var stringValue = value as string;
-                if (!string.IsNullOrEmpty(stringValue))
+                if (stringValue is not null)
                 {
                     return new TESTID(stringValue);
                 }
 
                 return base.ConvertFrom(context, culture, value);
+            }
+
+            public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            {
+                return sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+            }
+
+            public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+            {
+                if (value is TESTID idValue)
+                {
+                    if (destinationType == typeof(string))
+                    {
+                        return idValue.Value;
+                    }
+                }
+
+                return base.ConvertTo(context, culture, value, destinationType);
             }
         }

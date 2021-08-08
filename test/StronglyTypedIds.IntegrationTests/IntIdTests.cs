@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using StronglyTypedIds.IntegrationTests.Types;
@@ -182,6 +183,20 @@ namespace StronglyTypedIds.IntegrationTests
                 var retrieved = Assert.Single(all);
                 Assert.Equal(original.Id, retrieved.Id);
             }
+        }
+
+        [Theory]
+        [InlineData(123)]
+        [InlineData("123")]
+        public void TypeConverter_CanConvertToAndFrom(object value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(NoJsonIntId));
+            var id = converter.ConvertFrom(value);
+            Assert.IsType<NoJsonIntId>(id);
+            Assert.Equal(new NoJsonIntId(123), id);
+
+            var reconverted = converter.ConvertTo(id, value.GetType());
+            Assert.Equal(value, reconverted);
         }
 
         public class TestDbContext : DbContext
