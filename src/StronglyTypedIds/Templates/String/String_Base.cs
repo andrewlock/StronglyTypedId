@@ -9,8 +9,27 @@
 
         public static readonly TESTID Empty = new TESTID(string.Empty);
 
-        public bool Equals(TESTID other) => this.Value.Equals(other.Value);
-        public int CompareTo(TESTID other) => Value.CompareTo(other.Value);
+        public bool Equals(TESTID other)
+        {
+            return (Value, other.Value) switch
+            {
+                (null, null) => true,
+                (null, _) => false,
+                (_, null) => false,
+                (_, _) => Value.Equals(other.Value),
+            };
+        }
+
+        public int CompareTo(TESTID other)
+        {
+            return (Value, other.Value) switch
+            {
+                (null, null) => 0,
+                (null, _) => -1,
+                (_, null) => 1,
+                (_, _) => Value.CompareTo(other.Value),
+            };
+        }
 
         public override bool Equals(object obj)
         {

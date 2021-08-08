@@ -72,6 +72,21 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.NotEqual((object)bar, (object)foo);
         }
 
+        [Fact]
+        public void CanCompareDefaults()
+        {
+            GuidId1 original = default;
+            var other = GuidId1.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+
+            var equals1 = original.Equals(other);
+            var equals2 = other.Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
 
         [Fact]
         public void CanSerializeToGuid_WithTypeConverter()

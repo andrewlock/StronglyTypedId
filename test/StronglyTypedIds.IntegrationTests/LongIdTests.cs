@@ -62,6 +62,22 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanCompareDefaults()
+        {
+            LongId original = default;
+            var other = LongId.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+
+            var equals1 = original.Equals(other);
+            var equals2 = other.Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
+
+        [Fact]
         public void CanSerializeToLong_WithNewtonsoftJsonProvider()
         {
             var foo = new NewtonsoftJsonLongId(123);
