@@ -47,7 +47,7 @@ namespace StronglyTypedIds
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(resources.Header);
             if (hasNamespace)
             {
                 sb
