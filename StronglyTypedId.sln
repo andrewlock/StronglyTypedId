@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StronglyTypedIds.Tests", "t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StronglyTypedIds.IntegrationTests", "test\StronglyTypedIds.IntegrationTests\StronglyTypedIds.IntegrationTests.csproj", "{09F7364F-8CE9-4E9D-9BB7-B4CEBF682904}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{E13FB452-2D47-4719-8BAA-7B695D79AF3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,8 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E13FB452-2D47-4719-8BAA-7B695D79AF3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E13FB452-2D47-4719-8BAA-7B695D79AF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0F3A36-ED47-4D0F-B736-EFC559C9E2DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C0F3A36-ED47-4D0F-B736-EFC559C9E2DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0F3A36-ED47-4D0F-B736-EFC559C9E2DA}.Debug|x64.ActiveCfg = Debug|Any CPU
