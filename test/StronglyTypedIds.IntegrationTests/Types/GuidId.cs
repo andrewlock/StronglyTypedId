@@ -25,4 +25,7 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(converters: StronglyTypedIdConverter.EfCoreValueConverter)]
     public partial struct EfCoreGuidId { }
+
+    [StronglyTypedId(converters: StronglyTypedIdConverter.DapperTypeHandler)]
+    public partial struct DapperGuidId { }
 }

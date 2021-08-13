@@ -21,7 +21,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_NewtonsoftJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SystemTextJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_TypeConverter.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs")
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_DapperTypeHandler.cs")
         );
 
         internal static readonly ResourceCollection IntResources = new(
@@ -30,7 +31,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_NewtonsoftJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SystemTextJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_TypeConverter.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs")
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_DapperTypeHandler.cs")
         );
 
         internal static readonly ResourceCollection LongResources = new(
@@ -39,7 +41,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_NewtonsoftJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SystemTextJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_TypeConverter.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs")
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_DapperTypeHandler.cs")
         );
 
         internal static readonly ResourceCollection StringResources = new(
@@ -48,7 +51,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_NewtonsoftJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SystemTextJsonConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_TypeConverter.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs")
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_DapperTypeHandler.cs")
         );
 
         internal const string TypeConverterAttributeSource = "    [System.ComponentModel.TypeConverter(typeof(TESTIDTypeConverter))]";
@@ -77,14 +81,23 @@ namespace StronglyTypedIds
             public string SystemTextJson { get; }
             public string TypeConverter { get; }
             public string EfCoreValueConverter { get; }
+            public string DapperTypeHandler { get; }
 
-            public ResourceCollection(string header, string baseId, string newtonsoft, string systemTextJson, string typeConverter, string efCoreValueConverter)
+            public ResourceCollection(
+                string header,
+                string baseId,
+                string newtonsoft,
+                string systemTextJson,
+                string typeConverter,
+                string efCoreValueConverter,
+                string dapperTypeHandler)
             {
                 BaseId = baseId;
                 Newtonsoft = newtonsoft;
                 SystemTextJson = systemTextJson;
                 TypeConverter = typeConverter;
                 EfCoreValueConverter = efCoreValueConverter;
+                DapperTypeHandler = dapperTypeHandler;
                 Header = header;
             }
         }

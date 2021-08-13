@@ -46,6 +46,7 @@ namespace StronglyTypedIds
             var useNewtonsoftJson = converters.IsSet(StronglyTypedIdConverter.NewtonsoftJson);
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
+            var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
 
             var sb = new StringBuilder(resources.Header);
             if (hasNamespace)
@@ -77,6 +78,11 @@ namespace StronglyTypedIds
             if (useEfCoreValueConverter)
             {
                 sb.AppendLine(resources.EfCoreValueConverter);
+            }
+
+            if (useDapperTypeHandler)
+            {
+                sb.AppendLine(resources.DapperTypeHandler);
             }
 
             if (useTypeConverter)

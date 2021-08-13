@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using StronglyTypedIds.IntegrationTests.Types;
@@ -202,6 +204,21 @@ namespace StronglyTypedIds.IntegrationTests
                 Assert.Equal(original.Id, retrieved.Id);
                 Assert.Equal(original.Name, retrieved.Name);
             }
+        }
+
+        [Fact]
+        public async Task WhenDapperValueConverterUsesValueConverter()
+        {
+            using var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync();
+
+            SqlMapper.AddTypeHandler(new DapperStringId.DapperTypeHandler());
+
+
+            var results = await connection.QueryAsync<DapperStringId>("SELECT 'this is a value'");
+
+            var value = Assert.Single(results);
+            Assert.Equal(value, new DapperStringId("this is a value"));
         }
 
         [Theory]

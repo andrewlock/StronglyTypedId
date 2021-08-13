@@ -41,5 +41,10 @@ namespace StronglyTypedIds.Sources
         /// Creates an EF Core Value Converter for extracting the primitive value
         /// </summary>
         EfCoreValueConverter = 16,
+
+        /// <summary>
+        /// Creates a Dapper TypeHandler for converting to and from the type
+        /// </summary>
+        DapperTypeHandler = 32,
     }
 }
