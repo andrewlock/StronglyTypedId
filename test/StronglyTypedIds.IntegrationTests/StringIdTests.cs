@@ -212,9 +212,6 @@ namespace StronglyTypedIds.IntegrationTests
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
 
-            SqlMapper.AddTypeHandler(new DapperStringId.DapperTypeHandler());
-
-
             var results = await connection.QueryAsync<DapperStringId>("SELECT 'this is a value'");
 
             var value = Assert.Single(results);
