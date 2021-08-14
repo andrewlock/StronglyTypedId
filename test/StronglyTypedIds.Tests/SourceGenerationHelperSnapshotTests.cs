@@ -64,7 +64,7 @@ namespace StronglyTypedIds.Tests
 
             return Verifier.Verify(result)
                 .UseDirectory("Snapshots")
-                .UseParameters(ns, converter, backingType);
+                .UseParameters(ns, (int)converter, backingType);
         }
 
         public static IEnumerable<object[]> Parameters()
