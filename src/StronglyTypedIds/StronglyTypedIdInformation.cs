@@ -76,6 +76,7 @@ namespace StronglyTypedIds
                     var namedArgs = stronglyTypedIdAttribute.NamedArguments;
                     var backingType = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdBackingType.Default, 0, "backingType");
                     var converter = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdConverter.Default, 1, "converters");
+                    var implementations = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdImplementations.Default, 2, "implementations");
 
                     if (!converter.IsValidFlags())
                     {
@@ -87,7 +88,12 @@ namespace StronglyTypedIds
                         diagnostics.Add(InvalidBackingTypeDiagnostic.Create(target.Origin));
                     }
 
-                    idInfo.Add(structSymbol, (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter)));
+                    if (!implementations.IsValidFlags())
+                    {
+                        diagnostics.Add(InvalidImplementationsDiagnostic.Create(target.Origin));
+                    }
+
+                    idInfo.Add(structSymbol, (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter, implementations)));
                 }
             }
         }
@@ -118,6 +124,7 @@ namespace StronglyTypedIds
             // these values must mach the defaults
             var backingType = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdBackingType.Default, 0, "backingType");
             var converter = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdConverter.Default, 1, "converters");
+            var implementations = GetValueFromConstructorArguments(positionalArgs, namedArgs, StronglyTypedIdImplementations.Default, 2, "implementations");
 
             SyntaxNode? syntax = null;
             if (!converter.IsValidFlags())
@@ -138,7 +145,16 @@ namespace StronglyTypedIds
                 }
             }
 
-            return (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter));
+            if (!implementations.IsValidFlags())
+            {
+                syntax ??= assemblyAttribute.ApplicationSyntaxReference?.GetSyntax();
+                if (syntax is not null)
+                {
+                    diagnostics.Add(InvalidImplementationsDiagnostic.Create(syntax));
+                }
+            }
+
+            return (diagnostics.ToImmutable(), new StronglyTypedIdConfiguration(backingType, converter, implementations));
         }
 
         static T GetValueFromConstructorArguments<T>(

@@ -38,5 +38,26 @@ namespace StronglyTypedIds.Tests
                 yield return converter;
             }
         }
+
+        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true, bool includeNone = true)
+        {
+            // get highest value
+            var highestValue = Enum.GetValues(typeof(StronglyTypedIdImplementations))
+                .Cast<int>()
+                .Max();
+
+            var upperBound = highestValue * 2;
+            for (var i = 0; i < upperBound; i++)
+            {
+                var implementations = (StronglyTypedIdImplementations)i;
+                if (implementations.IsSet(StronglyTypedIdImplementations.Default) && !includeDefault
+                    || implementations == StronglyTypedIdImplementations.None && !includeNone)
+                {
+                    continue;
+                }
+
+                yield return implementations;
+            }
+        }
     }
 }

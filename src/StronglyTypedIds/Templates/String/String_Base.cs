@@ -1,4 +1,4 @@
-﻿    readonly partial struct TESTID : System.IComparable<TESTID>, System.IEquatable<TESTID>
+﻿    readonly partial struct TESTID : INTERFACES
     {
         public string Value { get; }
 
@@ -19,18 +19,6 @@
                 (_, _) => Value.Equals(other.Value),
             };
         }
-
-        public int CompareTo(TESTID other)
-        {
-            return (Value, other.Value) switch
-            {
-                (null, null) => 0,
-                (null, _) => -1,
-                (_, null) => 1,
-                (_, _) => Value.CompareTo(other.Value),
-            };
-        }
-
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -40,5 +28,5 @@
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();
-        public static bool operator ==(TESTID a, TESTID b) => a.CompareTo(b) == 0;
+        public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);

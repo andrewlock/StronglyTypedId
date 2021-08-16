@@ -16,12 +16,16 @@ namespace StronglyTypedIds.Sources
         /// Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
         /// <param name="converters">JSON library used to serialize/deserialize strongly-typed ID value.
         /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
+        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
+        /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
         public StronglyTypedIdDefaultsAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
-            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default)
+            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
+            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
         {
             BackingType = backingType;
             Converters = converters;
+            Implementations = implementations;
         }
 
         /// <summary>
@@ -33,5 +37,10 @@ namespace StronglyTypedIds.Sources
         /// The default converters to create for serializing/deserializing strongly-typed ID values.
         /// </summary>
         public StronglyTypedIdConverter Converters { get; }
+
+        /// <summary>
+        /// Interfaces and patterns the strongly typed id should implement
+        /// </summary>
+        public StronglyTypedIdImplementations Implementations { get; }
     }
 }

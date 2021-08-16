@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using StronglyTypedIds.Sources;
 
@@ -10,7 +11,8 @@ namespace StronglyTypedIds
             string idNamespace,
             string idName,
             StronglyTypedIdConverter converters,
-            StronglyTypedIdBackingType backingType)
+            StronglyTypedIdBackingType backingType,
+            StronglyTypedIdImplementations implementations)
         {
             var resources = backingType switch
             {
@@ -21,13 +23,14 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, converters, resources);
+            return CreateId(idNamespace, idName, converters, implementations, resources);
         }
 
         static string CreateId(
             string idNamespace,
             string idName,
             StronglyTypedIdConverter converters,
+            StronglyTypedIdImplementations implementations,
             EmbeddedSources.ResourceCollection resources)
         {
             if (string.IsNullOrEmpty(idName))
@@ -37,7 +40,12 @@ namespace StronglyTypedIds
 
             if (converters == StronglyTypedIdConverter.Default)
             {
-                throw new ArgumentException("Cannot use default converter - must provide concrete values or None", nameof(idName));
+                throw new ArgumentException("Cannot use default converter - must provide concrete values or None", nameof(converters));
+            }
+
+            if (implementations == StronglyTypedIdImplementations.Default)
+            {
+                throw new ArgumentException("Cannot use default implementations - must provide concrete values or None", nameof(implementations));
             }
 
             var hasNamespace = !string.IsNullOrEmpty(idNamespace);
@@ -47,6 +55,9 @@ namespace StronglyTypedIds
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
             var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
+
+            var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
+            var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
 
             var sb = new StringBuilder(resources.Header);
             if (hasNamespace)
@@ -74,6 +85,14 @@ namespace StronglyTypedIds
             }
 
             sb.Append(resources.BaseId);
+            ReplaceInterfaces(sb, useIEquatable, useIComparable);
+
+            // IEquatable is already implemented whether or not the interface is implemented
+
+            if (useIComparable)
+            {
+                sb.AppendLine(resources.Comparable);
+            }
 
             if (useEfCoreValueConverter)
             {
@@ -108,6 +127,30 @@ namespace StronglyTypedIds
             }
 
             return sb.ToString();
+        }
+
+        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable)
+        {
+            var interfaces = new List<string>();
+
+            if (useIComparable)
+            {
+                interfaces.Add("System.IComparable<TESTID>");
+            }
+
+            if (useIEquatable)
+            {
+                interfaces.Add("System.IEquatable<TESTID>");
+            }
+
+            if (interfaces.Count > 0)
+            {
+                sb.Replace("INTERFACES", string.Join(", ", interfaces));
+            }
+            else
+            {
+                sb.Replace(": INTERFACES", string.Empty);
+            }
         }
     }
 }

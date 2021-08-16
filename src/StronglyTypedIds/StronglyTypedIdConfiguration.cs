@@ -8,12 +8,16 @@ namespace StronglyTypedIds
 
         public StronglyTypedIdConverter Converters { get; }
 
+        public StronglyTypedIdImplementations Implementations { get; }
+
         public StronglyTypedIdConfiguration(
             StronglyTypedIdBackingType backingType,
-            StronglyTypedIdConverter converters)
+            StronglyTypedIdConverter converters,
+            StronglyTypedIdImplementations implementations)
         {
             BackingType = backingType;
             Converters = converters;
+            Implementations = implementations;
         }
 
         /// <summary>
@@ -23,7 +27,8 @@ namespace StronglyTypedIds
         /// </summary>
         public static readonly StronglyTypedIdConfiguration Defaults = new(
             backingType: StronglyTypedIdBackingType.Guid,
-            converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.NewtonsoftJson);
+            converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.NewtonsoftJson,
+            implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable);
 
         /// <summary>
         /// Combines multiple <see cref="StronglyTypedIdConfiguration"/> values associated
@@ -50,7 +55,15 @@ namespace StronglyTypedIds
                 (var specificValue, _) => specificValue
             };
 
-            return new StronglyTypedIdConfiguration(backingType, converter);
+            var implementations = (attributeValues.Implementations, globalValues?.Implementations) switch
+            {
+                (StronglyTypedIdImplementations.Default, null) => Defaults.Implementations,
+                (StronglyTypedIdImplementations.Default, StronglyTypedIdImplementations.Default) => Defaults.Implementations,
+                (StronglyTypedIdImplementations.Default, var globalDefault) => globalDefault.Value,
+                (var specificValue, _) => specificValue
+            };
+
+            return new StronglyTypedIdConfiguration(backingType, converter, implementations);
         }
     }
 }

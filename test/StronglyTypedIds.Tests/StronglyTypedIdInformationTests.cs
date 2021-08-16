@@ -142,6 +142,25 @@ public partial struct TestId1 {}
         }
 
         [Fact]
+        public void AddsDiagnosticWhenInvalidImplementations()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[StronglyTypedId(implementations: (StronglyTypedIdImplementations)1923)]
+public partial struct TestId1 {}
+";
+
+            var information = GetInformation(code);
+
+            var id = Assert.Single(information.Ids);
+            Assert.Equal("TestId1", id.Key.Name);
+            var diag = id.Value.Diagnostics;
+            Assert.NotEmpty(diag);
+            Assert.Single(diag, x => x.Id == InvalidImplementationsDiagnostic.Id);
+        }
+
+        [Fact]
         public void AddsDiagnosticWhenInvalidBackingType()
         {
             const string code = @"
@@ -235,6 +254,22 @@ using StronglyTypedIds;
         }
 
         [Fact]
+        public void AddsDiagnosticWhenInvalidImplementationsInAssemblyAttribute()
+        {
+            const string code = @"
+using StronglyTypedIds;
+
+[assembly:StronglyTypedIdDefaults(implementations: (StronglyTypedIdImplementations)1923)]
+";
+
+            var information = GetInformation(code);
+
+            Assert.NotNull(information.Defaults.Defaults);
+            Assert.NotEmpty(information.Defaults.Diagnostics);
+            Assert.Single(information.Defaults.Diagnostics, x => x.Id == InvalidImplementationsDiagnostic.Id);
+        }
+
+        [Fact]
         public void AddsDiagnosticWhenInvalidBackingTypeInBackingTypes()
         {
             const string code = @"
@@ -256,6 +291,7 @@ using StronglyTypedIds;
             var defaultsSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
             var backingTypeSyntaxTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdBackingTypeSource);
             var converterTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdConverterSource);
+            var implementationsTree = CSharpSyntaxTree.ParseText(EmbeddedSources.StronglyTypedIdImplementationsSource);
             var sourceSyntaxTree = CSharpSyntaxTree.ParseText(source);
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
@@ -264,7 +300,7 @@ using StronglyTypedIds;
 
             var compilation = CSharpCompilation.Create(
                 "generator",
-                new[] { attributeSyntaxTree, defaultsSyntaxTree, backingTypeSyntaxTree, converterTree, sourceSyntaxTree },
+                new[] { attributeSyntaxTree, defaultsSyntaxTree, backingTypeSyntaxTree, converterTree, sourceSyntaxTree, implementationsTree },
                 references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

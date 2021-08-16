@@ -21,6 +21,7 @@ namespace StronglyTypedIds
                 i.AddSource("StronglyTypedIdDefaultsAttribute", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
                 i.AddSource("StronglyTypedIdBackingType", EmbeddedSources.StronglyTypedIdBackingTypeSource);
                 i.AddSource("StronglyTypedIdConverter", EmbeddedSources.StronglyTypedIdConverterSource);
+                i.AddSource("StronglyTypedIdImplementations", EmbeddedSources.StronglyTypedIdImplementationsSource);
             });
 
             // Register a syntax receiver that will be created for each generation pass
@@ -77,7 +78,7 @@ namespace StronglyTypedIds
                 var className = structType.Name;
 
                 var values = StronglyTypedIdConfiguration.Combine(info.Configuration, globalDefaults);
-                var source = SourceGenerationHelper.CreateId(classNameSpace, className, values.Converters, values.BackingType);
+                var source = SourceGenerationHelper.CreateId(classNameSpace, className, values.Converters, values.BackingType, values.Implementations);
 
                 if (!string.IsNullOrEmpty(source))
                 {
