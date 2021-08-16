@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -61,22 +62,6 @@ namespace StronglyTypedIds.IntegrationTests
 
             //Assert.NotEqual(bar, foo); // does not compile
             Assert.NotEqual((object)bar, (object)foo);
-        }
-
-        [Fact]
-        public void CanCompareDefaults()
-        {
-            LongId original = default;
-            var other = LongId.Empty;
-
-            var compare1 = original.CompareTo(other);
-            var compare2 = other.CompareTo(original);
-            Assert.Equal(compare1, -compare2);
-
-            var equals1 = original.Equals(other);
-            var equals2 = other.Equals(original);
-
-            Assert.Equal(equals1, equals2);
         }
 
         [Fact]
@@ -228,6 +213,44 @@ namespace StronglyTypedIds.IntegrationTests
 
             var reconverted = converter.ConvertTo(id, value.GetType());
             Assert.Equal(value, reconverted);
+        }
+
+        [Fact]
+        public void CanCompareDefaults()
+        {
+            ComparableLongId original = default;
+            var other = ComparableLongId.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+        }
+
+        [Fact]
+        public void CanEquateDefaults()
+        {
+            EquatableLongId original = default;
+            var other = EquatableLongId.Empty;
+
+            var equals1 = (original as IEquatable<EquatableLongId>).Equals(other);
+            var equals2 = (other as IEquatable<EquatableLongId>).Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
+
+        [Fact]
+        public void ImplementsInterfaces()
+        {
+            Assert.IsAssignableFrom<IEquatable<BothLongId>>(BothLongId.Empty);
+            Assert.IsAssignableFrom<IComparable<BothLongId>>(BothLongId.Empty);
+
+            Assert.IsAssignableFrom<IEquatable<EquatableLongId>>(EquatableLongId.Empty);
+            Assert.IsAssignableFrom<IComparable<ComparableLongId>>(ComparableLongId.Empty);
+
+#pragma warning disable 184
+            Assert.False(LongId.Empty is IComparable<LongId>);
+            Assert.False(LongId.Empty is IEquatable<LongId>);
+#pragma warning restore 184
         }
 
         public class TestDbContext : DbContext

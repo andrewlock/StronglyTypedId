@@ -72,22 +72,6 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void CanCompareDefaults()
-        {
-            DefaultId1 original = default;
-            var other = DefaultId1.Empty;
-
-            var compare1 = original.CompareTo(other);
-            var compare2 = other.CompareTo(original);
-            Assert.Equal(compare1, -compare2);
-
-            var equals1 = original.Equals(other);
-            var equals2 = other.Equals(original);
-
-            Assert.Equal(equals1, equals2);
-        }
-
-        [Fact]
         public void WhenNoTypeConverter_SerializesWithValueProperty()
         {
             var foo = DefaultId1.New();

@@ -75,22 +75,6 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void CanCompareDefaults()
-        {
-            GuidId1 original = default;
-            var other = GuidId1.Empty;
-
-            var compare1 = original.CompareTo(other);
-            var compare2 = other.CompareTo(original);
-            Assert.Equal(compare1, -compare2);
-
-            var equals1 = original.Equals(other);
-            var equals2 = other.Equals(original);
-
-            Assert.Equal(equals1, equals2);
-        }
-
-        [Fact]
         public void CanSerializeToGuid_WithTypeConverter()
         {
             var foo = NewtonsoftJsonGuidId.New();
@@ -236,6 +220,44 @@ namespace StronglyTypedIds.IntegrationTests
 
             var reconverted = converter.ConvertTo(id, value.GetType());
             Assert.Equal(value, reconverted);
+        }
+
+        [Fact]
+        public void CanCompareDefaults()
+        {
+            ComparableGuidId original = default;
+            var other = ComparableGuidId.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+        }
+
+        [Fact]
+        public void CanEquateDefaults()
+        {
+            EquatableGuidId original = default;
+            var other = EquatableGuidId.Empty;
+
+            var equals1 = (original as IEquatable<EquatableGuidId>).Equals(other);
+            var equals2 = (other as IEquatable<EquatableGuidId>).Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
+
+        [Fact]
+        public void ImplementsInterfaces()
+        {
+            Assert.IsAssignableFrom<IEquatable<BothGuidId>>(BothGuidId.Empty);
+            Assert.IsAssignableFrom<IComparable<BothGuidId>>(BothGuidId.Empty);
+
+            Assert.IsAssignableFrom<IEquatable<EquatableGuidId>>(EquatableGuidId.Empty);
+            Assert.IsAssignableFrom<IComparable<ComparableGuidId>>(ComparableGuidId.Empty);
+
+#pragma warning disable 184
+            Assert.False(GuidId1.Empty is IComparable<GuidId1>);
+            Assert.False(GuidId1.Empty is IEquatable<GuidId1>);
+#pragma warning restore 184
         }
 
         public class TestDbContext : DbContext

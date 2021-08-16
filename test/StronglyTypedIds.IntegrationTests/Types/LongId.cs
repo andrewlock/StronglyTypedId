@@ -25,4 +25,13 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(converters: StronglyTypedIdConverter.DapperTypeHandler, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct DapperLongId { }
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable)]
+    public partial struct BothLongId { }
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IEquatable)]
+    public partial struct EquatableLongId { }
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IComparable)]
+    public partial struct ComparableLongId { }
 }

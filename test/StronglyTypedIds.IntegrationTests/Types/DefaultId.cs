@@ -1,5 +1,5 @@
 ﻿using StronglyTypedIds;
-[assembly: StronglyTypedIdDefaults(converters: StronglyTypedIdConverter.None)]
+[assembly: StronglyTypedIdDefaults(converters: StronglyTypedIdConverter.None, implementations: StronglyTypedIdImplementations.None)]
 
 namespace StronglyTypedIds.IntegrationTests.Types
 {

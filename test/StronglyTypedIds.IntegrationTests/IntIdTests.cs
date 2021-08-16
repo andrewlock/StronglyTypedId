@@ -65,22 +65,6 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void CanCompareDefaults()
-        {
-            IntId original = default;
-            var other = IntId.Empty;
-
-            var compare1 = original.CompareTo(other);
-            var compare2 = other.CompareTo(original);
-            Assert.Equal(compare1, -compare2);
-
-            var equals1 = original.Equals(other);
-            var equals2 = other.Equals(original);
-
-            Assert.Equal(equals1, equals2);
-        }
-
-        [Fact]
         public void CanSerializeToInt_WithNewtonsoftJsonProvider()
         {
             var foo = new NewtonsoftJsonIntId(123);
@@ -228,6 +212,44 @@ namespace StronglyTypedIds.IntegrationTests
 
             var reconverted = converter.ConvertTo(id, value.GetType());
             Assert.Equal(value, reconverted);
+        }
+
+        [Fact]
+        public void CanCompareDefaults()
+        {
+            ComparableIntId original = default;
+            var other = ComparableIntId.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+        }
+
+        [Fact]
+        public void CanEquateDefaults()
+        {
+            EquatableIntId original = default;
+            var other = EquatableIntId.Empty;
+
+            var equals1 = (original as IEquatable<EquatableIntId>).Equals(other);
+            var equals2 = (other as IEquatable<EquatableIntId>).Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
+
+        [Fact]
+        public void ImplementsInterfaces()
+        {
+            Assert.IsAssignableFrom<IEquatable<BothIntId>>(BothIntId.Empty);
+            Assert.IsAssignableFrom<IComparable<BothIntId>>(BothIntId.Empty);
+
+            Assert.IsAssignableFrom<IEquatable<EquatableIntId>>(EquatableIntId.Empty);
+            Assert.IsAssignableFrom<IComparable<ComparableIntId>>(ComparableIntId.Empty);
+
+#pragma warning disable 184
+            Assert.False(IntId.Empty is IComparable<IntId>);
+            Assert.False(IntId.Empty is IEquatable<IntId>);
+#pragma warning restore 184
         }
 
         public class TestDbContext : DbContext
