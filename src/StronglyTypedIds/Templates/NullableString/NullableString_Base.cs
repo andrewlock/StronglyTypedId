@@ -26,6 +26,6 @@
         }
 
         public override int GetHashCode() => Value?.GetHashCode() ?? 0;
-        public override string? ToString() => Value?.ToString();
+        public override string? ToString() => Value;
         public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);
