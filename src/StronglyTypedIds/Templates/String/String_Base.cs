@@ -4,7 +4,7 @@
 
         public TESTID(string value)
         {
-            Value = value;
+            Value = value ?? throw new System.ArgumentNullException(nameof(value));
         }
 
         public static readonly TESTID Empty = new TESTID(string.Empty);
@@ -27,6 +27,6 @@
 
         public override int GetHashCode() => Value.GetHashCode();
 
-        public override string ToString() => Value.ToString();
+        public override string ToString() => Value;
         public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);

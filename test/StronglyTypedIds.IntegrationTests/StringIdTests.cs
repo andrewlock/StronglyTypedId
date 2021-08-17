@@ -15,6 +15,12 @@ namespace StronglyTypedIds.IntegrationTests
     public class StringIdTests
     {
         [Fact]
+        public async Task ThrowsIfTryToCreateWithNull()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(new StringId(null)));
+        }
+
+        [Fact]
         public void SameValuesAreEqual()
         {
             var id = "some-value";

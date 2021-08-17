@@ -15,7 +15,7 @@
 
         public MyTestId(string value)
         {
-            Value = value;
+            Value = value ?? throw new System.ArgumentNullException(nameof(value));
         }
 
         public static readonly MyTestId Empty = new MyTestId(string.Empty);
@@ -38,7 +38,7 @@
 
         public override int GetHashCode() => Value.GetHashCode();
 
-        public override string ToString() => Value.ToString();
+        public override string ToString() => Value;
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
         public int CompareTo(MyTestId other)
