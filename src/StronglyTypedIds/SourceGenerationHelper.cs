@@ -20,6 +20,7 @@ namespace StronglyTypedIds
                 StronglyTypedIdBackingType.Int => EmbeddedSources.IntResources,
                 StronglyTypedIdBackingType.Long => EmbeddedSources.LongResources,
                 StronglyTypedIdBackingType.String => EmbeddedSources.StringResources,
+                StronglyTypedIdBackingType.NullableString => EmbeddedSources.NullableStringResources,
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
@@ -60,6 +61,11 @@ namespace StronglyTypedIds
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
 
             var sb = new StringBuilder(resources.Header);
+            if (resources.NullableEnable)
+            {
+                sb.AppendLine("#nullable enable");
+            }
+
             if (hasNamespace)
             {
                 sb

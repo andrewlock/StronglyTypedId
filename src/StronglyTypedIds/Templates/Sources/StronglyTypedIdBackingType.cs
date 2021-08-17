@@ -16,5 +16,6 @@ namespace StronglyTypedIds
         Int = 2,
         String = 3,
         Long = 4,
+        NullableString = 5,
     }
 }
