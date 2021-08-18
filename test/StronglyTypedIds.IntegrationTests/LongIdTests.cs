@@ -268,7 +268,7 @@ namespace StronglyTypedIds.IntegrationTests
                     {
                         builder
                             .Property(x => x.Id)
-                            .HasConversion(EfCoreLongId.EfCoreValueConverter)
+                            .HasConversion(new EfCoreLongId.EfCoreValueConverter())
                             .ValueGeneratedNever();
                     });
             }

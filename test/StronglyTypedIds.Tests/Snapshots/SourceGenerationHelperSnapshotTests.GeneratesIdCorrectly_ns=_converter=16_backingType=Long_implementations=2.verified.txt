@@ -31,11 +31,9 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
 
-        public static readonly MyTestIdEfCoreValueConverter EfCoreValueConverter = new MyTestIdEfCoreValueConverter();
-
-        public class MyTestIdEfCoreValueConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyTestId, long>
+        public class EfCoreValueConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyTestId, long>
         {
-            public MyTestIdEfCoreValueConverter(Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints mappingHints = null)
+            public EfCoreValueConverter(Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints mappingHints = null)
                 : base(
                     id => id.Value,
                     value => new MyTestId(value),

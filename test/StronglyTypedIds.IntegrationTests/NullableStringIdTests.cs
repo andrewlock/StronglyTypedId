@@ -341,7 +341,7 @@ namespace StronglyTypedIds.IntegrationTests
                     {
                         builder
                             .Property(x => x.Name)
-                            .HasConversion(EfCoreNullableStringId.EfCoreValueConverter)
+                            .HasConversion(new EfCoreNullableStringId.EfCoreValueConverter())
                             .ValueGeneratedNever();
                     });
             }
