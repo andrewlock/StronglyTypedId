@@ -8,9 +8,9 @@
     <Copyright>Copyright © AndrewLock</Copyright>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/andrewlock/StronglyTypedId</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/logo.png</PackageIconUrl>
     <PackageTags>stronglytypedid attribute generator generation codegen codegenerator codegeneration netescapades</PackageTags>
     <RepositoryUrl>https://github.com/andrewlock/StronglyTypedId</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -23,6 +23,10 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageOutputPath>$(MSBuildThisFileDirectory)\artifacts</PackageOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\logo.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <Import Project="releasenotes.props" />
 
