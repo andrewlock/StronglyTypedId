@@ -112,9 +112,16 @@ class Build : NukeBuild
         .Executes(() =>
         {
             var projectFile = TestsDirectory / "StronglyTypedIds.Nuget.IntegrationTests";
+
+            DotNetRestore(s => s
+                .SetProjectFile(projectFile)
+                .When(!string.IsNullOrEmpty(PackagesDirectory), x => x.SetPackageDirectory(PackagesDirectory))
+                .SetConfigFile(RootDirectory / "NuGet.integration-tests.config"));
+
             DotNetBuild(s => s
                 .SetProjectFile(projectFile)
                 .When(!string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
+                .EnableNoRestore()
                 .SetConfiguration(Configuration));
 
             DotNetTest(s => s
