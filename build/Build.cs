@@ -22,6 +22,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     OnPushTags = new [] {"*"},
     OnPushBranches = new[] {"master", "main"},
     OnPullRequestBranches = new[] {"*"},
+    AutoGenerate = false,
     ImportSecrets = new[] {nameof(NuGetToken)},
     InvokedTargets = new[] {nameof(Clean), nameof(Test), nameof(TestPackage), nameof(PushToNuGet)}
 )]
