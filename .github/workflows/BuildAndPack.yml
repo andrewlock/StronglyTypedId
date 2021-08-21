@@ -58,6 +58,7 @@ jobs:
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
+          MSBuildEnableWorkloadResolver: false
       - uses: actions/upload-artifact@v1
         with:
           name: artifacts
@@ -92,6 +93,7 @@ jobs:
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
+          MSBuildEnableWorkloadResolver: false
       - uses: actions/upload-artifact@v1
         with:
           name: artifacts
@@ -126,6 +128,7 @@ jobs:
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
+          MSBuildEnableWorkloadResolver: false
       - uses: actions/upload-artifact@v1
         with:
           name: artifacts
