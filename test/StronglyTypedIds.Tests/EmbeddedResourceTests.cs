@@ -43,7 +43,9 @@ namespace StronglyTypedIds.Tests
         static string GetCompiledResource(string filename)
         {
             return TestHelpers.LoadEmbeddedResource($"StronglyTypedIds.Tests.Sources.{filename}.cs")
-                .Replace("namespace StronglyTypedIds.Sources", "namespace StronglyTypedIds");
+                .Replace("namespace StronglyTypedIds.Sources", "namespace StronglyTypedIds")
+                .Replace("public sealed class ", "internal sealed class ")
+                .Replace("public enum ", "internal enum ");
         }
     }
 }

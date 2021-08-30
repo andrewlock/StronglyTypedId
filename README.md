@@ -68,7 +68,7 @@ To install the packages, add the references to your _csproj_ file so that it loo
   </PropertyGroup>
   
   <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta01" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta02" />
   <!-- -->
 
 </Project>

@@ -6,7 +6,7 @@ namespace StronglyTypedIds
     /// Place on partial structs to make the type a strongly-typed ID
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public class StronglyTypedIdAttribute : Attribute
+    internal sealed class StronglyTypedIdAttribute : Attribute
     {
         /// <summary>
         /// Make the struct a strongly typed ID

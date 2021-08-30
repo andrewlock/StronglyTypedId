@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.0-beta02]
+
+Bug fixes
+
+* Adds auto-generated attributes and enums as `internal` to help avoid referencing issues
+
 ## [v1.0.0-beta01]
 
 Version 0.x of this library used the helper library [CodeGeneration.Roslyn](https://github.com/AArnott/CodeGeneration.Roslyn) by [AArnott](https://github.com/AArnott), for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.

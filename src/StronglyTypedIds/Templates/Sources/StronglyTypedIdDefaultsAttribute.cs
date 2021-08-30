@@ -7,7 +7,7 @@ namespace StronglyTypedIds
     /// Used to control the default Place on partial structs to make the type a strongly-typed ID
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
-    public sealed class StronglyTypedIdDefaultsAttribute : Attribute
+    internal sealed class StronglyTypedIdDefaultsAttribute : Attribute
     {
         /// <summary>
         /// Set the default values used for strongly typed ids

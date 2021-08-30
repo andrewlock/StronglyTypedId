@@ -6,7 +6,7 @@ namespace StronglyTypedIds
     /// Converters used to to serialize/deserialize strongly-typed ID values
     /// </summary>
     [Flags]
-    public enum StronglyTypedIdConverter
+    internal enum StronglyTypedIdConverter
     {
         // Used with HasFlag, so needs to be 1, 2, 4 etc
 

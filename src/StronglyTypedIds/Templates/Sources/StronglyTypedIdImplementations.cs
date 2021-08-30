@@ -6,7 +6,7 @@ namespace StronglyTypedIds
     /// Interfaces and patterns the strongly typed id should implement
     /// </summary>
     [Flags]
-    public enum StronglyTypedIdImplementations
+    internal enum StronglyTypedIdImplementations
     {
         // Used with HasFlag, so needs to be 1, 2, 4 etc
 
