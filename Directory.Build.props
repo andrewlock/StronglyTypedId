@@ -14,6 +14,7 @@
     <PackageTags>stronglytypedid attribute generator generation codegen codegenerator codegeneration netescapades</PackageTags>
     <RepositoryUrl>https://github.com/andrewlock/StronglyTypedId</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
