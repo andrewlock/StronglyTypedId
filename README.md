@@ -23,7 +23,7 @@ and the source generator magically generates the backing code when you save the 
     <img src="https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/docs/strongly_typed_id.gif" alt="Generating a strongly-typed ID using the StronglyTypedId packages"/>
 </picture>
 
-> StronglyTypedId requires requires [the .NET Core SDK v5.0.300 or greater](https://dotnet.microsoft.com/download/dotnet/5.0).
+> StronglyTypedId requires requires [the .NET Core SDK v6.0.100 or greater](https://dotnet.microsoft.com/download/dotnet/6.0).
 
 ## Changes in version 1.x
 
