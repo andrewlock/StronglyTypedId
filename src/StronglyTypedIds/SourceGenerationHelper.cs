@@ -13,6 +13,15 @@ namespace StronglyTypedIds
             StronglyTypedIdConverter converters,
             StronglyTypedIdBackingType backingType,
             StronglyTypedIdImplementations implementations)
+            => CreateId(idNamespace, idName, converters, backingType, implementations, null);
+
+        public static string CreateId(
+            string idNamespace,
+            string idName,
+            StronglyTypedIdConverter converters,
+            StronglyTypedIdBackingType backingType,
+            StronglyTypedIdImplementations implementations,
+            StringBuilder? sb)
         {
             var resources = backingType switch
             {
@@ -24,7 +33,7 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, converters, implementations, resources);
+            return CreateId(idNamespace, idName, converters, implementations, resources, sb);
         }
 
         static string CreateId(
@@ -32,7 +41,8 @@ namespace StronglyTypedIds
             string idName,
             StronglyTypedIdConverter converters,
             StronglyTypedIdImplementations implementations,
-            EmbeddedSources.ResourceCollection resources)
+            EmbeddedSources.ResourceCollection resources,
+            StringBuilder? sb)
         {
             if (string.IsNullOrEmpty(idName))
             {
@@ -60,7 +70,9 @@ namespace StronglyTypedIds
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
 
-            var sb = new StringBuilder(resources.Header);
+            sb ??= new StringBuilder();
+            sb.Append(resources.Header);
+
             if (resources.NullableEnable)
             {
                 sb.AppendLine("#nullable enable");

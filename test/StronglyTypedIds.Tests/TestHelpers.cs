@@ -11,7 +11,7 @@ namespace StronglyTypedIds.Tests
     internal static class TestHelpers
     {
         public static (ImmutableArray<Diagnostic> Diagnostics, string Output) GetGeneratedOutput<T>(string source)
-            where T : ISourceGenerator, new()
+            where T : IIncrementalGenerator, new()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var references = AppDomain.CurrentDomain.GetAssemblies()
@@ -27,7 +27,7 @@ namespace StronglyTypedIds.Tests
             var originalTreeCount = compilation.SyntaxTrees.Length;
             var generator = new T();
 
-            var driver = CSharpGeneratorDriver.Create(ImmutableArray.Create<ISourceGenerator>(generator));
+            var driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
 
             var trees = outputCompilation.SyntaxTrees.ToList();

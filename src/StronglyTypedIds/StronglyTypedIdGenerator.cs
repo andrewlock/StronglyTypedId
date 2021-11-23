@@ -1,110 +1,84 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using StronglyTypedIds.Sources;
 
 namespace StronglyTypedIds
 {
     /// <inheritdoc />
     [Generator]
-    public class StronglyTypedIdGenerator : ISourceGenerator
+    public class StronglyTypedIdGenerator : IIncrementalGenerator
     {
         /// <inheritdoc />
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Register the attribute and enum sources
-            context.RegisterForPostInitialization((i) =>
+            context.RegisterPostInitializationOutput(i =>
             {
-                i.AddSource("StronglyTypedIdAttribute", EmbeddedSources.StronglyTypedIdAttributeSource);
-                i.AddSource("StronglyTypedIdDefaultsAttribute", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
-                i.AddSource("StronglyTypedIdBackingType", EmbeddedSources.StronglyTypedIdBackingTypeSource);
-                i.AddSource("StronglyTypedIdConverter", EmbeddedSources.StronglyTypedIdConverterSource);
-                i.AddSource("StronglyTypedIdImplementations", EmbeddedSources.StronglyTypedIdImplementationsSource);
+                i.AddSource("StronglyTypedIdAttribute.g.cs", EmbeddedSources.StronglyTypedIdAttributeSource);
+                i.AddSource("StronglyTypedIdDefaultsAttribute.g.cs", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
+                i.AddSource("StronglyTypedIdBackingType.g.cs", EmbeddedSources.StronglyTypedIdBackingTypeSource);
+                i.AddSource("StronglyTypedIdConverter.g.cs", EmbeddedSources.StronglyTypedIdConverterSource);
+                i.AddSource("StronglyTypedIdImplementations.g.cs", EmbeddedSources.StronglyTypedIdImplementationsSource);
             });
 
-            // Register a syntax receiver that will be created for each generation pass
-            context.RegisterForSyntaxNotifications(() => new StronglyTypedIdReceiver());
+            IncrementalValuesProvider<StructDeclarationSyntax> structDeclarations = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    predicate: static (s, _) => Parser.IsStructTargetForGeneration(s),
+                    transform: static (ctx, _) => Parser.GetStructSemanticTargetForGeneration(ctx))
+                .Where(static m => m is not null)!;
+
+            IncrementalValuesProvider<AttributeSyntax> defaultAttributesDeclarations = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    predicate: static (s, _) => Parser.IsAttributeTargetForGeneration(s),
+                    transform: static (ctx, _) => Parser.GetAssemblyAttributeSemanticTargetForGeneration(ctx))
+                .Where(static m => m is not null)!;
+
+            IncrementalValueProvider<(ImmutableArray<StructDeclarationSyntax>, ImmutableArray<AttributeSyntax>)> targetsAndDefaultAttributes
+                = structDeclarations.Collect().Combine(defaultAttributesDeclarations.Collect());
+
+            IncrementalValueProvider<(Compilation Left, (ImmutableArray<StructDeclarationSyntax>, ImmutableArray<AttributeSyntax>) Right)> compilationAndValues
+                = context.CompilationProvider.Combine(targetsAndDefaultAttributes);
+
+            context.RegisterSourceOutput(compilationAndValues,
+                static (spc, source) => Execute(source.Item1, source.Item2.Item1, source.Item2.Item2, spc));
         }
 
-        /// <inheritdoc />
-        public void Execute(GeneratorExecutionContext context)
+        static void Execute(
+            Compilation compilation,
+            ImmutableArray<StructDeclarationSyntax> structs,
+            ImmutableArray<AttributeSyntax> defaults,
+            SourceProductionContext context)
         {
-            if (context.SyntaxReceiver is not StronglyTypedIdReceiver receiver)
+            if (structs.IsDefaultOrEmpty)
             {
+                // nothing to do yet
                 return;
             }
 
-            var compilation = context.Compilation;
-            var results = GenerateStronglyTypedId(receiver, compilation, context.AnalyzerConfigOptions);
+            List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config)> idsToGenerate =
+                Parser.GetTypesToGenerate(compilation, structs, context.ReportDiagnostic, context.CancellationToken);
 
-            foreach (var result in results)
+            if (idsToGenerate.Count > 0)
             {
-                foreach (var diagnostic in result.Diagnostics)
+                StronglyTypedIdConfiguration? globalDefaults = Parser.GetDefaults(defaults, compilation, context.ReportDiagnostic);
+                StringBuilder sb = new StringBuilder();
+                foreach (var idToGenerate in idsToGenerate)
                 {
-                    context.ReportDiagnostic(diagnostic);
-                }
-
-                if (result.SourceName is not null && result.SourceText is not null)
-                {
-                    context.AddSource(result.SourceName, result.SourceText);
-                }
-            }
-        }
-
-        private static ImmutableArray<GenerationResult> GenerateStronglyTypedId(
-            StronglyTypedIdReceiver receiver,
-            Compilation compilation,
-            AnalyzerConfigOptionsProvider optionsProvider)
-        {
-            var results = ImmutableArray.CreateBuilder<GenerationResult>();
-            var information = StronglyTypedIdInformation.Create(receiver, compilation);
-            var globalDefaults = information.Defaults.Defaults ;
-            if (!information.Defaults.Diagnostics.IsDefaultOrEmpty)
-            {
-                results.Add(new GenerationResult(information.Defaults.Diagnostics, null, null));
-            }
-
-            foreach (var stronglyTypedIdInfo in information.Ids)
-            {
-                var structType = stronglyTypedIdInfo.Key;
-                var info = stronglyTypedIdInfo.Value;
-
-                var classNameSpace = structType.ContainingNamespace.IsGlobalNamespace
-                    ? string.Empty
-                    : structType.ContainingNamespace.ToDisplayString();
-
-                var className = structType.Name;
-
-                var values = StronglyTypedIdConfiguration.Combine(info.Configuration, globalDefaults);
-                var source = SourceGenerationHelper.CreateId(classNameSpace, className, values.Converters, values.BackingType, values.Implementations);
-
-                if (!string.IsNullOrEmpty(source))
-                {
-                    var sourceText = SourceText.From(source, Encoding.UTF8);
-                    var sourceFileName = $"{className}_id.g.cs";
-                    results.Add(new GenerationResult(info.Diagnostics, sourceFileName, sourceText));
+                    sb.Clear();
+                    var values = StronglyTypedIdConfiguration.Combine(idToGenerate.Config, globalDefaults);
+                    var result = SourceGenerationHelper.CreateId(
+                        idToGenerate.NameSpace,
+                        idToGenerate.Name,
+                        values.Converters,
+                        values.BackingType,
+                        values.Implementations,
+                        sb);
+                    context.AddSource(idToGenerate.Name + ".g.cs", SourceText.From(result, Encoding.UTF8));
                 }
             }
-
-            return results.ToImmutable();
-        }
-
-        private class GenerationResult
-        {
-            public GenerationResult(ImmutableArray<Diagnostic> diagnostics, string? sourceName, SourceText? sourceText)
-            {
-                Diagnostics = diagnostics;
-                SourceName = sourceName;
-                SourceText = sourceText;
-            }
-
-            public ImmutableArray<Diagnostic> Diagnostics { get; }
-
-            public string? SourceName { get; }
-
-            public SourceText? SourceText { get; }
         }
     }
 }
