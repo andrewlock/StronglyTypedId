@@ -7,7 +7,7 @@ namespace StronglyTypedIds.Tests
         [Fact]
         public void StronglyTypedIdAttributeSource_IsSameAsCompiledSource()
         {
-            var embeddedInGenerator = EmbeddedSources.StronglyTypedIdAttributeSource;
+            var embeddedInGenerator = RemoveConditionalAttribute(EmbeddedSources.StronglyTypedIdAttributeSource);
             var compiledInGenerator = GetCompiledResource("StronglyTypedIdAttribute");
 
             Assert.Equal(embeddedInGenerator, compiledInGenerator);
@@ -16,7 +16,7 @@ namespace StronglyTypedIds.Tests
         [Fact]
         public void StronglyTypedIdDefaultsAttributeSource_IsSameAsCompiledSource()
         {
-            var embeddedInGenerator = EmbeddedSources.StronglyTypedIdDefaultsAttributeSource;
+            var embeddedInGenerator = RemoveConditionalAttribute(EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
             var compiledInGenerator = GetCompiledResource("StronglyTypedIdDefaultsAttribute");
 
             Assert.Equal(embeddedInGenerator, compiledInGenerator);
@@ -47,5 +47,9 @@ namespace StronglyTypedIds.Tests
                 .Replace("public sealed class ", "internal sealed class ")
                 .Replace("public enum ", "internal enum ");
         }
+
+        static string RemoveConditionalAttribute(string resource)
+            => resource.Replace(@"    [System.Diagnostics.Conditional(""NEVER_SET"")]
+", string.Empty);
     }
 }
