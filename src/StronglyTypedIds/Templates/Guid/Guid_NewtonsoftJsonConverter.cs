@@ -14,7 +14,7 @@
 
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
-                var guid = serializer.Deserialize<System.Guid>(reader);
-                return new TESTID(guid);
+                var guid = serializer.Deserialize<System.Guid?>(reader);
+                return guid.HasValue ? new TESTID(guid.Value) : null;
             }
         }

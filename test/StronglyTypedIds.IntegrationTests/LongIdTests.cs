@@ -76,6 +76,18 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanSerializeToNullableInt_WithNewtonsoftJsonProvider()
+        {
+            var entity = new EntityWithNullableId { Id = null };
+
+            var json = NewtonsoftJsonSerializer.SerializeObject(entity);
+            var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
+
+            Assert.NotNull(deserialize);
+            Assert.Null(deserialize.Id);
+        }
+
+        [Fact]
         public void CanSerializeToLong_WithSystemTextJsonProvider()
         {
             var foo = new SystemTextJsonLongId(123L);
@@ -277,6 +289,11 @@ namespace StronglyTypedIds.IntegrationTests
         public class TestEntity
         {
             public EfCoreLongId Id { get; set; }
+        }
+
+        public class EntityWithNullableId
+        {
+            public NewtonsoftJsonLongId? Id { get; set; }
         }
     }
 }
