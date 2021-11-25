@@ -20,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Sources\*.cs" Link="Sources\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Sources\*.cs" Link="Sources\Generator\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Attributes\*.cs" Link="Sources\Attributes\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

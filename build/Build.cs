@@ -24,7 +24,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     OnPullRequestBranches = new[] {"*"},
     AutoGenerate = false,
     ImportSecrets = new[] {nameof(NuGetToken)},
-    InvokedTargets = new[] {nameof(Clean), nameof(Test), nameof(TestPackage), nameof(PushToNuGet)}
+    InvokedTargets = new[] {nameof(Clean), nameof(Test), nameof(TestPackages), nameof(PushToNuGet)}
 )]
 class Build : NukeBuild
 {
@@ -102,33 +102,38 @@ class Build : NukeBuild
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .EnableNoRestore()
-                .SetProject(Solution.src.StronglyTypedIds));
+                .SetProject(Solution));
         });
 
-    Target TestPackage => _ => _
+    Target TestPackages => _ => _
         .DependsOn(Pack)
         .After(Test)
         .Produces(ArtifactsDirectory)
         .Executes(() =>
         {
-            var projectFile = TestsDirectory / "StronglyTypedIds.Nuget.IntegrationTests";
+            var projectFiles = new[]
+            {
+                TestsDirectory / "StronglyTypedIds.Nuget.IntegrationTests",
+                TestsDirectory / "StronglyTypedIds.Nuget.Attributes.IntegrationTests",
+            };
 
             DotNetRestore(s => s
-                .SetProjectFile(projectFile)
                 .When(!string.IsNullOrEmpty(PackagesDirectory), x => x.SetPackageDirectory(PackagesDirectory))
-                .SetConfigFile(RootDirectory / "NuGet.integration-tests.config"));
+                .SetConfigFile(RootDirectory / "NuGet.integration-tests.config")
+                .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
 
             DotNetBuild(s => s
-                .SetProjectFile(projectFile)
                 .When(!string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
                 .EnableNoRestore()
-                .SetConfiguration(Configuration));
+                .SetConfiguration(Configuration)
+                .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
 
             DotNetTest(s => s
-                .SetProjectFile(projectFile)
                 .SetConfiguration(Configuration)
                 .EnableNoBuild()
-                .EnableNoRestore());
+                .EnableNoRestore()
+                .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
+
         });
 
     Target PushToNuGet => _ => _

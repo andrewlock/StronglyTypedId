@@ -86,7 +86,7 @@
               "PushToNuGet",
               "Restore",
               "Test",
-              "TestPackage"
+              "TestPackages"
             ]
           }
         },
@@ -106,7 +106,7 @@
               "PushToNuGet",
               "Restore",
               "Test",
-              "TestPackage"
+              "TestPackages"
             ]
           }
         },

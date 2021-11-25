@@ -80,7 +80,7 @@ namespace StronglyTypedIds
         internal const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
         internal const string SystemTextJsonAttributeSource = "    [System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
 
-        private static string LoadEmbeddedResource(string resourceName)
+        internal static string LoadEmbeddedResource(string resourceName)
         {
             var resourceStream = ThisAssembly.GetManifestResourceStream(resourceName);
             if (resourceStream is null)

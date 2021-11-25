@@ -4,63 +4,59 @@ namespace StronglyTypedIds.Tests
 {
     public class EmbeddedResourceTests
     {
-        [Fact]
-        public void StronglyTypedIdAttributeSource_IsSameAsCompiledSource()
+        public static TheoryData<string> EmbeddedResources { get; } = new()
         {
-            var embeddedInGenerator = GetEmebeddedResource(EmbeddedSources.StronglyTypedIdAttributeSource);
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdAttribute");
+            "StronglyTypedIdAttribute",
+            "StronglyTypedIdDefaultsAttribute",
+            "StronglyTypedIdBackingType",
+            "StronglyTypedIdConverter",
+            "StronglyTypedIdImplementations",
+        };
 
-            Assert.Equal(embeddedInGenerator, compiledInGenerator);
+        [Theory]
+        [MemberData(nameof(EmbeddedResources))]
+        public void EmittedResourceIsSameAsCompiledResource(string resource)
+        {
+            var emittedByGenerator = GetEmittedResource(resource);
+            var compiledInGenerator = GetGeneratorCompiledResource(resource);
+
+            Assert.Equal(emittedByGenerator, compiledInGenerator);
         }
 
-        [Fact]
-        public void StronglyTypedIdDefaultsAttributeSource_IsSameAsCompiledSource()
+        [Theory]
+        [MemberData(nameof(EmbeddedResources))]
+        public void EmittedResourceIsSameAsAttributeDllResource(string resource)
         {
-            var embeddedInGenerator = GetEmebeddedResource(EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdDefaultsAttribute");
+            var emittedByGenerator = GetEmittedResource(resource);
+            var compiledInAttributesDll = GetAttributesCompiledResource(resource);
 
-            Assert.Equal(embeddedInGenerator, compiledInGenerator);
+            Assert.Equal(emittedByGenerator, compiledInAttributesDll);
         }
 
-        [Fact]
-        public void StronglyTypedIdBackingTypeSource_IsSameAsCompiledSource()
+        static string GetGeneratorCompiledResource(string filename)
         {
-            var embeddedInGenerator = GetEmebeddedResource(EmbeddedSources.StronglyTypedIdBackingTypeSource);
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdBackingType");
-
-            Assert.Equal(embeddedInGenerator, compiledInGenerator);
-        }
-
-        [Fact]
-        public void StronglyTypedIdConverterSource_IsSameAsCompiledSource()
-        {
-            var embeddedInGenerator = GetEmebeddedResource(EmbeddedSources.StronglyTypedIdConverterSource);
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdConverter");
-
-            Assert.Equal(embeddedInGenerator, compiledInGenerator);
-        }
-
-        [Fact]
-        public void StronglyTypedIdImplementationsSource_IsSameAsCompiledSource()
-        {
-            var embeddedInGenerator = GetEmebeddedResource(EmbeddedSources.StronglyTypedIdImplementationsSource);
-            var compiledInGenerator = GetCompiledResource("StronglyTypedIdImplementations");
-
-            Assert.Equal(embeddedInGenerator, compiledInGenerator);
-        }
-
-        static string GetCompiledResource(string filename)
-        {
-            return TestHelpers.LoadEmbeddedResource($"StronglyTypedIds.Tests.Sources.{filename}.cs")
+            return TestHelpers.LoadEmbeddedResource($"StronglyTypedIds.Tests.Sources.Generator.{filename}.cs")
                 .Replace("namespace StronglyTypedIds.Sources", "namespace StronglyTypedIds")
                 .Replace("public sealed class ", "internal sealed class ")
                 .Replace("public enum ", "internal enum ");
         }
 
-        static string GetEmebeddedResource(string resource)
-            => resource.Replace(@"    [System.Diagnostics.Conditional(""STRONGLY_TYPED_ID_USAGES"")]
-", string.Empty).Replace(@"#if !STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
-", string.Empty).Replace(@"
+        static string GetAttributesCompiledResource(string filename)
+        {
+            return TestHelpers.LoadEmbeddedResource($"StronglyTypedIds.Tests.Sources.Attributes.{filename}.cs")
+                .Replace("public sealed class ", "internal sealed class ")
+                .Replace("public enum ", "internal enum ")
+                .Replace(@"    [System.Diagnostics.Conditional(""STRONGLY_TYPED_ID_USAGES"")]
+", string.Empty);
+        }
+
+        static string GetEmittedResource(string resource)
+            => EmbeddedSources.LoadEmbeddedResource($"StronglyTypedIds.Templates.Sources.{resource}.cs")
+                .Replace(@"    [System.Diagnostics.Conditional(""STRONGLY_TYPED_ID_USAGES"")]
+", string.Empty)
+                .Replace(@"#if !STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
+", string.Empty)
+                .Replace(@"
 #endif // STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES", string.Empty);
     }
 }
