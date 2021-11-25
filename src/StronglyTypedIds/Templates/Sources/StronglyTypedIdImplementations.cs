@@ -1,3 +1,4 @@
+#if !STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
 using System;
 
 namespace StronglyTypedIds
@@ -35,3 +36,4 @@ namespace StronglyTypedIds
         IComparable = 4,
     }
 }
+#endif // STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES

@@ -1,3 +1,4 @@
+#if !STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
 using System;
 
 namespace StronglyTypedIds
@@ -6,7 +7,7 @@ namespace StronglyTypedIds
     /// Place on partial structs to make the type a strongly-typed ID
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional("NEVER_SET")]
+    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
     internal sealed class StronglyTypedIdAttribute : Attribute
     {
         /// <summary>
@@ -46,3 +47,4 @@ namespace StronglyTypedIds
         public StronglyTypedIdImplementations Implementations { get; }
     }
 }
+#endif // STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
+using System;
 
 namespace StronglyTypedIds
 {
@@ -48,3 +49,4 @@ namespace StronglyTypedIds
         DapperTypeHandler = 32,
     }
 }
+#endif // STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES
