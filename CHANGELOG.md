@@ -1,5 +1,20 @@
 # Changelog
 
+## [v1.0.0-beta03]
+
+Breaking Changes:
+
+* Converted to use .NET 6's incremental source generators. This should provide performance improvements, but it requires using the .NET 6 SDK.
+
+Bug fixes:
+
+* Fixed problem deserializing nullable strongly-typed IDs with Newtonsoft.Json (https://github.com/andrewlock/StronglyTypedId/issues/36)
+
+New Features:
+
+* To support scenarios in which [InternalsVisibleTo] causes duplicate reference issues with the marker attributes, you can set the msbuild constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES` to exclude these from build output. You must then reference the StronglyTypedId.Attributes project as well, which contains the marker attributes.
+* By default, the marker attributes are decorated with the `[Conditional]` attribute, so they will not appear on your IDs. If you need these to persist, define the msbuild constant `STRONGLY_TYPED_ID_USAGES`.
+
 ## [v1.0.0-beta02]
 
 Bug fixes

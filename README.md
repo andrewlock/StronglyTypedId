@@ -5,7 +5,7 @@
 ![Build status](https://github.com/andrewlock/StronglyTypedId/actions/workflows/BuildAndPack.yml/badge.svg)
 [![NuGet](https://img.shields.io/nuget/v/StronglyTypedId.svg)](https://www.nuget.org/packages/StronglyTypedId/)
 
-StronglyTypedId makes creating strongly-typed IDs as easy as adding an attribute! No more [accidentally passing arguments in the wrong order to methods](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem) - StronglyTypedId uses .NET 5+'s compile-time source generators to generate [the boilerplate](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#a-full-example-implementation) required to use strongly-typed IDs.
+StronglyTypedId makes creating strongly-typed IDs as easy as adding an attribute! No more [accidentally passing arguments in the wrong order to methods](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem) - StronglyTypedId uses .NET 6's compile-time incremental source generators to generate [the boilerplate](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#a-full-example-implementation) required to use strongly-typed IDs.
 
 Simply, [install the required package](#installing) add the `[StronglyTypedId]` attribute to a `struct` (in the `StronglyTypedIds` namespace):
 
@@ -27,7 +27,7 @@ and the source generator magically generates the backing code when you save the 
 
 ## Changes in version 1.x
 
-Version 0.x of this library used the helper library [CodeGeneration.Roslyn](https://github.com/AArnott/CodeGeneration.Roslyn) by [AArnott](https://github.com/AArnott), for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.
+Version 0.x of this library used the helper library [CodeGeneration.Roslyn](https://github.com/AArnott/CodeGeneration.Roslyn) by [AArnott](https://github.com/AArnott), for build-time source generation. In version 1.0.0 this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 6+. As part of this change, there were a number of additional features added and breaking changes made.
 
 ### Breaking Changes
 
@@ -47,12 +47,13 @@ Version 0.x of this library used the helper library [CodeGeneration.Roslyn](http
 * Some converters had incorrect implementations, such as in ([#26](https://github.com/andrewlock/StronglyTypedId/issues/24)). These have been addressed in version 1.x.
 * Better null handling has been added for the `String` backing type, handling issues such as [#32](https://github.com/andrewlock/StronglyTypedId/issues/32).
 * The code is marked as auto generated, to avoid errors such as #CS1591 as described in [#27](https://github.com/andrewlock/StronglyTypedId/issues/27)
+* An error deserializing nullable StronglyTypedIds with Newtonsoft.Json [#36](https://github.com/andrewlock/StronglyTypedId/issues/36)
 
 ## Installing
 
 To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/StronglyTypedId), install the [StronglyTypedId](https://www.nuget.org/packages/StronglyTypedId) package into your project. Depending on which converters you implement, you may need one or more of the following additional packages
 
-* [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/) (optional, only required if [generating a Newtonsoft `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in ASP.NET Core apps, you will likely already reference this project via transitive dependencies.
+* [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/) (optional, only required if [generating a Newtonsoft `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in some ASP.NET Core apps, you will likely already reference this project via transitive dependencies.
 * [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/) (optional, only required if [generating a System.Text `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in .NET Core apps, you will likely already reference this project via transitive dependencies.
 * [Dapper](https://www.nuget.org/packages/Dapper/) (optional, only required if [generating a type mapper](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-3/#interfacing-with-external-system-using-strongly-typed-ids))
 * [EF Core](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore) (optional, only required if [generating an EF Core ValueConverter](https://andrewlock.net/strongly-typed-ids-in-ef-core-using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-4/))
@@ -64,11 +65,11 @@ To install the packages, add the references to your _csproj_ file so that it loo
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   
   <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta02" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta03" />
   <!-- -->
 
 </Project>
@@ -123,6 +124,38 @@ var id = new FooId("my-id-value");
 ```
 Currently supported values are `Guid` (the default), `int`, `long`, and `string`.
 
+## Error CS0436 and [InternalsVisibleTo]
+
+The StronglyTypedId generator automatically adds the `[StronglyTypedId]` attributes to your compilation as `internal` attributes. If you add the source generator package to multiple projects, and use the `[InternalsVisibleTo]` attribute, you may experience errors when you build:
+
+```bash
+warning CS0436: The type 'StronglyTypedIdImplementations' in 'StronglyTypedIds\StronglyTypedIds.StronglyTypedIdGenerator\StronglyTypedIdImplementations.cs' conflicts with the imported type 'StronglyTypedIdImplementations' in 'MyProject, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'.
+```
+
+Removing the `[InternalsVisibleTo]` attribute will resolve the problem, but if this is not possible you can disable the auto-generation of the `[StronglyTypedId]` marker attributes, and rely on the helper [`StronglyTypedId.Attributes` package instead](https://www.nuget.org/packages/StronglyTypedId.Attributes). This package contains the same attributes, but as they are in an external package, you can avoid the CS0436 error.
+
+Add the package to your solution, ensuring you set `"PrivateAssets="All"` in the `<PackageReference>` (this will be done automatically when using the .NET CLI or an IDE). To disable the auto-generation of the marker attributes, define the constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES` in your project file. Your project file should look something like the following:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <DefineConstants>STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES</DefineConstants>
+  </PropertyGroup>
+  
+  <!-- Core package -->
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta03" />
+  <PackageReference Include="StronglyTypedId.Attributes" Version="1.0.0-beta03">
+    <PrivateAssets>All</PrivateAssets>
+  </PackageReference>
+  <!-- -->
+
+</Project>
+```
+
+The attribute library is only required at compile time, so it won't appear in your build output. 
 
 ## Why do I need this library?
 
@@ -144,7 +177,7 @@ You can see see example implementations in the test `SourceGenerationHelperSnaps
 
 The StronglyTypedId NuGet package is a .NET Standard 2.0 package. 
 
-You must be using the .NET 5+ SDK (though you can compile for other target frameworks like .NET Core 2.1 and .NET Framework 4.8)
+You must be using the .NET 6+ SDK (though you can compile for other target frameworks like .NET Core 2.1 and .NET Framework 4.8)
 
 The `struct`s you decorate with the `StronglyTypedId` attribute must be marked `partial`, and cannot be nested inside another class.
 
