@@ -8,22 +8,37 @@
     <Copyright>Copyright © AndrewLock</Copyright>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/andrewlock/StronglyTypedId</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/logo.png</PackageIconUrl>
     <PackageTags>stronglytypedid attribute generator generation codegen codegenerator codegeneration netescapades</PackageTags>
     <RepositoryUrl>https://github.com/andrewlock/StronglyTypedId</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
     <DebugType>embedded</DebugType>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <LangVersion>7.3</LangVersion>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageOutputPath>$(SolutionDir)/artifacts</PackageOutputPath>
-    <CodeGenerationRoslynPackagesVersion>0.7.63</CodeGenerationRoslynPackagesVersion>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)\artifacts</PackageOutputPath>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\logo.png" Pack="true" PackagePath="\"/>
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+  </ItemGroup>
 
   <Import Project="releasenotes.props" />
 

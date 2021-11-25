@@ -1,13 +1,49 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">
       <![CDATA[
 
-Features:
+Version 0.x of this library used the helper library CodeGeneration.Roslyn for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.
 
-* Added support for .NET Core 3.1, and converted to using CodeGeneration.Roslyn.Tool instead of dotnet-codegen (thanks Bartłomiej Oryszak!)
-* Added support for generating System.Text.Json JsonConverters (thanks Bartłomiej Oryszak!)
-* Added support for long backing type (thanks Bartłomiej Oryszak!)
+## Changes in 1.0.0-beta03:
+
+Breaking Changes:
+
+* Converted to use .NET 6's incremental source generators. This should provide performance improvements, but it requires using the .NET 6 SDK.
+
+Bug fixes:
+
+* Fixed problem deserializing nullable strongly-typed IDs with Newtonsoft.Json (https://github.com/andrewlock/StronglyTypedId/issues/36)
+
+New Features:
+
+* To support scenarios in which [InternalsVisibleTo] causes duplicate reference issues with the marker attributes, you can set the msbuild constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES` to exclude these from build output. You must then reference the StronglyTypedId.Attributes project as well, which contains the marker attributes.
+* By default, the marker attributes are decorated with the `[Conditional]` attribute, so they will not appear on your IDs. If you need these to persist, define the msbuild constant `STRONGLY_TYPED_ID_USAGES`.
+
+## Changes in 1.0.0-beta02:
+
+Bug fixes
+
+* Adds auto-generated attributes and enums as `internal` to help avoid referencing issues
+
+## Breaking Changes
+
+* `StronglyTypedIds` namespace is required. In version 0.x of the library, the `[StronglyTypedId]` attribute was in the global namespace. In version 1.x, the attribute is in the `StronglyTypedIds` namespace, so you must add `namespace StronglyTypedIds;`.
+* The properties exposed by `StronglyTypedIds` have changed: there is no longer a `generateJsonConverter` property. Instead, this is infered based on the `StronglyTypedIdConverters` flags provided.
+* The `String` backing typed ID will throw if you call the constructor with a `null` value
+
+## New Features
+
+* The attributes can now auto-generate additional converter types such as EF Core `ValueConverter` and Dapper `TypeHandler`, as described in [my blog posts](https://andrewlock.net/series/using-strongly-typed-entity-ids-to-avoid-primitive-obsession/). These are optional flags on the `converters` property.
+* Made interface implementations (`IEquatable<T>` and `IComparable<T>` currently) optional. This is to potentially support additional interfaces in future versions.
+* Added a `NullableString` backing type. Due to the behaviour of `struct`s in c#, the `String` backing type ID _may_ still be null, but you can't explicitly call the constructor with a null value. In contrast, you can do this with the `NullableString` backing type.
+* Added a `[StronglyTypedIdDefaults]` attribute to set default values for all `[StronglyTypedId]` attributes in your project. This is useful if you want to customise all the attributes, for example, if you want to generate additional converters by default. You can still override all the properties of a `[StronglyTypedId]` instance.
+
+## Bug Fixes
+
+* Some converters had incorrect implementations, such as in ([#26](https://github.com/andrewlock/StronglyTypedId/issues/24)). These have been addressed in version 1.x.
+* Better null handling has been added for the `String` backing type, handling issues such as [#32](https://github.com/andrewlock/StronglyTypedId/issues/32).
+* The code is marked as auto generated, to avoid errors such as #CS1591 as described in [#27](https://github.com/andrewlock/StronglyTypedId/issues/27)
 
 ]]>
     </PackageReleaseNotes>
