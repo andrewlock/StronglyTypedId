@@ -7,7 +7,6 @@
     <PackageId>StronglyTypedId.Attributes</PackageId>
     <Description>Helper library for StronglyTypedId generator containg attributes only. See README for when to use this package </Description>
     <IsPackable>true</IsPackable>
-    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
 </Project>
