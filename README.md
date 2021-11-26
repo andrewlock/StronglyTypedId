@@ -69,7 +69,7 @@ To install the packages, add the references to your _csproj_ file so that it loo
   </PropertyGroup>
   
   <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta03" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04" />
   <!-- -->
 
 </Project>
@@ -146,8 +146,8 @@ Add the package to your solution, ensuring you set `"PrivateAssets="All"` in the
   </PropertyGroup>
   
   <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta03" />
-  <PackageReference Include="StronglyTypedId.Attributes" Version="1.0.0-beta03">
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04" />
+  <PackageReference Include="StronglyTypedId.Attributes" Version="1.0.0-beta04">
     <PrivateAssets>All</PrivateAssets>
   </PackageReference>
   <!-- -->

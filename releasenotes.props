@@ -5,6 +5,12 @@
 
 Version 0.x of this library used the helper library CodeGeneration.Roslyn for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.
 
+## Changes in 1.0.0-beta04:
+
+New Features:
+
+* Added support for IDs inside nested classes/records/structs (Fixes https://github.com/andrewlock/StronglyTypedId/issues/40)
+
 ## Changes in 1.0.0-beta03:
 
 Breaking Changes:
