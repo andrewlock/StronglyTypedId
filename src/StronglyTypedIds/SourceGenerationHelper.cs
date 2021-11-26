@@ -10,14 +10,16 @@ namespace StronglyTypedIds
         public static string CreateId(
             string idNamespace,
             string idName,
+            ParentClass? parentClass,
             StronglyTypedIdConverter converters,
             StronglyTypedIdBackingType backingType,
             StronglyTypedIdImplementations implementations)
-            => CreateId(idNamespace, idName, converters, backingType, implementations, null);
+            => CreateId(idNamespace, idName, parentClass, converters, backingType, implementations, null);
 
         public static string CreateId(
             string idNamespace,
             string idName,
+            ParentClass? parentClass,
             StronglyTypedIdConverter converters,
             StronglyTypedIdBackingType backingType,
             StronglyTypedIdImplementations implementations,
@@ -33,12 +35,13 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, converters, implementations, resources, sb);
+            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources, sb);
         }
 
         static string CreateId(
             string idNamespace,
             string idName,
+            ParentClass? parentClass,
             StronglyTypedIdConverter converters,
             StronglyTypedIdImplementations implementations,
             EmbeddedSources.ResourceCollection resources,
@@ -70,6 +73,8 @@ namespace StronglyTypedIds
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
 
+            var parentsCount = 0;
+
             sb ??= new StringBuilder();
             sb.Append(resources.Header);
 
@@ -85,6 +90,21 @@ namespace StronglyTypedIds
                     .Append(idNamespace)
                     .AppendLine(@"
 {");
+            }
+
+            while (parentClass is not null)
+            {
+                sb
+                    .Append("    partial ")
+                    .Append(parentClass.Keyword)
+                    .Append(' ')
+                    .Append(parentClass.Name)
+                    .Append(' ')
+                    .Append(parentClass.Constraints)
+                    .AppendLine(@"
+    {");
+                parentsCount++;
+                parentClass = parentClass.Child;
             }
 
             if (useNewtonsoftJson)
@@ -139,6 +159,12 @@ namespace StronglyTypedIds
 
             sb.Replace("TESTID", idName);
             sb.AppendLine(@"    }");
+
+            for (int i = 0; i < parentsCount; i++)
+            {
+                sb.AppendLine(@"    }");
+            }
+
             if (hasNamespace)
             {
                 sb.Append('}').AppendLine();

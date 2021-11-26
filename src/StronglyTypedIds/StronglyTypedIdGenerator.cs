@@ -58,7 +58,7 @@ namespace StronglyTypedIds
                 return;
             }
 
-            List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config)> idsToGenerate =
+            List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)> idsToGenerate =
                 Parser.GetTypesToGenerate(compilation, structs, context.ReportDiagnostic, context.CancellationToken);
 
             if (idsToGenerate.Count > 0)
@@ -72,6 +72,7 @@ namespace StronglyTypedIds
                     var result = SourceGenerationHelper.CreateId(
                         idToGenerate.NameSpace,
                         idToGenerate.Name,
+                        idToGenerate.Parent,
                         values.Converters,
                         values.BackingType,
                         values.Implementations,

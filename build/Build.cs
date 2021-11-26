@@ -119,6 +119,12 @@ class Build : NukeBuild
                 TestsDirectory / "StronglyTypedIds.Nuget.Attributes.IntegrationTests",
             };
 
+            if (!string.IsNullOrEmpty(PackagesDirectory))
+            {
+                DeleteDirectory(PackagesDirectory / "stronglytypedid");
+                DeleteDirectory(PackagesDirectory / "stronglytypedid.attributes");
+            }
+
             DotNetRestore(s => s
                 .When(!string.IsNullOrEmpty(PackagesDirectory), x => x.SetPackageDirectory(PackagesDirectory))
                 .SetConfigFile(RootDirectory / "NuGet.integration-tests.config")

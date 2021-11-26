@@ -44,7 +44,7 @@ Version 0.x of this library used the helper library [CodeGeneration.Roslyn](http
 
 ### Bug Fixes
  
-* Some converters had incorrect implementations, such as in ([#26](https://github.com/andrewlock/StronglyTypedId/issues/24)). These have been addressed in version 1.x.
+* Some converters had incorrect implementations, such as in ([#24](https://github.com/andrewlock/StronglyTypedId/issues/24)). These have been addressed in version 1.x.
 * Better null handling has been added for the `String` backing type, handling issues such as [#32](https://github.com/andrewlock/StronglyTypedId/issues/32).
 * The code is marked as auto generated, to avoid errors such as #CS1591 as described in [#27](https://github.com/andrewlock/StronglyTypedId/issues/27)
 * An error deserializing nullable StronglyTypedIds with Newtonsoft.Json [#36](https://github.com/andrewlock/StronglyTypedId/issues/36)
@@ -179,7 +179,7 @@ The StronglyTypedId NuGet package is a .NET Standard 2.0 package.
 
 You must be using the .NET 6+ SDK (though you can compile for other target frameworks like .NET Core 2.1 and .NET Framework 4.8)
 
-The `struct`s you decorate with the `StronglyTypedId` attribute must be marked `partial`, and cannot be nested inside another class.
+The `struct`s you decorate with the `StronglyTypedId` attribute must be marked `partial`.
 
 ## Credits
 [Credits]: #credits

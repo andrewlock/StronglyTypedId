@@ -33,6 +33,87 @@ public partial struct MyId {}";
         }
 
         [Fact]
+        public Task CanGenerateIdInNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace
+{
+    [StronglyTypedId]
+    public partial struct MyId {}
+}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateIdInFileScopedNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace;
+[StronglyTypedId]
+public partial struct MyId {}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateNestedIdInFileScopeNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace;
+
+public class ParentClass
+{
+    [StronglyTypedId]
+    public partial struct MyId {}
+}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateVeryNestedIdInFileScopeNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace;
+
+public class ParentClass<T> 
+    where T: new() 
+{
+    internal record InnerClass<TKey, TValue>
+    {
+        public struct InnerStruct
+        {
+            [StronglyTypedId]
+            public partial struct MyId {}
+        }
+    }
+}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
         public Task CanOverrideDefaultsUsingGlobalAttribute()
         {
             const string input = @"using StronglyTypedIds;
