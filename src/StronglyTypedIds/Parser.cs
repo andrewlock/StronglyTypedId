@@ -84,13 +84,13 @@ internal static class Parser
         return null;
     }
 
-    public static List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config)> GetTypesToGenerate(
+    public static List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)> GetTypesToGenerate(
         Compilation compilation,
         ImmutableArray<StructDeclarationSyntax> targets,
         Action<Diagnostic> reportDiagnostic,
         CancellationToken ct)
     {
-        var idsToGenerate = new List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config)>();
+        var idsToGenerate = new List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)>();
         INamedTypeSymbol? idAttribute = compilation.GetTypeByMetadataName(StronglyTypedIdAttribute);
         if (idAttribute == null)
         {
@@ -226,15 +226,11 @@ internal static class Parser
                 reportDiagnostic(NotPartialDiagnostic.Create(structDeclarationSyntax));
             }
 
-            if (structSymbol.ContainingType is not null)
-            {
-                reportDiagnostic(NestedTypeDiagnostic.Create(structDeclarationSyntax));
-            }
-
-            string nameSpace = structSymbol.ContainingNamespace.IsGlobalNamespace ? string.Empty : structSymbol.ContainingNamespace.ToString();
+            string nameSpace = GetNameSpace(structDeclarationSyntax);
+            var parentClass = GetParentClasses(structDeclarationSyntax);
             var name = structSymbol.Name;
 
-            idsToGenerate.Add((Name: name, NameSpace: nameSpace, Config: config.Value));
+            idsToGenerate.Add((Name: name, NameSpace: nameSpace, Config: config.Value, Parent: parentClass));
         }
 
         return idsToGenerate;
@@ -369,5 +365,59 @@ internal static class Parser
         }
 
         return null;
+    }
+
+    private static string GetNameSpace(StructDeclarationSyntax structSymbol)
+    {
+        // determine the namespace the struct is declared in, if any
+        SyntaxNode? potentialNamespaceParent = structSymbol.Parent;
+        while (potentialNamespaceParent != null &&
+               potentialNamespaceParent is not NamespaceDeclarationSyntax
+               && potentialNamespaceParent is not FileScopedNamespaceDeclarationSyntax)
+        {
+            potentialNamespaceParent = potentialNamespaceParent.Parent;
+        }
+
+        if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
+        {
+            string nameSpace = namespaceParent.Name.ToString();
+            while (true)
+            {
+                if(namespaceParent.Parent is not NamespaceDeclarationSyntax namespaceParentParent)
+                {
+                    break;
+                }
+
+                namespaceParent = namespaceParentParent;
+                nameSpace = $"{namespaceParent.Name}.{nameSpace}";
+            }
+
+            return nameSpace;
+        }
+        return string.Empty;
+    }
+
+    private static ParentClass? GetParentClasses(StructDeclarationSyntax structSymbol)
+    {
+        TypeDeclarationSyntax? parentIdClass = structSymbol.Parent as TypeDeclarationSyntax;
+        ParentClass? parentClass = null;
+
+        while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))
+        {
+            parentClass = new ParentClass(
+                keyword: parentIdClass.Keyword.ValueText,
+                name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
+                constraints: parentIdClass.ConstraintClauses.ToString(),
+                child: parentClass);
+
+            parentIdClass = (parentIdClass.Parent as TypeDeclarationSyntax);
+        }
+
+        return parentClass;
+
+        static bool IsAllowedKind(SyntaxKind kind) =>
+            kind == SyntaxKind.ClassDeclaration ||
+            kind == SyntaxKind.StructDeclaration ||
+            kind == SyntaxKind.RecordDeclaration;
     }
 }

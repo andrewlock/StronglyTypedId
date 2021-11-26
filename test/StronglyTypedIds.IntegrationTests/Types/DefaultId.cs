@@ -26,4 +26,16 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(converters: StronglyTypedIdConverter.EfCoreValueConverter)]
     public partial struct EfCoreDefaultId { }
+
+    public partial class SomeType<T> where T : new()
+    {
+        public partial record NestedType<TKey, TValue>
+        {
+            public partial struct MoreNesting
+            {
+                [StronglyTypedId]
+                public partial struct VeryNestedId {}
+            }
+        }
+    }
 }

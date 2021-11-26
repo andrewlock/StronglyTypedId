@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.0-beta04]
+
+New Features:
+
+* Added support for IDs inside nested classes/records/structs (Fixes https://github.com/andrewlock/StronglyTypedId/issues/40)
+ 
 ## [v1.0.0-beta03]
 
 Breaking Changes:

@@ -20,6 +20,7 @@ namespace StronglyTypedIds.Tests
             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
                 idName: idName,
                 idNamespace: IdNamespace,
+                parentClass: null,
                 converters: StronglyTypedIdConverter.None,
                 backingType: StronglyTypedIdBackingType.Guid,
                 implementations: StronglyTypedIdImplementations.None
@@ -32,6 +33,7 @@ namespace StronglyTypedIds.Tests
             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
                 idName: "MyTestId",
                 idNamespace: IdNamespace,
+                parentClass: null,
                 converters: StronglyTypedIdConverter.Default,
                 backingType: StronglyTypedIdBackingType.Guid,
                 implementations: StronglyTypedIdImplementations.None
@@ -44,6 +46,7 @@ namespace StronglyTypedIds.Tests
             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
                 idName: "MyTestId",
                 idNamespace: IdNamespace,
+                parentClass: null,
                 converters: StronglyTypedIdConverter.None,
                 backingType: StronglyTypedIdBackingType.Default,
                 implementations: StronglyTypedIdImplementations.None
@@ -56,6 +59,7 @@ namespace StronglyTypedIds.Tests
             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
                 idName: "MyTestId",
                 idNamespace: IdNamespace,
+                parentClass: null,
                 converters: StronglyTypedIdConverter.None,
                 backingType: StronglyTypedIdBackingType.Guid,
                 implementations: StronglyTypedIdImplementations.Default
@@ -74,6 +78,7 @@ namespace StronglyTypedIds.Tests
             var result = SourceGenerationHelper.CreateId(
                 idName: idName,
                 idNamespace: ns,
+                parentClass: null,
                 converters: converter,
                 backingType: backingType,
                 implementations: implementations
@@ -82,6 +87,32 @@ namespace StronglyTypedIds.Tests
             return Verifier.Verify(result)
                 .UseDirectory("Snapshots")
                 .UseParameters(ns, (int)converter, backingType, (int)implementations);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public Task GeneratesIdWithNestedClassCorrectly(int nestedClassCount)
+        {
+            var parent = new ParentClass("record", "InnerMost<T>", string.Empty, child: null);
+            for (int i = 0; i < nestedClassCount; i++)
+            {
+                parent = new ParentClass("class", "OuterLayer" + i, string.Empty, parent);
+            }
+
+            var result = SourceGenerationHelper.CreateId(
+                idName: "MyTestId",
+                idNamespace: "MyTestNamespace",
+                parentClass: parent,
+                converters: StronglyTypedIdConverter.SystemTextJson,
+                backingType: StronglyTypedIdBackingType.Guid,
+                implementations: StronglyTypedIdImplementations.None
+            );
+
+            return Verifier.Verify(result)
+                .UseDirectory("Snapshots")
+                .UseParameters(nestedClassCount);
         }
 
         public static IEnumerable<object[]> Parameters()
