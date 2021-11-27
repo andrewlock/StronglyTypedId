@@ -16,10 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="StronglyTypedId" Version="$(Version)">
-      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="StronglyTypedId" Version="$(Version)" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0'">
