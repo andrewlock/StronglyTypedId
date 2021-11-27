@@ -20,14 +20,4 @@
     <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndNamespace.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndNamespace.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndFileScopedNamespace.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndFileScopedNamespace.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClass.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClass.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdInFileScopedNamespace.verified.txt" />
-  </ItemGroup>
-
 </Project>
