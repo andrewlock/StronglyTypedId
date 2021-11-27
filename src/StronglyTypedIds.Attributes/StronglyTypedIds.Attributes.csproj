@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>StronglyTypedIds</RootNamespace>
-    <PackageId>StronglyTypedId.Attributes</PackageId>
-    <Description>Helper library for StronglyTypedId generator containg attributes only. See README for when to use this package </Description>
-    <IsPackable>true</IsPackable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
 </Project>

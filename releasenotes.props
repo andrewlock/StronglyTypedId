@@ -5,6 +5,16 @@
 
 Version 0.x of this library used the helper library CodeGeneration.Roslyn for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.
 
+## Changes in 1.0.0-beta05:
+
+Breaking Changes:
+* Removed StronglyTypedId.Attributes NuGet package.
+* The attributes are no longer embed in your project by default, instead it will use the external dll. You can re-enable the embedding by setting `STRONGLY_TYPED_ID_EMBED_ATTRIBUTES`.
+
+New Features:
+
+* Improved approach to handling [InternalsVisibleTo] issues, by embedding the StronglyTypedId.Attributes.dll in the NuGet package directly.
+
 ## Changes in 1.0.0-beta04:
 
 New Features:

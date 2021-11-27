@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>beta04</VersionSuffix>
+    <VersionSuffix>beta05</VersionSuffix>
     <PackageVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
   </PropertyGroup>

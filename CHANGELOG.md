@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.0.0-beta05]
+
+Breaking Changes:
+* Removed StronglyTypedId.Attributes NuGet package.
+* The attributes are no longer embed in your project by default, instead it will use the external dll. You can re-enable the embedding by setting `STRONGLY_TYPED_ID_EMBED_ATTRIBUTES`.
+
+New Features:
+
+* Improved approach to handling [InternalsVisibleTo] issues, by embedding the StronglyTypedId.Attributes.dll in the NuGet package directly.
+
 ## [v1.0.0-beta04]
 
 New Features:

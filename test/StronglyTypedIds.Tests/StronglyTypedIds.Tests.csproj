@@ -17,21 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Sources\*.cs" Link="Sources\Generator\%(Filename)%(Extension)" />
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Attributes\*.cs" Link="Sources\Attributes\%(Filename)%(Extension)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndNamespace.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndNamespace.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndFileScopedNamespace.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClassAndFileScopedNamespace.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClass.verified.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdNestedInClass.received.txt" />
-    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateIdInFileScopedNamespace.verified.txt" />
+    <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" />
   </ItemGroup>
 
 </Project>
