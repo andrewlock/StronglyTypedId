@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using StronglyTypedIds.Sources;
 
 namespace StronglyTypedIds
 {

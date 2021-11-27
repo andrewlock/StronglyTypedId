@@ -17,11 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Sources\*.cs" Link="Sources\Generator\%(Filename)%(Extension)" />
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Attributes\*.cs" Link="Sources\Attributes\%(Filename)%(Extension)" />
+    <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" />
   </ItemGroup>
 
   <ItemGroup>

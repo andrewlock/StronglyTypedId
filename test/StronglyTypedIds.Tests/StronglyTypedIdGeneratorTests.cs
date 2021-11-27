@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using StronglyTypedIds.Sources;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;

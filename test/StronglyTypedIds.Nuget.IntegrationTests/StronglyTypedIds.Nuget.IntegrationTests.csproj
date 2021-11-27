@@ -16,7 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="StronglyTypedId" Version="$(Version)" />
+    <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04">
+      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0'">
@@ -33,7 +36,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.17"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.17" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 

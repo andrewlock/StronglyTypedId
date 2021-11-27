@@ -1,4 +1,3 @@
-using StronglyTypedIds.Sources;
 
 namespace StronglyTypedIds
 {
