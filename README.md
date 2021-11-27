@@ -58,7 +58,7 @@ To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/St
 To install the packages, add the references to your _csproj_ file, for example by running
 
 ```bash
-dotnet add package StronglyTypedId --version 1.0.0-beta04
+dotnet add package StronglyTypedId --version 1.0.0-beta05
 ```
 
 This adds a `<PackageReference>` to your project. As the package is marked as a development-only dependency, by default, the package is added with assets excluded.
@@ -72,7 +72,7 @@ This adds a `<PackageReference>` to your project. As the package is marked as a 
   </PropertyGroup>
   
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04">
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05">
     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     <PrivateAssets>all</PrivateAssets>
   </PackageReference>
@@ -160,7 +160,7 @@ For example, the following project file shows the same project file as before, u
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04">
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05">
     <!--            👇      Add compile to the list of included assets. You can also remove "runtime"-->
     <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     <PrivateAssets>all</PrivateAssets>
