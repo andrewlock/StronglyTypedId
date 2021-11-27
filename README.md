@@ -61,7 +61,9 @@ To install the packages, add the references to your _csproj_ file, for example b
 dotnet add package StronglyTypedId --version 1.0.0-beta05
 ```
 
-This adds a `<PackageReference>` to your project. As the package is marked as a development-only dependency, by default, the package is added with assets excluded.
+This adds a `<PackageReference>` to your project. You can additionally mark the package as `PrivateAsets="all"` and `ExcludeAssets="runtime"`.
+
+> Setting `PrivateAssets="all"` means any projects referencing this one will not also get a reference to the _StronglyTypedId_ package. Setting `ExcludeAssets="runtime"` ensures the _StronglyTypedId.Attributes.dll_ file is not copied to your build output (it is not required at runtime).
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -72,16 +74,11 @@ This adds a `<PackageReference>` to your project. As the package is marked as a 
   </PropertyGroup>
   
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05">
-    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    <PrivateAssets>all</PrivateAssets>
-  </PackageReference>
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" PrivateAssets="all" ExcludeAssets="runtime" />
   <!-- -->
 
 </Project>
 ```
-
-> Note that in the default configuration above, a _StronglyTypedId.Attributes.dll_ file will appear in your project's build output. This dll is not required, and can be removed by removing `runtime` from the default generated `<IncludeAssets>` element. 
 
 ## Usage
 
@@ -132,22 +129,46 @@ var id = new FooId("my-id-value");
 ```
 Currently supported values are `Guid` (the default), `int`, `long`, and `string`.
 
-## Error CS0436 and [InternalsVisibleTo]
+## Changing the defaults globally
 
-The StronglyTypedId generator automatically adds the `[StronglyTypedId]` attributes to your compilation as `internal` attributes. If you add the source generator package to multiple projects, and use the `[InternalsVisibleTo]` attribute, you may experience errors when you build:
+If you wish to change the converters, backing types, or implementations used by default for _all_ the `[StronglyTypedId]`-decorated IDs in your project, you can use the assembly attribute `[StronglyTypedIdDefaults]` to set all of these. For example, the following sets the default converter to a whole project to `[SystemTextJson]`, and changes the default backing-type to an `int` 
 
-```bash
-warning CS0436: The type 'StronglyTypedIdImplementations' in 'StronglyTypedIds\StronglyTypedIds.StronglyTypedIdGenerator\StronglyTypedIdImplementations.cs' conflicts with the imported type 'StronglyTypedIdImplementations' in 'MyProject, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'.
+```csharp
+// Set the defaults for the project
+[assembly:StronglyTypedIdDefaults(
+    backingType: StronglyTypedIdBackingType.Int,
+    converters: StronglyTypedIdConverter.SystemTextJson)]
+
+[StronglyTypedId]
+public partial struct OrderId { }
+
+[StronglyTypedId]
+public partial struct UserId { } 
 ```
 
-Removing the `[InternalsVisibleTo]` attribute will resolve the problem, but if this is not possible you can disable the auto-generation of the `[StronglyTypedId]` marker attributes, and rely on the included _StronglyTypedId.Attributes.dll_ library instead. This package contains the same attributes, but they are defined in an external library (included in the same _StronglyTypedId_ NuGet package, so it avoids the CS0436 error.
+This is equivalent to setting these values manually on all the IDs:
 
-To use this approach you must do two things:
+```csharp
+[StronglyTypedId(
+    backingType: StronglyTypedIdBackingType.Int,
+    converters: StronglyTypedIdConverter.SystemTextJson)]
+public partial struct OrderId { }
 
-1. Define the MSBuild constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES`. This ensures the attributes are not embedded in your project
-2. Add `compile` to the list of included assets in your `<PackageReference>` element. This ensures the attributes can still be referenced in your project by using the _StronglyTypedId.Attributes.dll_ library.
+[StronglyTypedId(
+     backingType: StronglyTypedIdBackingType.Int,
+    converters: StronglyTypedIdConverter.SystemTextJson)]
+public partial struct UserId { }
+```
 
-For example, the following project file shows the same project file as before, updated to use the attributes library:
+
+## Embedding the attributes in your project
+
+By default, the `[StronglyTypedId]` attributes referenced in your application are contained in an external dll. It is also possible to embed the attributes directly in your project, so they appear in the dll when your project is built. If you wish to do this, you must do two things:
+
+1. Define the MSBuild constant `STRONGLY_TYPED_ID_EMBED_ATTRIBUTES`. This ensures the attributes are embedded in your project
+2. Add `compile` to the list of excluded assets in your `<PackageReference>` element. This ensures the attributes in your project are referenced, instead of the _StronglyTypedId.Attributes.dll_ library.
+
+Your project file should look something like this:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -156,19 +177,52 @@ For example, the following project file shows the same project file as before, u
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <!--  Define the MSBuild constant    -->
-    <DefineConstants>STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES</DefineConstants>
+    <DefineConstants>STRONGLY_TYPED_ID_EMBED_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05">
-    <!--            👇      Add compile to the list of included assets. You can also remove "runtime"-->
-    <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    <PrivateAssets>all</PrivateAssets>
-  </PackageReference>
-  <!-- -->
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" 
+                    PrivateAssets="all"
+                    ExcludeAssets="compile;runtime" />
+<!--                               ☝ Add compile to the list of excluded assets. -->
 
 </Project>
 ```
+
+## Preserving usages of the `[StronglyTypedId]` attribute
+
+The `[StronglyTypedId]` and `[StronglyTypedIdDefaults]` attributes are decorated with the `[Conditional]` attribute, [so their usage will not appear in the build output of your project](https://andrewlock.net/conditional-compilation-for-ignoring-method-calls-with-the-conditionalattribute/#applying-the-conditional-attribute-to-classes). If you use reflection at runtime on one of your IDs, you will not find `[StronglyTypedId]` in the list of custom attributes.
+
+If you wish to preserve these attributes in the build output, you can define the `STRONGLY_TYPED_ID_USAGES` MSBuild variable. Note that this means your project will have a runtime-dependency on _StronglyTypedId.Attributes.dll_ so you need to ensure this is included in your build output.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <!--  Define the MSBuild constant to preserve usages   -->
+    <DefineConstants>STRONGLY_TYPED_ID_USAGES</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Add the package -->
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" PrivateAssets="all" />
+  <!--              ☝ You must not exclude the runtime assets in this case -->
+
+</Project>
+```
+
+## Error CS0436 and [InternalsVisibleTo]
+
+> In the latest version of StronglyTypedId, you should not experience error CS0436 by default. 
+
+In previous versions of the StronglyTypedId generator, the `[StronglyTypedId]` attributes were added to your compilation as `internal` attributes by default. If you added the source generator package to multiple projects, and used the `[InternalsVisibleTo]` attribute, you could experience errors when you build:
+
+```bash
+warning CS0436: The type 'StronglyTypedIdImplementations' in 'StronglyTypedIds\StronglyTypedIds.StronglyTypedIdGenerator\StronglyTypedIdImplementations.cs' conflicts with the imported type 'StronglyTypedIdImplementations' in 'MyProject, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'.
+```
+
+In the latest version of _StronglyTypedId_, the attributes are not embedded by default, so you should not experience this problem. If you see this error, compare your installation to the examples in the installation guide.
 
 ## Why do I need this library?
 
