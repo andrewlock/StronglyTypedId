@@ -18,10 +18,7 @@ public partial struct FooId { }
 
 and the source generator magically generates the backing code when you save the file! Use _Go to Definition_ to see the generated code:
 
-<picture>
-    <source srcset="https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/docs/strongly_typed_id.mp4" type="video/mp4">
-    <img src="https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/docs/strongly_typed_id.gif" alt="Generating a strongly-typed ID using the StronglyTypedId packages"/>
-</picture>
+<img src="https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/docs/strongly_typed_id.gif" alt="Generating a strongly-typed ID using the StronglyTypedId packages"/>
 
 > StronglyTypedId requires requires [the .NET Core SDK v6.0.100 or greater](https://dotnet.microsoft.com/download/dotnet/6.0).
 
@@ -58,7 +55,13 @@ To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/St
 * [Dapper](https://www.nuget.org/packages/Dapper/) (optional, only required if [generating a type mapper](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-3/#interfacing-with-external-system-using-strongly-typed-ids))
 * [EF Core](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore) (optional, only required if [generating an EF Core ValueConverter](https://andrewlock.net/strongly-typed-ids-in-ef-core-using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-4/))
 
-To install the packages, add the references to your _csproj_ file so that it looks something like the following:
+To install the packages, add the references to your _csproj_ file, for example by running
+
+```bash
+dotnet add package StronglyTypedId --version 1.0.0-beta04
+```
+
+This adds a `<PackageReference>` to your project. As the package is marked as a development-only dependency, by default, the package is added with assets excluded.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -68,12 +71,17 @@ To install the packages, add the references to your _csproj_ file so that it loo
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   
-  <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04" />
+  <!-- Add the package -->
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04">
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PrivateAssets>all</PrivateAssets>
+  </PackageReference>
   <!-- -->
 
 </Project>
 ```
+
+> Note that in the default configuration above, a _StronglyTypedId.Attributes.dll_ file will appear in your project's build output. This dll is not required, and can be removed by removing `runtime` from the default generated `<IncludeAssets>` element. 
 
 ## Usage
 
@@ -132,9 +140,14 @@ The StronglyTypedId generator automatically adds the `[StronglyTypedId]` attribu
 warning CS0436: The type 'StronglyTypedIdImplementations' in 'StronglyTypedIds\StronglyTypedIds.StronglyTypedIdGenerator\StronglyTypedIdImplementations.cs' conflicts with the imported type 'StronglyTypedIdImplementations' in 'MyProject, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'.
 ```
 
-Removing the `[InternalsVisibleTo]` attribute will resolve the problem, but if this is not possible you can disable the auto-generation of the `[StronglyTypedId]` marker attributes, and rely on the helper [`StronglyTypedId.Attributes` package instead](https://www.nuget.org/packages/StronglyTypedId.Attributes). This package contains the same attributes, but as they are in an external package, you can avoid the CS0436 error.
+Removing the `[InternalsVisibleTo]` attribute will resolve the problem, but if this is not possible you can disable the auto-generation of the `[StronglyTypedId]` marker attributes, and rely on the included _StronglyTypedId.Attributes.dll_ library instead. This package contains the same attributes, but they are defined in an external library (included in the same _StronglyTypedId_ NuGet package, so it avoids the CS0436 error.
 
-Add the package to your solution, ensuring you set `"PrivateAssets="All"` in the `<PackageReference>` (this will be done automatically when using the .NET CLI or an IDE). To disable the auto-generation of the marker attributes, define the constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES` in your project file. Your project file should look something like the following:
+To use this approach you must do two things:
+
+1. Define the MSBuild constant `STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES`. This ensures the attributes are not embedded in your project
+2. Add `compile` to the list of included assets in your `<PackageReference>` element. This ensures the attributes can still be referenced in your project by using the _StronglyTypedId.Attributes.dll_ library.
+
+For example, the following project file shows the same project file as before, updated to use the attributes library:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -142,20 +155,20 @@ Add the package to your solution, ensuring you set `"PrivateAssets="All"` in the
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <!--  Define the MSBuild constant    -->
     <DefineConstants>STRONGLY_TYPED_ID_EXCLUDE_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
-  
-  <!-- Core package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04" />
-  <PackageReference Include="StronglyTypedId.Attributes" Version="1.0.0-beta04">
-    <PrivateAssets>All</PrivateAssets>
+
+  <!-- Add the package -->
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta04">
+    <!--            👇      Add compile to the list of included assets. You can also remove "runtime"-->
+    <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PrivateAssets>all</PrivateAssets>
   </PackageReference>
   <!-- -->
 
 </Project>
 ```
-
-The attribute library is only required at compile time, so it won't appear in your build output. 
 
 ## Why do I need this library?
 
