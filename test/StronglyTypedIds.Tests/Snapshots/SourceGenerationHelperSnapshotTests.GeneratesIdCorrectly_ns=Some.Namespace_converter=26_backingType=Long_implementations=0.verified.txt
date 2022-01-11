@@ -92,7 +92,7 @@ namespace Some.Namespace
         {
             public override MyTestId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
             {
-                return new MyTestId(reader.GetInt32());
+                return new MyTestId(reader.GetInt64());
             }
 
             public override void Write(System.Text.Json.Utf8JsonWriter writer, MyTestId value, System.Text.Json.JsonSerializerOptions options)

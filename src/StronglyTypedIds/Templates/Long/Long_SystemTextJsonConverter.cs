@@ -3,7 +3,7 @@
         {
             public override TESTID Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
             {
-                return new TESTID(reader.GetInt32());
+                return new TESTID(reader.GetInt64());
             }
 
             public override void Write(System.Text.Json.Utf8JsonWriter writer, TESTID value, System.Text.Json.JsonSerializerOptions options)
