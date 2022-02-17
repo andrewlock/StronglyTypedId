@@ -3,7 +3,7 @@
         {
             public override TESTID Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
             {
-                return new TESTID(MassTransit.NewId.FromSequentialGuid(System.Guid.Parse(reader.GetString())));
+                return new TESTID(MassTransit.NewId.FromSequentialGuid(reader.GetGuid()));
             }
 
             public override void Write(System.Text.Json.Utf8JsonWriter writer, TESTID value, System.Text.Json.JsonSerializerOptions options)

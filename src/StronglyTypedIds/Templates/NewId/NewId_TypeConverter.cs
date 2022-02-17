@@ -13,7 +13,7 @@
                 return value switch
                 {
                     MassTransit.NewId newIdValue => new TESTID(newIdValue),
-                    System.Guid guidValue => new TESTID(MassTransit.NewId.FromSequentialGuid(guidValue))
+                    System.Guid guidValue => new TESTID(MassTransit.NewId.FromSequentialGuid(guidValue)),
                     string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new TESTID(MassTransit.NewId.FromSequentialGuid(result)),
                     _ => base.ConvertFrom(context, culture, value),
                 };
@@ -21,7 +21,7 @@
 
             public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
             {
-                return typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+                return sourceType == typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
             }
 
             public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
@@ -35,7 +35,7 @@
 
                     if (destinationType == typeof(System.Guid)) 
                     {
-                        return idValue.Value.ToSequentialGuid()
+                        return idValue.Value.ToSequentialGuid();
                     }
 
                     if (destinationType == typeof(string))

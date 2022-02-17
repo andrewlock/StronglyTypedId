@@ -85,7 +85,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_IComparable.cs"),
-            true
+            false
         );
 
         internal const string TypeConverterAttributeSource = "    [System.ComponentModel.TypeConverter(typeof(TESTIDTypeConverter))]";
