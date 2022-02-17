@@ -13,8 +13,8 @@
                 return value switch
                 {
                     MassTransit.NewId newIdValue => new TESTID(newIdValue),
-                    System.Guid guidValue => new TESTID(MassTransit.NewId.FromSequentialGuid(guidValue)),
-                    string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new TESTID(MassTransit.NewId.FromSequentialGuid(result)),
+                    System.Guid guidValue => new TESTID(MassTransit.NewId.FromGuid(guidValue)),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new TESTID(MassTransit.NewId.FromGuid(result)),
                     _ => base.ConvertFrom(context, culture, value),
                 };
             }
@@ -35,12 +35,12 @@
 
                     if (destinationType == typeof(System.Guid)) 
                     {
-                        return idValue.Value.ToSequentialGuid();
+                        return idValue.Value.ToGuid();
                     }
 
                     if (destinationType == typeof(string))
                     {
-                        return idValue.Value.ToString();
+                        return idValue.Value.ToGuid().ToString();
                     }
                 }
 

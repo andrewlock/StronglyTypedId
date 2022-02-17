@@ -3,8 +3,8 @@
         {
             public EfCoreValueConverter(Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints mappingHints = null)
                 : base(
-                    id => id.Value.ToSequentialGuid(),
-                    value => new TESTID(MassTransit.NewId.FromSequentialGuid(value)),
+                    id => id.Value.ToGuid(),
+                    value => new TESTID(MassTransit.NewId.FromGuid(value)),
                     mappingHints
                 ) { }
         }
