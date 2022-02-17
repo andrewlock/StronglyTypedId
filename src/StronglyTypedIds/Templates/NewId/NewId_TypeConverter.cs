@@ -3,14 +3,17 @@
         {
             public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
             {
-                return sourceType == typeof(System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+                return sourceType == typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || 
+                       sourceType == typeof(string) || base.CanConvertFrom
+                (context, sourceType);
             }
 
             public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
             {
                 return value switch
                 {
-                    MassTransit.NewId guidValue => new TESTID(guidValue),
+                    MassTransit.NewId newIdValue => new TESTID(newIdValue),
+                    System.Guid guidValue => new TESTID(MassTransit.NewId.FromSequentialGuid(guidValue))
                     string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new TESTID(MassTransit.NewId.FromSequentialGuid(result)),
                     _ => base.ConvertFrom(context, culture, value),
                 };
@@ -18,7 +21,7 @@
 
             public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
             {
-                return sourceType == typeof(MassTransit.NewId) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+                return typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
             }
 
             public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
@@ -28,6 +31,11 @@
                     if (destinationType == typeof(MassTransit.NewId))
                     {
                         return idValue.Value;
+                    }
+
+                    if (destinationType == typeof(System.Guid)) 
+                    {
+                        return idValue.Value.ToSequentialGuid()
                     }
 
                     if (destinationType == typeof(string))
