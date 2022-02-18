@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 1591 // publicly visible type or member must be documented
+
     readonly partial struct MyId : System.IComparable<MyId>, System.IEquatable<MyId>
     {
         public int Value { get; }

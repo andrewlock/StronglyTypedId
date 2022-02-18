@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#pragma warning disable 1591 // publicly visible type or member must be documented
+
     [System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
     readonly partial struct MyTestId : System.IEquatable<MyTestId>
     {
