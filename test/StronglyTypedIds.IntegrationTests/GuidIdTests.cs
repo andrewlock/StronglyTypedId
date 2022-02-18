@@ -272,6 +272,59 @@ namespace StronglyTypedIds.IntegrationTests
 #pragma warning restore 184
         }
 
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<ConventionsDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ConventionsDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities.Add(
+                    new TestEntity { Id = EfCoreGuidId.New() });
+                context.SaveChanges();
+            }
+            using (var context = new ConventionsDbContext(options))
+            {
+                var all = context.Entities.ToList();
+                Assert.Single(all);
+            }
+        }
+
+        public class ConventionsDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public ConventionsDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+            {
+                configurationBuilder
+                    .Properties<EfCoreGuidId>()
+                    .HaveConversion<EfCoreGuidId.EfCoreValueConverter>();
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+#endif
+
         public class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }

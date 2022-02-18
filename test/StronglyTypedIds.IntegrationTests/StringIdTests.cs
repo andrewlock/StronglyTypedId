@@ -260,6 +260,63 @@ namespace StronglyTypedIds.IntegrationTests
 #pragma warning restore 184
         }
 
+
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<ConventionsDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var original = new TestEntity { Id = Guid.NewGuid(), Name = new EfCoreStringId("some name") };
+            using (var context = new ConventionsDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities.Add(original);
+                context.SaveChanges();
+            }
+
+            using (var context = new ConventionsDbContext(options))
+            {
+                var all = context.Entities.ToList();
+                var retrieved = Assert.Single(all);
+                Assert.Equal(original.Id, retrieved.Id);
+                Assert.Equal(original.Name, retrieved.Name);
+            }
+        }
+
+        public class ConventionsDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public ConventionsDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+            {
+                configurationBuilder
+                    .Properties<EfCoreStringId>()
+                    .HaveConversion<EfCoreStringId.EfCoreValueConverter>();
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+#endif
+
         public class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
