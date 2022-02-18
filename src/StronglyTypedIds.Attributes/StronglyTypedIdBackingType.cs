@@ -17,5 +17,6 @@ namespace StronglyTypedIds
         String = 3,
         Long = 4,
         NullableString = 5,
+        MassTransitNewId = 6,
     }
 }
