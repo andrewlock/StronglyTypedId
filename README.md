@@ -58,7 +58,7 @@ To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/St
 To install the packages, add the references to your _csproj_ file, for example by running
 
 ```bash
-dotnet add package StronglyTypedId --version 1.0.0-beta05
+dotnet add package StronglyTypedId --version 1.0.0-beta06
 ```
 
 This adds a `<PackageReference>` to your project. You can additionally mark the package as `PrivateAsets="all"` and `ExcludeAssets="runtime"`.
@@ -74,7 +74,7 @@ This adds a `<PackageReference>` to your project. You can additionally mark the 
   </PropertyGroup>
   
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" PrivateAssets="all" ExcludeAssets="runtime" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" PrivateAssets="all" ExcludeAssets="runtime" />
   <!-- -->
 
 </Project>
@@ -181,7 +181,7 @@ Your project file should look something like this:
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" 
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" 
                     PrivateAssets="all"
                     ExcludeAssets="compile;runtime" />
 <!--                               ☝ Add compile to the list of excluded assets. -->
@@ -206,7 +206,7 @@ If you wish to preserve these attributes in the build output, you can define the
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta05" PrivateAssets="all" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" PrivateAssets="all" />
   <!--              ☝ You must not exclude the runtime assets in this case -->
 
 </Project>

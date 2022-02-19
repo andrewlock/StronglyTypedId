@@ -5,6 +5,12 @@
 
 Version 0.x of this library used the helper library CodeGeneration.Roslyn for build-time source generation. In version 1.x this approach has been completely replaced in favour of source generators, as these are explicitly supported in .NET 5+. As part of this change, there were a number of additional features added and breaking changes made.
 
+## Changes in 1.0.0-beta06:
+
+* Added support for Masstransit.NewId (thanks @Khitiara!) Fixes https://github.com/andrewlock/StronglyTypedId/issues/51
+* Added parameterless constructor to EF Core ValueConverts for compatibility with global conventions. Fixes https://github.com/andrewlock/StronglyTypedId/issues/50
+* Added `#pragma warning disable 1591` to generated code to avoid warning CS1591. Fixes https://github.com/andrewlock/StronglyTypedId/issues/47
+
 ## Changes in 1.0.0-beta05:
 
 Breaking Changes:

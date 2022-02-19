@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.0-beta06]
+
+Features
+* Added support for Masstransit.NewId ([thanks @Khitiara](https://github.com/andrewlock/StronglyTypedId/pull/52)!) Fixes https://github.com/andrewlock/StronglyTypedId/issues/51
+* Added parameterless constructor to EF Core ValueConverts for compatibility with global conventions. Fixes https://github.com/andrewlock/StronglyTypedId/issues/50
+* Added `#pragma warning disable 1591` to generated code to avoid warning CS1591. Fixes https://github.com/andrewlock/StronglyTypedId/issues/47
+
+
 ## [v1.0.0-beta05]
 
 Breaking Changes:
