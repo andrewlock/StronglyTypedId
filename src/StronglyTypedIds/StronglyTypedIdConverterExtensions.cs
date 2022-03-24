@@ -23,5 +23,15 @@ namespace StronglyTypedIds
         {
             return (int)value >= 0 && (int)value < _maxImplementationsId;
         }
+        
+        public static bool IsValidCombination(this StronglyTypedIdConverter value, StronglyTypedIdBackingType backingType)
+        {
+            return value switch
+            {
+                StronglyTypedIdConverter.MongoObjectIdSerializer 
+                    when backingType is not StronglyTypedIdBackingType.String and not StronglyTypedIdBackingType.NullableString => false,
+                _ => true
+            };
+        }
     }
 }
