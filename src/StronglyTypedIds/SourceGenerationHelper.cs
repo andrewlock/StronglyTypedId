@@ -69,7 +69,7 @@ namespace StronglyTypedIds
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
             var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
-            var useMongoObjectIdSerializer = converters.IsSet(StronglyTypedIdConverter.MongoObjectIdSerializer);
+            var useMongoSerializer = converters.IsSet(StronglyTypedIdConverter.MongoSerializer);
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
@@ -123,9 +123,9 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
             }
             
-            if (useMongoObjectIdSerializer)
+            if (useMongoSerializer)
             {
-                sb.AppendLine(EmbeddedSources.MongoObjectIdSerializerAttributeSource);
+                sb.AppendLine(EmbeddedSources.MongoSerializerAttributeSource);
             }
 
             sb.Append(resources.BaseId);
@@ -163,9 +163,9 @@ namespace StronglyTypedIds
                 sb.AppendLine(resources.SystemTextJson);
             }
             
-            if (useMongoObjectIdSerializer)
+            if (useMongoSerializer)
             {
-                sb.AppendLine(resources.MongoObjectId);
+                sb.AppendLine(resources.Mongo);
             }
 
             sb.Replace("TESTID", idName);

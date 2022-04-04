@@ -48,8 +48,8 @@ namespace StronglyTypedIds
         DapperTypeHandler = 32,
         
         /// <summary>
-        /// Creates a Mongo Serializer for converting string to and from ObjectId
+        /// Creates a Mongo Serializer for converting string to and from type
         /// </summary>
-        MongoObjectIdSerializer = 64,
+        MongoSerializer = 64,
     }
 }

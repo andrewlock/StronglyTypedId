@@ -25,7 +25,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_IComparable.cs"),
-            string.Empty,
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_MongoSerializer.cs"),
             false
         );
 
@@ -38,7 +38,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_IComparable.cs"),
-            string.Empty,
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_MongoSerializer.cs"),
             false
         );
 
@@ -51,7 +51,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_IComparable.cs"),
-            string.Empty,
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_MongoSerializer.cs"),
             false
         );
 
@@ -64,7 +64,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_IComparable.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_MongoObjectIdSerializer.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_MongoSerializer.cs"),
             false
         );
 
@@ -77,7 +77,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_IComparable.cs"),
-            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_MongoObjectIdSerializer.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_MongoSerializer.cs"),
             true
         );
 
@@ -90,14 +90,14 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_IComparable.cs"),
-            string.Empty,
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_MongoSerializer.cs"),
             false
         );
 
         internal const string TypeConverterAttributeSource = "    [System.ComponentModel.TypeConverter(typeof(TESTIDTypeConverter))]";
         internal const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
         internal const string SystemTextJsonAttributeSource = "    [System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
-        internal const string MongoObjectIdSerializerAttributeSource = "    [MongoDB.Bson.Serialization.Attributes.BsonSerializer(typeof(TESTIDMongoObjectIdSerializer))]";
+        internal const string MongoSerializerAttributeSource = "    [MongoDB.Bson.Serialization.Attributes.BsonSerializer(typeof(TESTIDMongoSerializer))]";
 
         internal static string LoadEmbeddedResource(string resourceName)
         {
@@ -123,7 +123,7 @@ namespace StronglyTypedIds
             public string TypeConverter { get; }
             public string EfCoreValueConverter { get; }
             public string DapperTypeHandler { get; }
-            public string MongoObjectId { get; }
+            public string Mongo { get; }
             public string Comparable { get; }
 
             public ResourceCollection(
@@ -135,7 +135,7 @@ namespace StronglyTypedIds
                 string efCoreValueConverter,
                 string dapperTypeHandler,
                 string comparable,
-                string mongoObjectId,
+                string mongo,
                 bool nullableEnable)
             {
                 BaseId = baseId;
@@ -146,7 +146,7 @@ namespace StronglyTypedIds
                 DapperTypeHandler = dapperTypeHandler;
                 Comparable = comparable;
                 NullableEnable = nullableEnable;
-                MongoObjectId = mongoObjectId;
+                Mongo = mongo;
                 Header = header;
             }
         }

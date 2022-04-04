@@ -195,10 +195,6 @@ internal static class Parser
                 {
                     reportDiagnostic(InvalidBackingTypeDiagnostic.Create(structDeclarationSyntax));
                 }
-                else if (!converter.IsValidCombination(backingType))
-                {
-                    reportDiagnostic(InvalidConverterAndBackingTypeCombinationDiagnostic.Create(structDeclarationSyntax));
-                }
 
                 if (!implementations.IsValidFlags())
                 {
