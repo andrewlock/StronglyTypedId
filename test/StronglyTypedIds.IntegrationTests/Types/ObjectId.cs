@@ -1,7 +1,10 @@
 ﻿namespace StronglyTypedIds.IntegrationTests.Types;
 
 [StronglyTypedId(backingType: StronglyTypedIdBackingType.ObjectId)]
-partial struct ObjectIdId { }
+partial struct ObjectIdId1 { }
+
+[StronglyTypedId(backingType: StronglyTypedIdBackingType.ObjectId)]
+partial struct ObjectIdId2 { }
     
 [StronglyTypedId(backingType: StronglyTypedIdBackingType.ObjectId, converters: StronglyTypedIdConverter.None)]
 public partial struct NoConverterObjectIdId { }

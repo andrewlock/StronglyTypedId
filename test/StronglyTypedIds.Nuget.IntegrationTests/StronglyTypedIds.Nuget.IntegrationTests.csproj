@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="2.15.0" />
     <PackageReference Include="NewId" Version="4.0.0-develop.44" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

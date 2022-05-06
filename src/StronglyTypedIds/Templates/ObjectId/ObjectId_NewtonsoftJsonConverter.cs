@@ -14,6 +14,7 @@
 
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
-                return new TESTID(new MongoDB.Bson.ObjectId(serializer.Deserialize<string>(reader)));
+                var result = serializer.Deserialize<string>(reader);
+                return string.IsNullOrEmpty(result) ? null : new TESTID(new MongoDB.Bson.ObjectId(result));
             }
         }

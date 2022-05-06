@@ -3,7 +3,8 @@
         {
             public override TESTID Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
             {
-                return new TESTID(new MongoDB.Bson.ObjectId(reader.GetString()));
+                var result = reader.GetString();
+                return string.IsNullOrEmpty(result) ? TESTID.Empty : new TESTID(new MongoDB.Bson.ObjectId(result));
             }
 
             public override void Write(System.Text.Json.Utf8JsonWriter writer, TESTID value, System.Text.Json.JsonSerializerOptions options)
