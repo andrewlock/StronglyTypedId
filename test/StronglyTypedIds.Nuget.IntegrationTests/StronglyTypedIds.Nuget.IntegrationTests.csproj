@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="..\StronglyTypedIds.IntegrationTests\*.cs" Link="%(Filename)%(Extension)" />
     <Compile Include="..\StronglyTypedIds.IntegrationTests\Types\*.cs" Link="Types\%(Filename)%(Extension)" />
+    <Compile Include="..\StronglyTypedIds.IntegrationTests\Fixtures\*.cs" Link="Fixtures\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
