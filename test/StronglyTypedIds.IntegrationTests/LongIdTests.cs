@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using StronglyTypedIds.IntegrationTests.Fixtures;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -12,8 +14,16 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
+    [Collection(MongoDbCollection.Name)]
     public class LongIdTests
     {
+        private readonly MongoDbFixture _mongoDbFixture;
+
+        public LongIdTests(MongoDbFixture mongoDbFixture)
+        {
+            _mongoDbFixture = mongoDbFixture;
+        }
+        
         [Fact]
         public void SameValuesAreEqual()
         {
@@ -212,6 +222,18 @@ namespace StronglyTypedIds.IntegrationTests
             var value = Assert.Single(results);
             Assert.Equal(value, new DapperLongId(123));
         }
+        
+        [Fact]
+        public async Task WhenMongoSerializerUsesSerializer()
+        {
+            var collection = _mongoDbFixture.Database.GetCollection<TestDocument>("LongIdTestCollection");
+            
+            var original = new TestDocument { Id = new MongoLongId(123) };
+            await collection.InsertOneAsync(original);
+            var retrieved = await collection.Find(x => x.Id == new MongoLongId(123)).FirstAsync();
+            
+            Assert.Equal(new MongoLongId(123), retrieved.Id);
+        }
 
         [Theory]
         [InlineData(123L)]
@@ -348,6 +370,11 @@ namespace StronglyTypedIds.IntegrationTests
         public class EntityWithNullableId
         {
             public NewtonsoftJsonLongId? Id { get; set; }
+        }
+        
+        public class TestDocument
+        {
+            public MongoLongId Id { get; set; }
         }
     }
 }

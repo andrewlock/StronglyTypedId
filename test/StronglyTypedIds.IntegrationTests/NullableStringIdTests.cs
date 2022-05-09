@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using StronglyTypedIds.IntegrationTests.Fixtures;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -12,8 +14,16 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
+    [Collection(MongoDbCollection.Name)]
     public class NullableStringIdTests
     {
+        private readonly MongoDbFixture _mongoDbFixture;
+
+        public NullableStringIdTests(MongoDbFixture mongoDbFixture)
+        {
+            _mongoDbFixture = mongoDbFixture;
+        }
+        
         [Fact]
         public void SameValuesAreEqual()
         {
@@ -200,6 +210,18 @@ namespace StronglyTypedIds.IntegrationTests
 
             var value = Assert.Single(results);
             Assert.Equal(value, new DapperNullableStringId("this is a value"));
+        }
+        
+        [Fact]
+        public async Task WhenMongoSerializerUsesSerializer()
+        {
+            var collection = _mongoDbFixture.Database.GetCollection<TestDocument>("MongoNullableStringIdTestCollection");
+            
+            var original = new TestDocument { Id = new MongoNullableStringId("some value") };
+            await collection.InsertOneAsync(original);
+            var retrieved = await collection.Find(x => x.Id == new MongoNullableStringId("some value")).FirstAsync();
+            
+            Assert.Equal(new MongoNullableStringId("some value"), retrieved.Id);
         }
 
         [Theory]
@@ -406,6 +428,11 @@ namespace StronglyTypedIds.IntegrationTests
         {
             public Guid Id { get; set; }
             public EfCoreNullableStringId Name { get; set; }
+        }
+        
+        public class TestDocument
+        {
+            public MongoNullableStringId Id { get; set; }
         }
     }
 }

@@ -6,6 +6,8 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using MongoDB.Driver;
+using StronglyTypedIds.IntegrationTests.Fixtures;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -13,8 +15,16 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests;
 
+[Collection(MongoDbCollection.Name)]
 public class ObjectIdTests
 {
+    private readonly MongoDbFixture _mongoDbFixture;
+
+    public ObjectIdTests(MongoDbFixture mongoDbFixture)
+    {
+        _mongoDbFixture = mongoDbFixture;
+    }
+    
     [Fact]
     public void SameValuesAreEqual()
     {
@@ -221,6 +231,19 @@ public class ObjectIdTests
         var value = Assert.Single(results);
         Assert.Equal(new DapperObjectIdId(new ObjectId("62758c6ee39f6ef4751bb831")), value);
     }
+    
+    [Fact]
+    public async Task WhenMongoSerializerUsesSerializer()
+    {
+        var collection = _mongoDbFixture.Database.GetCollection<TestDocument>("ObjectIdIdTestCollection");
+
+        var objectIdValue = ObjectId.GenerateNewId();
+        var original = new TestDocument { Id = new MongoObjectIdId(objectIdValue) };
+        await collection.InsertOneAsync(original);
+        var retrieved = await collection.Find(x => x.Id == new MongoObjectIdId(objectIdValue)).FirstAsync();
+        
+        Assert.Equal(new MongoObjectIdId(objectIdValue), retrieved.Id);
+    }
 
     [Theory]
     [InlineData("62758cacb6f910fe91bd697b")]
@@ -356,5 +379,10 @@ public class ObjectIdTests
     public class EntityWithNullableId
     {
         public NewtonsoftJsonObjectIdId? Id { get; set; }
+    }
+    
+    public class TestDocument
+    {
+        public MongoObjectIdId Id { get; set; }
     }
 }

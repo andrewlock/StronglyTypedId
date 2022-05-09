@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using StronglyTypedIds.IntegrationTests.Fixtures;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -12,8 +14,16 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
+    [Collection(MongoDbCollection.Name)]
     public class StringIdTests
     {
+        private readonly MongoDbFixture _mongoDbFixture;
+
+        public StringIdTests(MongoDbFixture mongoDbFixture)
+        {
+            _mongoDbFixture = mongoDbFixture;
+        }
+        
         [Fact]
         public async Task ThrowsIfTryToCreateWithNull()
         {
@@ -207,6 +217,18 @@ namespace StronglyTypedIds.IntegrationTests
             var value = Assert.Single(results);
             Assert.Equal(value, new DapperStringId("this is a value"));
         }
+        
+        [Fact]
+        public async Task WhenMongoSerializerUsesSerializer()
+        {
+            var collection = _mongoDbFixture.Database.GetCollection<TestDocument>("StringIdTestCollection");
+            
+            var original = new TestDocument { Id = new MongoStringId("some value") };
+            await collection.InsertOneAsync(original);
+            var retrieved = await collection.Find(x => x.Id == new MongoStringId("some value")).FirstAsync();
+            
+            Assert.Equal(new MongoStringId("some value"), retrieved.Id);
+        }
 
         [Theory]
         [InlineData("")]
@@ -342,6 +364,11 @@ namespace StronglyTypedIds.IntegrationTests
         {
             public Guid Id { get; set; }
             public EfCoreStringId Name { get; set; }
+        }
+        
+        public class TestDocument
+        {
+            public MongoStringId Id { get; set; }
         }
     }
 }
