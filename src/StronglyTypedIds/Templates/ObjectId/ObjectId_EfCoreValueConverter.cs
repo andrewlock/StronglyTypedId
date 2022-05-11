@@ -4,8 +4,8 @@
             public EfCoreValueConverter() : this(null) { }
             public EfCoreValueConverter(Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints mappingHints = null)
                 : base(
-                    id => id.Value.ToString(),
-                    value => new TESTID(new MongoDB.Bson.ObjectId(value)),
+                    id => id.Value == MongoDB.Bson.ObjectId.Empty ? null : id.Value.ToString(),
+                    value => string.IsNullOrEmpty(value) ? TESTID.Empty : new TESTID(new MongoDB.Bson.ObjectId(value)),
                     mappingHints
                 ) { }
         }

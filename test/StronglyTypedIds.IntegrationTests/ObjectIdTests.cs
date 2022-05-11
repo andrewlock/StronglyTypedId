@@ -120,18 +120,6 @@ public class ObjectIdTests
     }
 
     [Fact]
-    public void CanSerializeToNullable_WithNewtonsoftJsonProvider()
-    {
-        var entity = new EntityWithNullableId { Id = null };
-
-        var json = NewtonsoftJsonSerializer.SerializeObject(entity);
-        var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
-
-        Assert.NotNull(deserialize);
-        Assert.Null(deserialize.Id);
-    }
-
-    [Fact]
     public void CanDeserializeFromObjectId_WithSystemTextJsonProvider()
     {
         var value = ObjectId.GenerateNewId();
@@ -376,11 +364,6 @@ public class ObjectIdTests
         public EfCoreObjectIdId Id { get; set; }
     }
 
-    public class EntityWithNullableId
-    {
-        public NewtonsoftJsonObjectIdId? Id { get; set; }
-    }
-    
     public class TestDocument
     {
         public MongoObjectIdId Id { get; set; }

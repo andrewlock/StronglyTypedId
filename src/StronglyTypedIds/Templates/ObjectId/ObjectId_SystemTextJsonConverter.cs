@@ -9,6 +9,13 @@
 
             public override void Write(System.Text.Json.Utf8JsonWriter writer, TESTID value, System.Text.Json.JsonSerializerOptions options)
             {
-                writer.WriteStringValue(value.Value.ToString());
+                if (value.Value == MongoDB.Bson.ObjectId.Empty)
+                {
+                    writer.WriteNullValue();
+                }
+                else
+                {
+                    writer.WriteStringValue(value.Value.ToString());
+                }
             }
         }

@@ -8,13 +8,19 @@
 
             public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
             {
-                var id = (TESTID)value;
-                serializer.Serialize(writer, id.Value.ToString());
+                if (value is TESTID id && id.Value != MongoDB.Bson.ObjectId.Empty)
+                {
+                    serializer.Serialize(writer, id.Value.ToString());
+                }
+                else
+                {
+                    serializer.Serialize(writer, null);
+                }
             }
 
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
                 var result = serializer.Deserialize<string>(reader);
-                return string.IsNullOrEmpty(result) ? null : new TESTID(new MongoDB.Bson.ObjectId(result));
+                return string.IsNullOrEmpty(result) ? TESTID.Empty : new TESTID(new MongoDB.Bson.ObjectId(result));
             }
         }
