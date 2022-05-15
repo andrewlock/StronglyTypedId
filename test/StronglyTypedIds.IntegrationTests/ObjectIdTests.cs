@@ -95,6 +95,18 @@ public class ObjectIdTests
 
         Assert.Equal(serializedFoo, serializedObjectId);
     }
+    
+    [Fact]
+    public void CanSerializeToNullable_WithNewtonsoftJsonProvider()
+    {
+        var entity = new EntityWithNullableId { Id = null };
+
+        var json = NewtonsoftJsonSerializer.SerializeObject(entity);
+        var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
+
+        Assert.NotNull(deserialize);
+        Assert.Equal(deserialize.Id, NewtonsoftJsonObjectIdId.Empty);
+    }
 
     [Fact]
     public void CanSerializeToObjectId_WithSystemTextJsonProvider()
@@ -362,6 +374,11 @@ public class ObjectIdTests
     public class TestEntity
     {
         public EfCoreObjectIdId Id { get; set; }
+    }
+    
+    public class EntityWithNullableId
+    {
+        public NewtonsoftJsonObjectIdId? Id { get; set; }
     }
 
     public class TestDocument
