@@ -24,7 +24,7 @@ public class ObjectIdTests
     {
         _mongoDbFixture = mongoDbFixture;
     }
-    
+
     [Fact]
     public void SameValuesAreEqual()
     {
@@ -94,18 +94,6 @@ public class ObjectIdTests
         var serializedObjectId = NewtonsoftJsonSerializer.SerializeObject(foo.Value.ToString());
 
         Assert.Equal(serializedFoo, serializedObjectId);
-    }
-    
-    [Fact]
-    public void CanSerializeToNullable_WithNewtonsoftJsonProvider()
-    {
-        var entity = new EntityWithNullableId { Id = null };
-
-        var json = NewtonsoftJsonSerializer.SerializeObject(entity);
-        var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
-
-        Assert.NotNull(deserialize);
-        Assert.Equal(deserialize.Id, NewtonsoftJsonObjectIdId.Empty);
     }
 
     [Fact]
@@ -231,7 +219,7 @@ public class ObjectIdTests
         var value = Assert.Single(results);
         Assert.Equal(new DapperObjectIdId(new ObjectId("62758c6ee39f6ef4751bb831")), value);
     }
-    
+
     [Fact]
     public async Task WhenMongoSerializerUsesSerializer()
     {
@@ -241,7 +229,7 @@ public class ObjectIdTests
         var original = new TestDocument { Id = new MongoObjectIdId(objectIdValue) };
         await collection.InsertOneAsync(original);
         var retrieved = await collection.Find(x => x.Id == new MongoObjectIdId(objectIdValue)).FirstAsync();
-        
+
         Assert.Equal(new MongoObjectIdId(objectIdValue), retrieved.Id);
     }
 
@@ -374,11 +362,6 @@ public class ObjectIdTests
     public class TestEntity
     {
         public EfCoreObjectIdId Id { get; set; }
-    }
-    
-    public class EntityWithNullableId
-    {
-        public NewtonsoftJsonObjectIdId? Id { get; set; }
     }
 
     public class TestDocument
