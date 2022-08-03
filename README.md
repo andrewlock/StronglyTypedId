@@ -95,12 +95,12 @@ This generates the "default" strongly-typed ID using a `Guid` backing field, a c
 
 ### Customising the converters
 
-You can customise which converters to generate by using flags. For example, to generate a `TypeConverter`, a `System.Text.JsonConverter`, and an EF Core `ValueConverter`, use
+You can customize which type of Json converter will be used. `Newtonsoft.Json` or `System.Text.Json`. _(`Newtonsoft.Json` is default.)_
 
 ```csharp
 using StronglyTypedIds;
 
-[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.EfCoreValueConverter)] 
+[StronglyTypedId(jsonConverter: StronglyTypedIdJsonConverter.SystemTextJson)]
 public partial struct SystemTextJsonConverterId { }
 ```
 
