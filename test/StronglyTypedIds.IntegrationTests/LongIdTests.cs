@@ -200,6 +200,32 @@ namespace StronglyTypedIds.IntegrationTests
                 Assert.Equal(original.Id, retrieved.Id);
             }
         }
+        
+        [Fact]
+        public void WhenEfCoreValueGenerationUsesValueGenerator()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<TestDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var original = new GenerationTestEntity(); 
+            using (var context = new TestDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.GenerationEntities.Add(original); 
+                context.SaveChanges();
+            }
+
+            using (var context = new TestDbContext(options))
+            {
+                var all = context.GenerationEntities.ToList();
+                var retrieved = Assert.Single(all);
+                Assert.Equal(1, retrieved.Id.Value); 
+            }
+        }
 
         [Fact]
         public async Task WhenDapperValueConverterUsesValueConverter()
@@ -322,6 +348,7 @@ namespace StronglyTypedIds.IntegrationTests
         public class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
+            public DbSet<GenerationTestEntity> GenerationEntities { get; set; }
 
             public TestDbContext(DbContextOptions options) : base(options)
             {
@@ -337,10 +364,24 @@ namespace StronglyTypedIds.IntegrationTests
                             .HasConversion(new EfCoreLongId.EfCoreValueConverter())
                             .ValueGeneratedNever();
                     });
+                modelBuilder
+                    .Entity<GenerationTestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .HasConversion(new EfCoreLongId.EfCoreValueConverter())
+                            .HasValueGenerator<EfCoreLongId.EfCoreValueGenerator>()
+                            .ValueGeneratedOnAdd();
+                    });
             }
         }
 
         public class TestEntity
+        {
+            public EfCoreLongId Id { get; set; }
+        }
+
+        public class GenerationTestEntity
         {
             public EfCoreLongId Id { get; set; }
         }
