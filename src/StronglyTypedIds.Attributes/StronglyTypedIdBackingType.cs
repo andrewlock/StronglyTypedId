@@ -11,12 +11,13 @@ namespace StronglyTypedIds
         /// Use the default backing type (either the globally configured default, or Guid)
         /// </summary>
         Default = 0,
-        
+
         Guid = 1,
         Int = 2,
         String = 3,
         Long = 4,
         NullableString = 5,
         MassTransitNewId = 6,
+        Short = 7,
     }
 }
