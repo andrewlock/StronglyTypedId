@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -24,15 +25,12 @@ namespace StronglyTypedIds.Tests
                 references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-            var originalTreeCount = compilation.SyntaxTrees.Length;
-            var generator = new T();
+            CSharpGeneratorDriver
+                .Create(new T())
+                .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            var output = string.Join("\n", outputCompilation.SyntaxTrees.Skip(6).Select(t => t.ToString())); 
 
-            var driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-
-            var trees = outputCompilation.SyntaxTrees.ToList();
-
-            return (diagnostics, trees.Count != originalTreeCount ? trees[^1].ToString() : string.Empty);
+            return (diagnostics, output);
         }
 
         internal static string LoadEmbeddedResource(string resourceName)
