@@ -196,5 +196,21 @@ namespace StronglyTypedIds
                 sb.Replace(": INTERFACES", string.Empty);
             }
         }
+
+        internal static string CreateSourceName(string nameSpace, ParentClass? parent, string name)
+        {
+            var sb = new StringBuilder(nameSpace).Append('.');
+            while (parent != null)
+            {
+                var s = parent.Name
+                    .Replace(" ", "")
+                    .Replace(",", "")
+                    .Replace("<", "__")
+                    .Replace(">", "");
+                sb.Append(s).Append('.');
+                parent = parent.Child;
+            }
+            return sb.Append(name).Append(".g.cs").ToString();
+        }
     }
 }

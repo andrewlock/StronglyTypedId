@@ -77,7 +77,11 @@ namespace StronglyTypedIds
                         values.BackingType,
                         values.Implementations,
                         sb);
-                    context.AddSource(idToGenerate.Name + ".g.cs", SourceText.From(result, Encoding.UTF8));
+                    var fileName = SourceGenerationHelper.CreateSourceName(
+                        idToGenerate.NameSpace,
+                        idToGenerate.Parent,
+                        idToGenerate.Name);
+                    context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
                 }
             }
         }
