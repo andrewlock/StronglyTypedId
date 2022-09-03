@@ -72,7 +72,14 @@ namespace StronglyTypedIds
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
+            var useImplicitCast = implementations.IsSet(StronglyTypedIdImplementations.ImplicitCast);
+            var useExplicitCast = implementations.IsSet(StronglyTypedIdImplementations.ExplicitCast);
 
+            if (useImplicitCast && useExplicitCast)
+            {
+                throw new ArgumentException("Cannot use implicit cast and explicit cast at the same time. Chose only one.", nameof(implementations));
+            }
+            
             var parentsCount = 0;
 
             sb ??= new StringBuilder();
@@ -130,6 +137,16 @@ namespace StronglyTypedIds
             if (useIComparable)
             {
                 sb.AppendLine(resources.Comparable);
+            }
+
+            if (useImplicitCast)
+            {
+                sb.AppendLine(resources.ImplicitCast);
+            }
+
+            if (useExplicitCast)
+            {
+                sb.AppendLine(resources.ExplicitCast);
             }
 
             if (useEfCoreValueConverter)

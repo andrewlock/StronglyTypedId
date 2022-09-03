@@ -38,8 +38,15 @@ namespace StronglyTypedIds.Tests
             }
         }
 
-        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true, bool includeNone = true)
+        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(
+            bool includeDefault = true,
+            bool includeNone = true,
+            StronglyTypedIdImplementations[] skip = null,
+            StronglyTypedIdImplementations[] only = null)
         {
+            skip ??= Array.Empty<StronglyTypedIdImplementations>();
+            only ??= Array.Empty<StronglyTypedIdImplementations>();
+            
             // get highest value
             var highestValue = Enum.GetValues(typeof(StronglyTypedIdImplementations))
                 .Cast<int>()
@@ -50,7 +57,9 @@ namespace StronglyTypedIds.Tests
             {
                 var implementations = (StronglyTypedIdImplementations)i;
                 if (implementations.IsSet(StronglyTypedIdImplementations.Default) && !includeDefault
-                    || implementations == StronglyTypedIdImplementations.None && !includeNone)
+                    || implementations == StronglyTypedIdImplementations.None && !includeNone
+                    || skip.Any(s => implementations.IsSet(s))
+                    || (only.Length > 0 && !only.Any(s => implementations.IsSet(s))))
                 {
                     continue;
                 }

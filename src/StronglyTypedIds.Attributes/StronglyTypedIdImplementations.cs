@@ -33,5 +33,17 @@ namespace StronglyTypedIds
         /// Implement the <see cref="IComparable{T}"/> interface
         /// </summary>
         IComparable = 4,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement an explicit cast
+        /// </summary>
+        ExplicitCast = 8,
+        
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement an explicit cast
+        /// </summary>
+        ImplicitCast = 16,
     }
 }

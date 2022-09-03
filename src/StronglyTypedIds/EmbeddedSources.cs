@@ -25,6 +25,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_ExplicitCast.cs"),
             false
         );
 
@@ -37,6 +39,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_ExplicitCast.cs"),
             false
         );
 
@@ -49,6 +53,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_ExplicitCast.cs"),
             false
         );
 
@@ -61,6 +67,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_ExplicitCast.cs"),
             false
         );
 
@@ -73,6 +81,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_ExplicitCast.cs"),
             true
         );
 
@@ -85,6 +95,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_ImplicitCast.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_ExplicitCast.cs"),
             false
         );
 
@@ -117,6 +129,8 @@ namespace StronglyTypedIds
             public string EfCoreValueConverter { get; }
             public string DapperTypeHandler { get; }
             public string Comparable { get; }
+            public string ImplicitCast { get; }
+            public string ExplicitCast { get; }
 
             public ResourceCollection(
                 string header,
@@ -127,6 +141,8 @@ namespace StronglyTypedIds
                 string efCoreValueConverter,
                 string dapperTypeHandler,
                 string comparable,
+                string implicitCast,
+                string explicitCast,
                 bool nullableEnable)
             {
                 BaseId = baseId;
@@ -136,6 +152,8 @@ namespace StronglyTypedIds
                 EfCoreValueConverter = efCoreValueConverter;
                 DapperTypeHandler = dapperTypeHandler;
                 Comparable = comparable;
+                ImplicitCast = implicitCast;
+                ExplicitCast = explicitCast;
                 NullableEnable = nullableEnable;
                 Header = header;
             }

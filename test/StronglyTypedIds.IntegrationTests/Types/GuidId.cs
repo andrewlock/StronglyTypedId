@@ -37,4 +37,10 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(implementations: StronglyTypedIdImplementations.IComparable)]
     public partial struct ComparableGuidId { }
+    
+    [StronglyTypedId(implementations: StronglyTypedIdImplementations.ExplicitCast)]
+    public partial struct ExplicitCastGuidId { }
+
+    [StronglyTypedId(implementations: StronglyTypedIdImplementations.ImplicitCast)]
+    public partial struct ImplicitCastGuidId { }
 }

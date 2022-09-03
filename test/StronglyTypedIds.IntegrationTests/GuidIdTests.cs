@@ -272,6 +272,23 @@ namespace StronglyTypedIds.IntegrationTests
 #pragma warning restore 184
         }
 
+        [Fact]
+        public void CanExplicitCast()
+        {
+            Assert.IsAssignableFrom<ExplicitCastGuidId>((ExplicitCastGuidId)Guid.NewGuid());
+            Assert.IsAssignableFrom<Guid>((Guid)ExplicitCastGuidId.New());
+        }
+        
+        [Fact]
+        public void CanImplicitCast()
+        {
+            ImplicitCastGuidId castedId = Guid.NewGuid();
+            Assert.IsType<ImplicitCastGuidId>(castedId);
+
+            Guid castedGuid = ImplicitCastGuidId.New();
+            Assert.IsType<Guid>(castedGuid);
+        }
+
 #if NET6_0_OR_GREATER
         [Fact]
         public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()

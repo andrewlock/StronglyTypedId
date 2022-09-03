@@ -114,11 +114,50 @@ namespace StronglyTypedIds.Tests
                 .UseParameters(nestedClassCount);
         }
 
+        [Theory]
+        [MemberData(nameof(ParametersOfImplicitAndExplicitCast))]
+        public void AllCombinationsOfExplicitAndImplicitCastAlwaysThrow(
+            string ns,
+            StronglyTypedIdConverter converter,
+            StronglyTypedIdBackingType backingType,
+            StronglyTypedIdImplementations implementations)
+        {
+            const string idName = "MyTestId";
+            Assert.Throws<ArgumentException>(() =>
+                SourceGenerationHelper.CreateId(
+                idName: idName,
+                idNamespace: ns,
+                parentClass: null,
+                converters: converter,
+                backingType: backingType,
+                implementations: implementations
+            ));
+        }
+        
         public static IEnumerable<object[]> Parameters()
         {
             foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
             foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
-            foreach (var implementations in EnumHelper.AllImplementations(includeDefault: false))
+            foreach (var implementations in EnumHelper.AllImplementations(
+                         includeDefault: false,
+                         skip: new[]
+                         {
+                             StronglyTypedIdImplementations.ExplicitCast|StronglyTypedIdImplementations.ImplicitCast,
+                         }))
+            foreach (var ns in new[] { string.Empty, IdNamespace })
+                yield return new object[] { ns, converter, backingType, implementations };
+        }
+        
+        public static IEnumerable<object[]> ParametersOfImplicitAndExplicitCast()
+        {
+            foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
+            foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
+            foreach (var implementations in EnumHelper.AllImplementations(
+                         includeDefault: false,
+                         only: new[]
+                         {
+                             StronglyTypedIdImplementations.ExplicitCast|StronglyTypedIdImplementations.ImplicitCast,
+                         }))
             foreach (var ns in new[] { string.Empty, IdNamespace })
                 yield return new object[] { ns, converter, backingType, implementations };
         }
