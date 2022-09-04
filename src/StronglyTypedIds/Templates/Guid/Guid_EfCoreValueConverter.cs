@@ -9,3 +9,13 @@
                     mappingHints
                 ) { }
         }
+        
+        public class EfCoreValueGenerator : Microsoft.EntityFrameworkCore.ValueGeneration.ValueGenerator<TESTID>
+        { 
+            public override bool GeneratesTemporaryValues => false;
+
+            public override TESTID Next(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
+            { 
+                return TESTID.New();
+            }
+        }

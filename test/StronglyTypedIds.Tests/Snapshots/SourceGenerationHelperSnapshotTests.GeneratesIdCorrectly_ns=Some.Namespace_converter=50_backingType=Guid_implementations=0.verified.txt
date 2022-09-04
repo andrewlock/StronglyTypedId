@@ -47,6 +47,16 @@ namespace Some.Namespace
                     mappingHints
                 ) { }
         }
+        
+        public class EfCoreValueGenerator : Microsoft.EntityFrameworkCore.ValueGeneration.ValueGenerator<MyTestId>
+        { 
+            public override bool GeneratesTemporaryValues => false;
+
+            public override MyTestId Next(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
+            { 
+                return MyTestId.New();
+            }
+        }
 
         public class DapperTypeHandler : Dapper.SqlMapper.TypeHandler<MyTestId>
         {

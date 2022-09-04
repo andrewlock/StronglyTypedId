@@ -46,6 +46,18 @@ namespace Some.Namespace
                     mappingHints
                 ) { }
         }
+        
+        public class EfCoreValueGenerator : Microsoft.EntityFrameworkCore.ValueGeneration.ValueGenerator<MyTestId>
+        {
+            private int _id = int.MinValue;
+            public override bool GeneratesTemporaryValues => true;
+
+            public override MyTestId Next(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
+            {
+                System.Threading.Interlocked.Increment(ref _id);
+                return new MyTestId(_id);
+            }
+        }
 
         class MyTestIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<MyTestId>
         {

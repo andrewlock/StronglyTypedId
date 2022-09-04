@@ -9,3 +9,15 @@
                     mappingHints
                 ) { }
         }
+        
+        public class EfCoreValueGenerator : Microsoft.EntityFrameworkCore.ValueGeneration.ValueGenerator<TESTID>
+        {
+            private long _id = long.MinValue;
+            public override bool GeneratesTemporaryValues => true;
+
+            public override TESTID Next(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
+            {
+                System.Threading.Interlocked.Increment(ref _id);
+                return new TESTID(_id);
+            }
+        }
