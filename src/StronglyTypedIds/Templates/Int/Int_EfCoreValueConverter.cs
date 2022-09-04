@@ -17,7 +17,7 @@
 
             public override TESTID Next(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry)
             {
-                _id += 1;
+                System.Threading.Interlocked.Increment(ref _id);
                 return new TESTID(_id);
             }
         }
