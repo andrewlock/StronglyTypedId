@@ -44,6 +44,13 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
 
+        public static MyTestId Parse(string? value) => new MyTestId(value?.Trim());
+        public static bool TryParse(string? value, out MyTestId result)
+        {
+            result = new MyTestId(value?.Trim());
+            return true;
+        }
+
         public class DapperTypeHandler : Dapper.SqlMapper.TypeHandler<MyTestId>
         {
             public override void SetValue(System.Data.IDbDataParameter parameter, MyTestId value)

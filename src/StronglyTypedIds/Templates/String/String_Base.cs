@@ -30,3 +30,15 @@
         public override string ToString() => Value;
         public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);
+
+        public static TESTID Parse(string value) => new TESTID(value.Trim());
+        public static bool TryParse(string value, out TESTID result)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                result = default;
+                return false;
+            }
+            result = new TESTID(value.Trim());
+            return true;
+        }

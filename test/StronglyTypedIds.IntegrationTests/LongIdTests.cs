@@ -65,6 +65,42 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanParseString()
+        {
+            var value = 1L;
+            var foo = LongId.Parse(value.ToString());
+            var bar = new LongId(value);
+
+            Assert.Equal(bar, foo);
+        }
+
+        [Fact]
+        public void ThrowWhenInvalidParseString()
+        {
+            Assert.Throws<FormatException>(() => LongId.Parse(""));
+        }
+
+        [Fact]
+        public void CanFailTryParse()
+        {
+            var result = LongId.TryParse("", out _);
+            Assert.False(result);
+        }
+
+
+        [Fact]
+        public void CanTryParseSuccessfully()
+        {
+            var value = 2L;
+            var result = LongId.TryParse(value.ToString(), out LongId foo);
+            var bar = new LongId(value);
+
+            Assert.True(result);
+            Assert.Equal(bar, foo);
+        }
+
+
+        [Fact]
         public void CanSerializeToLong_WithNewtonsoftJsonProvider()
         {
             var foo = new NewtonsoftJsonLongId(123);

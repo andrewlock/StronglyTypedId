@@ -75,6 +75,42 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanParseString()
+        {
+            var value = Guid.NewGuid();
+            var foo = GuidId1.Parse(value.ToString());
+            var bar = new GuidId1(value);
+
+            Assert.Equal(bar, foo);
+        }
+
+        [Fact]
+        public void ThrowWhenInvalidParseString()
+        {
+            Assert.Throws<FormatException>(() => GuidId1.Parse(""));
+        }
+
+        [Fact]
+        public void CanFailTryParse()
+        {
+            var result = GuidId1.TryParse("", out _);
+            Assert.False(result);
+        }
+
+
+        [Fact]
+        public void CanTryParseSuccessfully()
+        {
+            var value = Guid.NewGuid();
+            var result = GuidId1.TryParse(value.ToString(), out GuidId1 foo);
+            var bar = new GuidId1(value);
+
+            Assert.True(result);
+            Assert.Equal(bar, foo);
+        }
+
+
+        [Fact]
         public void CanSerializeToGuid_WithTypeConverter()
         {
             var foo = NewtonsoftJsonGuidId.New();

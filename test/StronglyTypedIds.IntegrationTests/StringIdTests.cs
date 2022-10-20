@@ -70,6 +70,40 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.NotEqual((object)bar, (object)foo);
         }
 
+
+        [Fact]
+        public void CanParseSuccessfully()
+        {
+            var value = "123ABC";
+            var foo = StringId.Parse($" {value} ");
+            var bar = new StringId(value);
+
+            Assert.Equal(bar, foo);
+        }
+
+
+        [Fact]
+        public void CanTryParseSuccessfully()
+        {
+            var value = "123ABC";
+            var result = StringId.TryParse($" {value} ", out StringId foo);
+            var bar = new StringId(value);
+
+            Assert.True(result);
+            Assert.Equal(bar, foo);
+        }
+
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null!)]
+        public void CaTryParseFailOnInvalidStrings(string value)
+        {
+            var result = StringId.TryParse(value, out _);
+            Assert.False(result);
+        }
+
         [Fact]
         public void CanSerializeToString_WithNewtonsoftJsonProvider()
         {

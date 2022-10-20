@@ -47,6 +47,18 @@ namespace Some.Namespace
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
 
+        public static MyTestId Parse(string value) => new MyTestId(value.Trim());
+        public static bool TryParse(string value, out MyTestId result)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                result = default;
+                return false;
+            }
+            result = new MyTestId(value.Trim());
+            return true;
+        }
+
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)

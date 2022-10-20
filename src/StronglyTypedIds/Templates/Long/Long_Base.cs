@@ -21,3 +21,15 @@
         public override string ToString() => Value.ToString();
         public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);
+
+        public static TESTID Parse(string value) => new TESTID(long.Parse(value));
+        public static bool TryParse(string value, out TESTID result)
+        {
+            if (long.TryParse(value, out long parseResult))
+            {
+                result = new TESTID(parseResult);
+                return true;
+            }
+            result = default;
+            return false;
+        }
