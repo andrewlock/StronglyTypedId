@@ -25,6 +25,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SwaggerSchemaFilter.cs"),
             false
         );
 
@@ -37,6 +38,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SwaggerSchemaFilter.cs"),
             false
         );
 
@@ -49,6 +51,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SwaggerSchemaFilter.cs"),
             false
         );
 
@@ -61,6 +64,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SwaggerSchemaFilter.cs"),
             false
         );
 
@@ -73,6 +77,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_SwaggerSchemaFilter.cs"),
             true
         );
 
@@ -85,12 +90,14 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_EfCoreValueConverter.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_IComparable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_SwaggerSchemaFilter.cs"),
             false
         );
 
         internal const string TypeConverterAttributeSource = "    [System.ComponentModel.TypeConverter(typeof(TESTIDTypeConverter))]";
         internal const string NewtonsoftJsonAttributeSource = "    [Newtonsoft.Json.JsonConverter(typeof(TESTIDNewtonsoftJsonConverter))]";
         internal const string SystemTextJsonAttributeSource = "    [System.Text.Json.Serialization.JsonConverter(typeof(TESTIDSystemTextJsonConverter))]";
+        internal const string SwaggerSchemaFilterAttributeSource = "    [Swashbuckle.AspNetCore.Annotations.SwaggerSchemaFilter(typeof(TESTIDSchemaFilter))]";
 
         internal static string LoadEmbeddedResource(string resourceName)
         {
@@ -108,6 +115,7 @@ namespace StronglyTypedIds
 
         public readonly struct ResourceCollection
         {
+            public string SwaggerSchemaFilter { get; }
             public string Header { get; }
             public bool NullableEnable { get; }
             public string BaseId { get; }
@@ -127,8 +135,10 @@ namespace StronglyTypedIds
                 string efCoreValueConverter,
                 string dapperTypeHandler,
                 string comparable,
+                string swaggerSchemaFilter,
                 bool nullableEnable)
             {
+                SwaggerSchemaFilter = swaggerSchemaFilter;
                 BaseId = baseId;
                 Newtonsoft = newtonsoft;
                 SystemTextJson = systemTextJson;

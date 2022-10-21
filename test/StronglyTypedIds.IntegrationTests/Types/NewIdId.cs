@@ -29,6 +29,11 @@ namespace StronglyTypedIds.IntegrationTests.Types
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.MassTransitNewId, converters: StronglyTypedIdConverter.DapperTypeHandler)]
     public partial struct DapperNewIdId { }
 
+#if NET5_0_OR_GREATER
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.MassTransitNewId, converters: StronglyTypedIdConverter.SwaggerSchemaFilter)]
+    public partial struct SwaggerNewIdId { }
+#endif
+
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.MassTransitNewId, implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable)]
     public partial struct BothNewIdId { }
 

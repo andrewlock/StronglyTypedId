@@ -54,6 +54,8 @@ To use the the [StronglyTypedId NuGet package](https://www.nuget.org/packages/St
 * [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/) (optional, only required if [generating a System.Text `JsonConverter`](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#creating-a-custom-jsonconverter)). Note that in .NET Core apps, you will likely already reference this project via transitive dependencies.
 * [Dapper](https://www.nuget.org/packages/Dapper/) (optional, only required if [generating a type mapper](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-3/#interfacing-with-external-system-using-strongly-typed-ids))
 * [EF Core](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore) (optional, only required if [generating an EF Core ValueConverter](https://andrewlock.net/strongly-typed-ids-in-ef-core-using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-4/))
+* [Swagger Annotations](https://www.nuget.org/packages/Swashbuckle.AspNetCore.Annotations) (optional, only required if [generating an Swagger Schema Filter](#openapiswagger-specification)
+
 
 To install the packages, add the references to your _csproj_ file, for example by running
 
@@ -160,6 +162,18 @@ public partial struct OrderId { }
 public partial struct UserId { }
 ```
 
+## OpenApi/Swagger Specification
+
+If you wish to use an ID in your Swagger models and want to have schema and model sample reflecting the ID backingfield type you will need:
+- Install [Swagger Annotations](https://www.nuget.org/packages/Swashbuckle.AspNetCore.Annotations) `>=5.0.0` 
+- Enable annotation in swagger gen with `services.AddSwaggerGen(c => c.EnableAnnotations());`
+- Use the converter flag `StronglyTypedIdConverter.SwaggerSchemaFilter` on the ID decorator. eg:
+    ```csharp
+    [StronglyTypedId(
+        backingType: StronglyTypedIdBackingType.Int,
+        converters: StronglyTypedIdConverter.SwaggerSchemaFilter | StronglyTypedIdConverter.SystemTextJson)]
+    public partial struct UserId { }
+    ```
 
 ## Embedding the attributes in your project
 

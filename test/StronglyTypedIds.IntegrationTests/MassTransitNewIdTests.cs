@@ -327,6 +327,27 @@ namespace StronglyTypedIds.IntegrationTests
         }
 #endif
 
+#if NET5_0_OR_GREATER
+        [Fact]
+        public void CanShowImplementationTypeExample_WithSwaggerSchemaFilter()
+        {
+            var schemaGenerator = new Swashbuckle.AspNetCore.SwaggerGen.SchemaGenerator(
+                new Swashbuckle.AspNetCore.SwaggerGen.SchemaGeneratorOptions(),
+                new Swashbuckle.AspNetCore.SwaggerGen.JsonSerializerDataContractResolver(
+                    new System.Text.Json.JsonSerializerOptions()));
+            var provider = Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.BuildServiceProvider(
+                new Microsoft.Extensions.DependencyInjection.ServiceCollection());
+            var schemaFilter = new Swashbuckle.AspNetCore.Annotations.AnnotationsSchemaFilter(provider);
+            var schemaRepository = new Swashbuckle.AspNetCore.SwaggerGen.SchemaRepository();
+
+            var idType = typeof(SwaggerNewIdId);
+            var schema = schemaGenerator.GenerateSchema(idType, schemaRepository);
+            schemaFilter.Apply(schema, new Swashbuckle.AspNetCore.SwaggerGen.SchemaFilterContext(idType, schemaGenerator, schemaRepository));
+
+            Assert.Equal("string", schema.Type);
+            Assert.Equal("uuid", schema.Format);
+        }
+#endif
         public class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
