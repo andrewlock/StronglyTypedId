@@ -41,6 +41,13 @@
         public override string? ToString() => Value;
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
+
+        public static MyTestId Parse(string? value) => new MyTestId(value);
+        public static bool TryParse(string? value, out MyTestId result)
+        {
+            result = new MyTestId(value?.Trim());
+            return true;
+        }
         public int CompareTo(MyTestId other)
         {
             return (Value, other.Value) switch

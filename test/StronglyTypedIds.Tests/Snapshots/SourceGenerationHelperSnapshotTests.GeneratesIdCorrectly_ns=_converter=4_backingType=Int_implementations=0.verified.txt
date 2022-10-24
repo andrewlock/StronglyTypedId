@@ -34,6 +34,18 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
 
+        public static MyTestId Parse(string value) => new MyTestId(int.Parse(value));
+        public static bool TryParse(string value, out MyTestId result)
+        {
+            if (int.TryParse(value, out int parseResult))
+            {
+                result = new MyTestId(parseResult);
+                return true;
+            }
+            result = default;
+            return false;
+        }
+
         class MyTestIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
         {
             public override bool CanConvert(System.Type objectType)

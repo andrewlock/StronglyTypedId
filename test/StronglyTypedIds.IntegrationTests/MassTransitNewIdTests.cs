@@ -76,6 +76,41 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanParseString()
+        {
+            var value = NewId.Next();
+            var foo = NewIdId1.Parse(value.ToString());
+            var bar = new NewIdId1(value);
+
+            Assert.Equal(bar, foo);
+        }
+
+        [Fact]
+        public void ThrowWhenInvalidParseString()
+        {
+            Assert.Throws<FormatException>(() => NewIdId1.Parse("invalid"));
+        }
+
+        [Fact]
+        public void CanFailTryParse()
+        {
+            var result = NewIdId1.TryParse("invalid", out _);
+            Assert.False(result);
+        }
+
+
+        [Fact]
+        public void CanTryParseSuccessfully()
+        {
+            var value = NewId.Next();
+            var result = NewIdId1.TryParse(value.ToString(), out NewIdId1 foo);
+            var bar = new NewIdId1(value);
+
+            Assert.True(result);
+            Assert.Equal(bar, foo);
+        }
+
+        [Fact]
         public void CanSerializeToNewId_WithTypeConverter()
         {
             var foo = NewtonsoftJsonNewIdId.New();
