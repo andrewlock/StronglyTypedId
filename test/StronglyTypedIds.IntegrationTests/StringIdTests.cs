@@ -75,7 +75,7 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanParseSuccessfully()
         {
             var value = "123ABC";
-            var foo = StringId.Parse($" {value} ");
+            var foo = StringId.Parse(value);
             var bar = new StringId(value);
 
             Assert.Equal(bar, foo);
@@ -86,7 +86,7 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanTryParseSuccessfully()
         {
             var value = "123ABC";
-            var result = StringId.TryParse($" {value} ", out StringId foo);
+            var result = StringId.TryParse(value, out StringId foo);
             var bar = new StringId(value);
 
             Assert.True(result);

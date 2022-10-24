@@ -68,7 +68,7 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanParseSuccessfully()
         {
             var value = "123ABC";
-            var foo = NullableStringId.Parse($" {value} ");
+            var foo = NullableStringId.Parse(value);
             var bar = new NullableStringId(value);
 
             Assert.Equal(bar, foo);
@@ -78,7 +78,7 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanTryParseSuccessfully()
         {
             var value = "123ABC";
-            var result = NullableStringId.TryParse($" {value} ", out NullableStringId foo);
+            var result = NullableStringId.TryParse(value, out NullableStringId foo);
             var bar = new NullableStringId(value);
 
             Assert.True(result);
