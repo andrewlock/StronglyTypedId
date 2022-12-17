@@ -182,6 +182,33 @@ namespace MyTests.TestNameSpace
                 .UseDirectory("Snapshots");
         }
 
+        [Fact]
+        public Task CanGenerateMultipleIdsWithSameName()
+        {
+            // https://github.com/andrewlock/StronglyTypedId/issues/74
+            const string input = @"using StronglyTypedIds;
+
+namespace MyContracts.V1
+{
+    [StronglyTypedId]
+    public partial struct MyId {}
+}
+
+namespace MyContracts.V2
+{
+    [StronglyTypedId]
+    public partial struct MyId {}
+}";
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
         public static TheoryData<StronglyTypedIdBackingType, StronglyTypedIdConverter?> GetData => new()
         {
             {StronglyTypedIdBackingType.Guid, null},
