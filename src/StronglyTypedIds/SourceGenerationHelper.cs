@@ -33,6 +33,7 @@ namespace StronglyTypedIds
                 StronglyTypedIdBackingType.NullableString => EmbeddedSources.NullableStringResources,
                 StronglyTypedIdBackingType.MassTransitNewId => EmbeddedSources.NewIdResources,
                 StronglyTypedIdBackingType.Short => EmbeddedSources.ShortResources,
+                StronglyTypedIdBackingType.Byte => EmbeddedSources.ByteResources,
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
