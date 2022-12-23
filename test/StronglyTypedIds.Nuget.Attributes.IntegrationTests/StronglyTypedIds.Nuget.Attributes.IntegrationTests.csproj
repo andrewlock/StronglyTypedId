@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <DefineConstants>STRONGLY_TYPED_ID_EMBED_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
@@ -20,39 +20,6 @@
     <PackageReference Include="StronglyTypedId" Version="$(Version)" ExcludeAssets="compile;runtime" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0-*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0-*" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0-*" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' and '$(TargetFramework)' != 'net6.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.17" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NewId" Version="4.0.0-develop.44" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="Dapper" Version="2.0.90" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="1.3.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />
 
 </Project>
