@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using StronglyTypedIds.IntegrationTests.Fixtures;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
 using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
@@ -12,8 +14,16 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
+    [Collection(MongoDbCollection.Name)]
     public class GuidIdTests
     {
+        private readonly MongoDbFixture _mongoDbFixture;
+
+        public GuidIdTests(MongoDbFixture mongoDbFixture)
+        {
+            _mongoDbFixture = mongoDbFixture;
+        }
+        
         [Fact]
         public void SameValuesAreEqual()
         {
@@ -220,6 +230,19 @@ namespace StronglyTypedIds.IntegrationTests
             var value = Assert.Single(results);
             Assert.Equal(value, new DapperGuidId(Guid.Parse("5640dad4-862a-4738-9e3c-c76dc227eb66")));
         }
+        
+        [Fact]
+        public async Task WhenMongoSerializerUsesSerializer()
+        {
+            var collection = _mongoDbFixture.Database.GetCollection<TestDocument>("GuidIdTestCollection");
+
+            var guidValue = Guid.NewGuid();
+            var original = new TestDocument { Id = new MongoGuidId(guidValue) };
+            await collection.InsertOneAsync(original);
+            var retrieved = await collection.Find(x => x.Id == new MongoGuidId(guidValue)).FirstAsync();
+            
+            Assert.Equal(new MongoGuidId(guidValue), retrieved.Id);
+        }
 
         [Theory]
         [InlineData("78104553-f1cd-41ec-bcb6-d3a8ff8d994d")]
@@ -354,6 +377,11 @@ namespace StronglyTypedIds.IntegrationTests
         public class EntityWithNullableId
         {
             public NewtonsoftJsonGuidId? Id { get; set; }
+        }
+        
+        public class TestDocument
+        {
+            public MongoGuidId Id { get; set; }
         }
     }
 }

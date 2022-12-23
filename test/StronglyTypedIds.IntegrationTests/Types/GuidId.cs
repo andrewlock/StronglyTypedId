@@ -37,4 +37,7 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(implementations: StronglyTypedIdImplementations.IComparable)]
     public partial struct ComparableGuidId { }
+    
+    [StronglyTypedId(converters: StronglyTypedIdConverter.MongoSerializer)]
+    public partial struct MongoGuidId { }
 }

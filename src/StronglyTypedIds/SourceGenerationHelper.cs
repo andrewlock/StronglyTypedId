@@ -32,6 +32,7 @@ namespace StronglyTypedIds
                 StronglyTypedIdBackingType.String => EmbeddedSources.StringResources,
                 StronglyTypedIdBackingType.NullableString => EmbeddedSources.NullableStringResources,
                 StronglyTypedIdBackingType.MassTransitNewId => EmbeddedSources.NewIdResources,
+                StronglyTypedIdBackingType.ObjectId => EmbeddedSources.ObjectIdResources,
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
@@ -69,6 +70,7 @@ namespace StronglyTypedIds
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
             var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
+            var useMongoSerializer = converters.IsSet(StronglyTypedIdConverter.MongoSerializer);
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
@@ -121,6 +123,11 @@ namespace StronglyTypedIds
             {
                 sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
             }
+            
+            if (useMongoSerializer)
+            {
+                sb.AppendLine(EmbeddedSources.MongoSerializerAttributeSource);
+            }
 
             sb.Append(resources.BaseId);
             ReplaceInterfaces(sb, useIEquatable, useIComparable);
@@ -155,6 +162,11 @@ namespace StronglyTypedIds
             if (useSystemTextJson)
             {
                 sb.AppendLine(resources.SystemTextJson);
+            }
+            
+            if (useMongoSerializer)
+            {
+                sb.AppendLine(resources.Mongo);
             }
 
             sb.Replace("TESTID", idName);

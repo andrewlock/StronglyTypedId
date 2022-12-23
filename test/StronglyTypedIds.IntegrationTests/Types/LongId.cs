@@ -34,4 +34,7 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IComparable)]
     public partial struct ComparableLongId { }
+    
+    [StronglyTypedId(converters: StronglyTypedIdConverter.MongoSerializer, backingType: StronglyTypedIdBackingType.Long)]
+    public partial struct MongoLongId { }
 }
