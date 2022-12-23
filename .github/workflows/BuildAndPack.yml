@@ -40,7 +40,6 @@ jobs:
             6.0.x
             5.0.x
             3.1.x
-            2.1.x
       - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
@@ -71,7 +70,6 @@ jobs:
             6.0.x
             5.0.x
             3.1.x
-            2.1.x
       - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
@@ -102,7 +100,6 @@ jobs:
             6.0.x
             5.0.x
             3.1.x
-            2.1.x
       - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
