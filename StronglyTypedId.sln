@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EE1258BD-3422-4F55-B9CF-B4D6C95DAD68}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D1907D86-8FFC-4178-A3DB-0ADBDD282C64}"
+	ProjectSection(SolutionItems) = preProject
+		test\IntegrationLibraries.props = test\IntegrationLibraries.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C4F0391-8A5A-4225-B356-01EFA94672AB}"
 	ProjectSection(SolutionItems) = preProject
