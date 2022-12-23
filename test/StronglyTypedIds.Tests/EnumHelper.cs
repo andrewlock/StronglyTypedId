@@ -6,18 +6,22 @@ namespace StronglyTypedIds.Tests
 {
     public class EnumHelper
     {
-        public static IEnumerable<StronglyTypedIdBackingType> AllBackingTypes(bool includeDefault = true)
-        {
-            foreach (StronglyTypedIdBackingType value in Enum.GetValues(typeof(StronglyTypedIdBackingType)))
-            {
-                if (value != StronglyTypedIdBackingType.Default || includeDefault)
-                {
-                    yield return value;
-                }
-            }
-        }
+        public static IEnumerable<StronglyTypedIdBackingType> AllBackingTypes(bool includeDefault = true) 
+            => Enum.GetValues(typeof(StronglyTypedIdBackingType))
+                .Cast<StronglyTypedIdBackingType>()
+                .Where(value => value != StronglyTypedIdBackingType.Default || includeDefault);
 
-        public static IEnumerable<StronglyTypedIdConverter> AllConverters(bool includeDefault = true, bool includeNone = true)
+        public static IEnumerable<StronglyTypedIdConverter> AllConverters(bool includeDefault = true) 
+            => Enum.GetValues(typeof(StronglyTypedIdConverter))
+                .Cast<StronglyTypedIdConverter>()
+                .Where(value => value != StronglyTypedIdConverter.Default || includeDefault);
+
+        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true) 
+            => Enum.GetValues(typeof(StronglyTypedIdImplementations))
+                .Cast<StronglyTypedIdImplementations>()
+                .Where(value => value != StronglyTypedIdImplementations.Default || includeDefault);
+
+        public static IEnumerable<StronglyTypedIdConverter> AllConverterCombinations(bool includeDefault = true, bool includeNone = true)
         {
             // get highest value
             var highestValue = Enum.GetValues(typeof(StronglyTypedIdConverter))
@@ -38,7 +42,7 @@ namespace StronglyTypedIds.Tests
             }
         }
 
-        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true, bool includeNone = true)
+        public static IEnumerable<StronglyTypedIdImplementations> AllImplementationCombinations(bool includeDefault = true, bool includeNone = true)
         {
             // get highest value
             var highestValue = Enum.GetValues(typeof(StronglyTypedIdImplementations))
