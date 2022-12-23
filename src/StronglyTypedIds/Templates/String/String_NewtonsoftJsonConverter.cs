@@ -14,6 +14,13 @@
 
             public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
             {
+                if (objectType == typeof(TESTID?))
+                {
+                    var value = serializer.Deserialize<string?>(reader);
+
+                    return value is null ? null : new TESTID(value);
+                }
+
                 return new TESTID(serializer.Deserialize<string>(reader));
             }
         }

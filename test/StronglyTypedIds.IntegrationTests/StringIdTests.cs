@@ -82,6 +82,18 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanSerializeToNullableId_WithNewtonsoftJsonProvider()
+        {
+            var entity = new EntityWithNullableId { Id = null };
+
+            var json = NewtonsoftJsonSerializer.SerializeObject(entity);
+            var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
+
+            Assert.NotNull(deserialize);
+            Assert.Null(deserialize.Id);
+        }
+
+        [Fact]
         public void CanSerializeToString_WithSystemTextJsonProvider()
         {
             var foo = new SystemTextJsonStringId("123");
@@ -342,6 +354,11 @@ namespace StronglyTypedIds.IntegrationTests
         {
             public Guid Id { get; set; }
             public EfCoreStringId Name { get; set; }
+        }
+
+        public class EntityWithNullableId
+        {
+            public NewtonsoftJsonStringId? Id { get; set; }
         }
     }
 }
