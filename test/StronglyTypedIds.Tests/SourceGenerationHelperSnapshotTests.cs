@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using VerifyXunit;
 using Xunit;
@@ -68,24 +69,51 @@ namespace StronglyTypedIds.Tests
         [Theory]
         [MemberData(nameof(Parameters))]
         public Task GeneratesIdCorrectly(
-            string ns,
-            StronglyTypedIdConverter converter,
-            StronglyTypedIdBackingType backingType,
-            StronglyTypedIdImplementations implementations)
+            StronglyTypedIdBackingType type,
+            StronglyTypedIdConverter c,
+            StronglyTypedIdImplementations i)
         {
             const string idName = "MyTestId";
             var result = SourceGenerationHelper.CreateId(
                 idName: idName,
-                idNamespace: ns,
+                idNamespace: "",
                 parentClass: null,
-                converters: converter,
-                backingType: backingType,
-                implementations: implementations
+                converters: c,
+                backingType: type,
+                implementations: i
             );
 
             return Verifier.Verify(result)
                 .UseDirectory("Snapshots")
-                .UseParameters(ns, (int)converter, backingType, (int)implementations);
+                .UseParameters(type, c, i);
+        }
+
+        [Theory]
+        [MemberData(nameof(BackingTypes))]
+        public Task GeneratesFullIdCorrectly(StronglyTypedIdBackingType type)
+        {
+            // combine them all
+            var combinedConverter = EnumHelper.AllConverters(includeDefault: false)
+                .Aggregate(StronglyTypedIdConverter.None, (prev, current) => prev | current);
+
+            // combine them all
+            var combinedImplementation = EnumHelper.AllImplementations(includeDefault: false)
+                .Aggregate(StronglyTypedIdImplementations.None, (prev, current) => prev | current);
+
+            const string idName = "MyTestId";
+            
+            var result = SourceGenerationHelper.CreateId(
+                idName: idName,
+                idNamespace: "",
+                parentClass: null,
+                converters: combinedConverter,
+                backingType: type,
+                implementations: combinedImplementation
+            );
+
+            return Verifier.Verify(result)
+                .UseDirectory("Snapshots")
+                .UseParameters(type);
         }
 
         [Theory]
@@ -114,13 +142,26 @@ namespace StronglyTypedIds.Tests
                 .UseParameters(nestedClassCount);
         }
 
+        public static IEnumerable<object[]> BackingTypes()
+            => EnumHelper.AllBackingTypes(includeDefault: false)
+                .Select(x => new object[] { x });
+
         public static IEnumerable<object[]> Parameters()
         {
-            foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
             foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
-            foreach (var implementations in EnumHelper.AllImplementations(includeDefault: false))
-            foreach (var ns in new[] { string.Empty, IdNamespace })
-                yield return new object[] { ns, converter, backingType, implementations };
+            {
+                // All individual convert types
+                foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
+                {
+                    yield return new object[] { backingType, converter, StronglyTypedIdImplementations.None };
+                }
+
+                // All individual implementations
+                foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false))
+                {
+                    yield return new object[] { backingType, StronglyTypedIdConverter.None, implementation };
+                }
+            }
         }
     }
 }
