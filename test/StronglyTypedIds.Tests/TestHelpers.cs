@@ -24,10 +24,12 @@ namespace StronglyTypedIds.Tests
                 references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
+            var originalTreeCount = compilation.SyntaxTrees.Length;
+
             CSharpGeneratorDriver
                 .Create(new T())
                 .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            var output = string.Join("\n", outputCompilation.SyntaxTrees.Skip(6).Select(t => t.ToString())); 
+            var output = string.Join("\n", outputCompilation.SyntaxTrees.Skip(originalTreeCount).Select(t => t.ToString())); 
 
             return (diagnostics, output);
         }
