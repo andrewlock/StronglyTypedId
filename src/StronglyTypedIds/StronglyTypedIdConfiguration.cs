@@ -1,7 +1,7 @@
 
 namespace StronglyTypedIds
 {
-    internal readonly struct StronglyTypedIdConfiguration
+    internal readonly record struct StronglyTypedIdConfiguration
     {
         public StronglyTypedIdBackingType BackingType { get; }
 
