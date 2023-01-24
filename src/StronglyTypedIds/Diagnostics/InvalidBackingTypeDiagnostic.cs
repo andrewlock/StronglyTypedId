@@ -13,5 +13,10 @@ namespace StronglyTypedIds.Diagnostics
                 new DiagnosticDescriptor(
                     Id, Title, Message, category: Constants.Usage, defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true),
                 currentNode.GetLocation());
+
+        public static DiagnosticInfo CreateInfo(SyntaxNode currentNode)
+            => new(new DiagnosticDescriptor(
+                    Id, Title, Message, category: Constants.Usage, defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true),
+                currentNode.GetLocation());
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -24,66 +23,70 @@ namespace StronglyTypedIds
                 i.AddSource("StronglyTypedIdImplementations.g.cs", EmbeddedSources.StronglyTypedIdImplementationsSource);
             });
 
-            IncrementalValuesProvider<StructDeclarationSyntax> structDeclarations = context.SyntaxProvider
-                .CreateSyntaxProvider(
-                    predicate: static (s, _) => Parser.IsStructTargetForGeneration(s),
-                    transform: static (ctx, _) => Parser.GetStructSemanticTargetForGeneration(ctx))
-                .Where(static m => m is not null)!;
+            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdAttribute,
+                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    transform: Parser.GetStructSemanticTarget)
+                .Where(static m => m is not null);
 
-            IncrementalValuesProvider<AttributeSyntax> defaultAttributesDeclarations = context.SyntaxProvider
-                .CreateSyntaxProvider(
-                    predicate: static (s, _) => Parser.IsAttributeTargetForGeneration(s),
-                    transform: static (ctx, _) => Parser.GetAssemblyAttributeSemanticTargetForGeneration(ctx))
-                .Where(static m => m is not null)!;
+            IncrementalValuesProvider<Result<(StronglyTypedIdConfiguration defaults, bool valid)>> defaultsAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdDefaultsAttribute,
+                    predicate: (node, _) => node is CompilationUnitSyntax,
+                    transform: Parser.GetDefaults)
+                .Where(static m => m is not null);
 
-            IncrementalValueProvider<(ImmutableArray<StructDeclarationSyntax>, ImmutableArray<AttributeSyntax>)> targetsAndDefaultAttributes
-                = structDeclarations.Collect().Combine(defaultAttributesDeclarations.Collect());
+            context.RegisterSourceOutput(
+                structAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(Diagnostic.Create(info.Descriptor, info.Location)));
 
-            IncrementalValueProvider<(Compilation Left, (ImmutableArray<StructDeclarationSyntax>, ImmutableArray<AttributeSyntax>) Right)> compilationAndValues
-                = context.CompilationProvider.Combine(targetsAndDefaultAttributes);
+            context.RegisterSourceOutput(
+                defaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(Diagnostic.Create(info.Descriptor, info.Location)));
 
-            context.RegisterSourceOutput(compilationAndValues,
-                static (spc, source) => Execute(source.Item1, source.Item2.Item1, source.Item2.Item2, spc));
+            IncrementalValuesProvider<StructToGenerate> structs = structAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.info);
+
+            IncrementalValueProvider<ImmutableArray<StronglyTypedIdConfiguration>> allDefaults = defaultsAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.defaults)
+                .Collect();
+
+            // we can only use one default attribute
+            // more than one is an error, but lets do our best
+            IncrementalValueProvider<StronglyTypedIdConfiguration?> selectedDefaults = allDefaults
+                .Select((all, _) => all.IsDefaultOrEmpty ? (StronglyTypedIdConfiguration?)null : all[0]);
+
+            var structsWithDefaults = structs.Combine(selectedDefaults);
+
+            context.RegisterSourceOutput(structsWithDefaults,
+                static (spc, source) => Execute(source.Left, source.Right, spc));
         }
 
         static void Execute(
-            Compilation compilation,
-            ImmutableArray<StructDeclarationSyntax> structs,
-            ImmutableArray<AttributeSyntax> defaults,
+            StructToGenerate idToGenerate,
+            StronglyTypedIdConfiguration? defaults,
             SourceProductionContext context)
         {
-            if (structs.IsDefaultOrEmpty)
-            {
-                // nothing to do yet
-                return;
-            }
+            var sb = new StringBuilder();
+            var values = StronglyTypedIdConfiguration.Combine(idToGenerate.Config, defaults);
 
-            List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)> idsToGenerate =
-                Parser.GetTypesToGenerate(compilation, structs, context.ReportDiagnostic, context.CancellationToken);
+            var result = SourceGenerationHelper.CreateId(
+                idToGenerate.NameSpace,
+                idToGenerate.Name,
+                idToGenerate.Parent,
+                values.Converters,
+                values.BackingType,
+                values.Implementations,
+                sb);
 
-            if (idsToGenerate.Count > 0)
-            {
-                StronglyTypedIdConfiguration? globalDefaults = Parser.GetDefaults(defaults, compilation, context.ReportDiagnostic);
-                StringBuilder sb = new StringBuilder();
-                foreach (var idToGenerate in idsToGenerate)
-                {
-                    sb.Clear();
-                    var values = StronglyTypedIdConfiguration.Combine(idToGenerate.Config, globalDefaults);
-                    var result = SourceGenerationHelper.CreateId(
-                        idToGenerate.NameSpace,
-                        idToGenerate.Name,
-                        idToGenerate.Parent,
-                        values.Converters,
-                        values.BackingType,
-                        values.Implementations,
-                        sb);
-                    var fileName = SourceGenerationHelper.CreateSourceName(
-                        idToGenerate.NameSpace,
-                        idToGenerate.Parent,
-                        idToGenerate.Name);
-                    context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
-                }
-            }
+            var fileName = SourceGenerationHelper.CreateSourceName(
+                idToGenerate.NameSpace,
+                idToGenerate.Parent,
+                idToGenerate.Name);
+            context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
         }
     }
 }

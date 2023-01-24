@@ -92,19 +92,19 @@ namespace StronglyTypedIds
 {");
             }
 
-            while (parentClass is not null)
+            while (parentClass is { } parent)
             {
                 sb
                     .Append("    partial ")
-                    .Append(parentClass.Keyword)
+                    .Append(parent.Keyword)
                     .Append(' ')
-                    .Append(parentClass.Name)
+                    .Append(parent.Name)
                     .Append(' ')
-                    .Append(parentClass.Constraints)
+                    .Append(parent.Constraints)
                     .AppendLine(@"
     {");
                 parentsCount++;
-                parentClass = parentClass.Child;
+                parentClass = parent.Child;
             }
 
             if (useNewtonsoftJson)
@@ -200,15 +200,15 @@ namespace StronglyTypedIds
         internal static string CreateSourceName(string nameSpace, ParentClass? parent, string name)
         {
             var sb = new StringBuilder(nameSpace).Append('.');
-            while (parent != null)
+            while (parent is { } p)
             {
-                var s = parent.Name
+                var s = p.Name
                     .Replace(" ", "")
                     .Replace(",", "")
                     .Replace("<", "__")
                     .Replace(">", "");
                 sb.Append(s).Append('.');
-                parent = parent.Child;
+                parent = p.Child;
             }
             return sb.Append(name).Append(".g.cs").ToString();
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using StronglyTypedIds.Diagnostics;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -123,6 +124,23 @@ public partial struct MyId {}";
             var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
 
             Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task MultipleAssemblyAttributesGeneratesWithDefault()
+        {
+            const string input = @"using StronglyTypedIds;
+[assembly:StronglyTypedIdDefaults(backingType: StronglyTypedIdBackingType.Int, converters: StronglyTypedIdConverter.None)]
+[assembly:StronglyTypedIdDefaults(backingType: StronglyTypedIdBackingType.Long, converters: StronglyTypedIdConverter.None)]
+
+[StronglyTypedId]
+public partial struct MyId {}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Contains(diagnostics, diagnostic => diagnostic.Id == MultipleAssemblyAttributeDiagnostic.Id);
 
             return Verifier.Verify(output)
                 .UseDirectory("Snapshots");

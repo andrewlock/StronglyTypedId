@@ -159,6 +159,11 @@ namespace StronglyTypedIds.Tests
                 // All individual implementations
                 foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false))
                 {
+                    if (implementation is StronglyTypedIdImplementations.None)
+                    {
+                        // We've already covered this one in the previous loop
+                        continue;
+                    }
                     yield return new object[] { backingType, StronglyTypedIdConverter.None, implementation };
                 }
             }

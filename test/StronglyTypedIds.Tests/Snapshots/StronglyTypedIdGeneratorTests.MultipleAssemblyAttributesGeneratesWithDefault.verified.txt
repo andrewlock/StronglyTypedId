@@ -1,0 +1,254 @@
+﻿#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+
+using System;
+
+namespace StronglyTypedIds
+{
+    /// <summary>
+    /// Place on partial structs to make the type a strongly-typed ID
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
+    internal sealed class StronglyTypedIdAttribute : Attribute
+    {
+        /// <summary>
+        /// Make the struct a strongly typed ID
+        /// </summary>
+        /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value.
+        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.BackingType"/>, which defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
+        /// <param name="converters">Converters to create for serializing/deserializing the strongly-typed ID value.
+        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Converters"/>, which defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/>
+        /// and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
+        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
+        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Implementations"/>, which defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/>
+        /// and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        public StronglyTypedIdAttribute(
+            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
+            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
+            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
+        {
+            BackingType = backingType;
+            Converters = converters;
+            Implementations = implementations;
+        }
+
+        /// <summary>
+        /// The <see cref="Type"/> to use to store the strongly-typed ID value
+        /// </summary>
+        public StronglyTypedIdBackingType BackingType { get; }
+
+        /// <summary>
+        /// JSON library used to serialize/deserialize strongly-typed ID value
+        /// </summary>
+        public StronglyTypedIdConverter Converters { get; }
+
+        /// <summary>
+        /// Interfaces and patterns the strongly typed id should implement
+        /// </summary>
+        public StronglyTypedIdImplementations Implementations { get; }
+    }
+}
+#endif
+#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+
+using System;
+
+namespace StronglyTypedIds
+{
+    /// <summary>
+    /// Used to control the default Place on partial structs to make the type a strongly-typed ID
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
+    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
+    internal sealed class StronglyTypedIdDefaultsAttribute : Attribute
+    {
+        /// <summary>
+        /// Set the default values used for strongly typed ids
+        /// </summary>
+        /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value.
+        /// Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
+        /// <param name="converters">JSON library used to serialize/deserialize strongly-typed ID value.
+        /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
+        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
+        /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        public StronglyTypedIdDefaultsAttribute(
+            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
+            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
+            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
+        {
+            BackingType = backingType;
+            Converters = converters;
+            Implementations = implementations;
+        }
+
+        /// <summary>
+        /// The default <see cref="Type"/> to use to store the strongly-typed ID values.
+        /// </summary>
+        public StronglyTypedIdBackingType BackingType { get; }
+
+        /// <summary>
+        /// The default converters to create for serializing/deserializing strongly-typed ID values.
+        /// </summary>
+        public StronglyTypedIdConverter Converters { get; }
+
+        /// <summary>
+        /// Interfaces and patterns the strongly typed id should implement
+        /// </summary>
+        public StronglyTypedIdImplementations Implementations { get; }
+    }
+}
+#endif
+#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+
+using System;
+
+namespace StronglyTypedIds
+{
+    /// <summary>
+    /// The <see cref="Type"/> to use to store the value of a strongly-typed ID
+    /// </summary>
+    internal enum StronglyTypedIdBackingType
+    {
+        /// <summary>
+        /// Use the default backing type (either the globally configured default, or Guid)
+        /// </summary>
+        Default = 0,
+        
+        Guid = 1,
+        Int = 2,
+        String = 3,
+        Long = 4,
+        NullableString = 5,
+        MassTransitNewId = 6,
+    }
+}
+#endif
+#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+
+using System;
+
+namespace StronglyTypedIds
+{
+    /// <summary>
+    /// Converters used to to serialize/deserialize strongly-typed ID values
+    /// </summary>
+    [Flags]
+    internal enum StronglyTypedIdConverter
+    {
+        // Used with HasFlag, so needs to be 1, 2, 4 etc
+
+        /// <summary>
+        /// Don't create any converters for the strongly typed ID
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Use the default converters for the strongly typed Id.
+        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
+        /// <see cref="TypeConverter"/> and <see cref="NewtonsoftJson"/>
+        /// </summary>
+        Default = 1,
+
+        /// <summary>
+        /// Creates a <see cref="TypeConverter"/> for converting from the strongly typed ID to and from a string
+        /// </summary>
+        TypeConverter = 2,
+
+        /// <summary>
+        /// Creates a Newtonsoft.Json.JsonConverter for serializing the strongly typed id to its primitive value
+        /// </summary>
+        NewtonsoftJson = 4,
+
+        /// <summary>
+        /// Creates a System.Text.Json.Serialization.JsonConverter for serializing the strongly typed id to its primitive value
+        /// </summary>
+        SystemTextJson = 8,
+
+        /// <summary>
+        /// Creates an EF Core Value Converter for extracting the primitive value
+        /// </summary>
+        EfCoreValueConverter = 16,
+
+        /// <summary>
+        /// Creates a Dapper TypeHandler for converting to and from the type
+        /// </summary>
+        DapperTypeHandler = 32,
+    }
+}
+#endif
+#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+
+using System;
+
+namespace StronglyTypedIds
+{
+    /// <summary>
+    /// Interfaces and patterns the strongly typed id should implement
+    /// </summary>
+    [Flags]
+    internal enum StronglyTypedIdImplementations
+    {
+        // Used with HasFlag, so needs to be 1, 2, 4 etc
+
+        /// <summary>
+        /// Don't implement any additional members for the strongly typed ID
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Use the default implementations for the strongly typed Id.
+        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
+        /// <see cref="IEquatable"/> and <see cref="IComparable"/>
+        /// </summary>
+        Default = 1,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IEquatable{T}"/> interface
+        /// </summary>
+        IEquatable = 2,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IComparable{T}"/> interface
+        /// </summary>
+        IComparable = 4,
+    }
+}
+#endif
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by the StronglyTypedId source generator
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+#pragma warning disable 1591 // publicly visible type or member must be documented
+
+    readonly partial struct MyId : System.IComparable<MyId>, System.IEquatable<MyId>
+    {
+        public int Value { get; }
+
+        public MyId(int value)
+        {
+            Value = value;
+        }
+
+        public static readonly MyId Empty = new MyId(0);
+
+        public bool Equals(MyId other) => this.Value.Equals(other.Value);
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is MyId other && Equals(other);
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override string ToString() => Value.ToString();
+        public static bool operator ==(MyId a, MyId b) => a.Equals(b);
+        public static bool operator !=(MyId a, MyId b) => !(a == b);
+        public int CompareTo(MyId other) => Value.CompareTo(other.Value);
+    }

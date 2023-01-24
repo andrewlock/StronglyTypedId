@@ -1,6 +1,6 @@
 namespace StronglyTypedIds;
 
-internal class ParentClass
+internal record ParentClass
 {
     public ParentClass(string keyword, string name, string constraints, ParentClass? child)
     {
