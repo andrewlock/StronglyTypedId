@@ -224,6 +224,7 @@ namespace MyContracts.V2
                 StronglyTypedIdConverter.NewtonsoftJson => "StronglyTypedIdConverter.NewtonsoftJson",
                 StronglyTypedIdConverter.SystemTextJson => "StronglyTypedIdConverter.SystemTextJson",
                 StronglyTypedIdConverter.TypeConverter => "StronglyTypedIdConverter.TypeConverter",
+                StronglyTypedIdConverter.SwaggerSchemaFilter => "StronglyTypedIdConverter.SwaggerSchemaFilter",
                 _ when converter.HasFlag(StronglyTypedIdConverter.NewtonsoftJson) &&
                        converter.HasFlag(StronglyTypedIdConverter.SystemTextJson) =>
                     "StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson",
