@@ -64,6 +64,7 @@ namespace StronglyTypedIds
 
             var hasNamespace = !string.IsNullOrEmpty(idNamespace);
 
+            var useSchemaFilter = converters.IsSet(StronglyTypedIdConverter.SwaggerSchemaFilter);
             var useTypeConverter = converters.IsSet(StronglyTypedIdConverter.TypeConverter);
             var useNewtonsoftJson = converters.IsSet(StronglyTypedIdConverter.NewtonsoftJson);
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
@@ -122,6 +123,12 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
             }
 
+            if (useSchemaFilter)
+            {
+                sb.AppendLine(EmbeddedSources.SwaggerSchemaFilterAttributeSource);
+            }
+
+
             sb.Append(resources.BaseId);
             ReplaceInterfaces(sb, useIEquatable, useIComparable);
 
@@ -155,6 +162,11 @@ namespace StronglyTypedIds
             if (useSystemTextJson)
             {
                 sb.AppendLine(resources.SystemTextJson);
+            }
+
+            if (useSchemaFilter)
+            {
+                sb.AppendLine(resources.SwaggerSchemaFilter);
             }
 
             sb.Replace("TESTID", idName);

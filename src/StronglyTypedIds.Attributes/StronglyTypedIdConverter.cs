@@ -46,5 +46,11 @@ namespace StronglyTypedIds
         /// Creates a Dapper TypeHandler for converting to and from the type
         /// </summary>
         DapperTypeHandler = 32,
+
+        /// <summary>
+        /// Creates a Swagger SchemaFilter for OpenApi documentation
+        /// </summary>
+        SwaggerSchemaFilter = 64,
+
     }
 }
