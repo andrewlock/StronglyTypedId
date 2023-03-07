@@ -1,6 +1,4 @@
-﻿using StronglyTypedIds;
-
-namespace StronglyTypedIds.IntegrationTests.Types
+﻿namespace StronglyTypedIds.IntegrationTests.Types
 {
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.String)]
     partial struct StringId { }

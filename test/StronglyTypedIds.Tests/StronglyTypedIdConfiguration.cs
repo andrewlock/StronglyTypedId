@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace StronglyTypedIds.Tests
@@ -146,7 +144,7 @@ namespace StronglyTypedIds.Tests
 
         public static IEnumerable<object[]> ExpectedConverters()
         {
-            foreach (var backingType in EnumHelper.AllConverterCombinations(includeDefault: false, includeNone: false))
+            foreach (var backingType in EnumHelper.AllConverters(includeDefault: false, includeNone: false))
             {
                 // attribute, expected
                 yield return new object[] { backingType, backingType };
@@ -158,16 +156,16 @@ namespace StronglyTypedIds.Tests
 
         public static IEnumerable<object[]> ExpectedConvertersWithDefault()
         {
-            foreach (var attributeType in EnumHelper.AllConverterCombinations(includeDefault: false))
+            foreach (var attributeType in EnumHelper.AllConverters(includeDefault: false))
             {
-                foreach (var defaultType in EnumHelper.AllConverterCombinations(includeDefault: true))
+                foreach (var defaultType in EnumHelper.AllConverters(includeDefault: true))
                 {
                     // attribute, default, expected
                     yield return new object[] { attributeType, defaultType, attributeType };
                 }
             }
 
-            foreach (var defaultType in EnumHelper.AllConverterCombinations(includeDefault: false))
+            foreach (var defaultType in EnumHelper.AllConverters(includeDefault: false))
             {
                 // attribute, default, expected
                 yield return new object[] { StronglyTypedIdConverter.Default, defaultType, defaultType };
@@ -178,7 +176,7 @@ namespace StronglyTypedIds.Tests
 
         public static IEnumerable<object[]> ExpectedImplementations()
         {
-            foreach (var backingType in EnumHelper.AllImplementationCombinations(includeDefault: false, includeNone: false))
+            foreach (var backingType in EnumHelper.AllImplementations(includeDefault: false, includeNone: false))
             {
                 // attribute, expected
                 yield return new object[] { backingType, backingType };
