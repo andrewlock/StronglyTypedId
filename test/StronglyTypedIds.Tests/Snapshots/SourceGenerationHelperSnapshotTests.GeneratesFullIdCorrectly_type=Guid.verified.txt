@@ -12,6 +12,7 @@
     [Newtonsoft.Json.JsonConverter(typeof(MyTestIdNewtonsoftJsonConverter))]
     [System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
     [System.ComponentModel.TypeConverter(typeof(MyTestIdTypeConverter))]
+    [Swashbuckle.AspNetCore.Annotations.SwaggerSchemaFilter(typeof(MyTestIdSchemaFilter))]
     readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>
     {
         public System.Guid Value { get; }
@@ -138,6 +139,19 @@
             public override void Write(System.Text.Json.Utf8JsonWriter writer, MyTestId value, System.Text.Json.JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.Value);
+            }
+        }
+
+        class MyTestIdSchemaFilter : Swashbuckle.AspNetCore.SwaggerGen.ISchemaFilter
+        {
+            public void Apply(Microsoft.OpenApi.Models.OpenApiSchema schema, Swashbuckle.AspNetCore.SwaggerGen.SchemaFilterContext context)
+            {
+                var idSchema = new Microsoft.OpenApi.Models.OpenApiSchema {Type = "string", Format = "uuid"};
+                schema.Type = idSchema.Type;
+                schema.Format = idSchema.Format;
+                schema.Example = idSchema.Example;
+                schema.Default = idSchema.Default;
+                schema.Properties = idSchema.Properties;
             }
         }
     }

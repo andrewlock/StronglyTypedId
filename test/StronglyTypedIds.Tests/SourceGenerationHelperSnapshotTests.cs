@@ -153,13 +153,12 @@ namespace StronglyTypedIds.Tests
                 // All individual convert types
                 foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
                 {
-                    yield return new object[] { backingType, converter, StronglyTypedIdImplementations.None };
-                }
 
-                // All individual implementations
-                foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false))
-                {
-                    yield return new object[] { backingType, StronglyTypedIdConverter.None, implementation };
+                    // All individual implementations
+                    foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false))
+                    {
+                        yield return new object[] { backingType, converter, implementation };
+                    }
                 }
             }
         }
