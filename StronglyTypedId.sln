@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		releasenotes.props = releasenotes.props
 		version.props = version.props
 		.github\workflows\BuildAndPack.yml = .github\workflows\BuildAndPack.yml
+		CHANGELOG.md = CHANGELOG.md
+		build.sh = build.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StronglyTypedIds", "src\StronglyTypedIds\StronglyTypedIds.csproj", "{9C0F3A36-ED47-4D0F-B736-EFC559C9E2DA}"
