@@ -73,10 +73,7 @@ namespace StronglyTypedIds
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
-
-            #if NET7_0_OR_GREATER
             var useParsable = implementations.IsSet(StronglyTypedIdImplementations.IParsable);
-            #endif
 
             var parentsCount = 0;
 
@@ -134,11 +131,7 @@ namespace StronglyTypedIds
 
 
             sb.Append(resources.BaseId);
-            #if NET7_0_OR_GREATER
             ReplaceInterfaces(sb, useIEquatable, useIComparable, useParsable);
-            #else
-            ReplaceInterfaces(sb, useIEquatable, useIComparable, false);
-            #endif
 
             // IEquatable is already implemented whether or not the interface is implemented
 

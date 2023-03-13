@@ -9,7 +9,7 @@
 
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
-    readonly partial struct MyTestId 
+    readonly partial struct MyTestId : System.IParsable<MyTestId>
     {
         public MassTransit.NewId Value { get; }
 
