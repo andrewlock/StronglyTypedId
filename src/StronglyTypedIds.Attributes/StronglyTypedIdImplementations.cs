@@ -8,7 +8,7 @@ namespace StronglyTypedIds
     [Flags]
     public enum StronglyTypedIdImplementations
     {
-        // Used with HasFlag, so needs to be 1, 2, 4 etc
+        // Used with HasFlag, so needs to be 1, 2, 4, 8 etc
 
         /// <summary>
         /// Don't implement any additional members for the strongly typed ID
@@ -34,11 +34,12 @@ namespace StronglyTypedIds
         /// </summary>
         IComparable = 4,
 
-
+        #if NET7_0_OR_GREATER
         // ReSharper disable once InconsistentNaming
         /// <summary>
         /// Implement the <see cref="IParsable{T}"/> interface
         /// </summary>
         IParsable = 8,
+        #endif
     }
 }
