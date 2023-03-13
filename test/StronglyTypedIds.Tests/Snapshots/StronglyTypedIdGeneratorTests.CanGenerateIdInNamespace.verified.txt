@@ -220,13 +220,11 @@ namespace StronglyTypedIds
         /// </summary>
         IComparable = 4,
 
-        #if NET7_0_OR_GREATER
         // ReSharper disable once InconsistentNaming
         /// <summary>
         /// Implement the <see cref="IParsable{T}"/> interface
         /// </summary>
-        IParsable = 8,
-        #endif
+        IParsable = 8
     }
 }
 
