@@ -41,4 +41,15 @@
         public override string? ToString() => Value;
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
+
+        public static MyTestId Parse(string s, IFormatProvider? provider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool TryParse(string? s, IFormatProvider? provider, out MyTestId result)
+        {
+            throw new NotImplementedException();
+        }
+
     }

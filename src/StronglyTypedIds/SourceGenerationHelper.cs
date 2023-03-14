@@ -140,7 +140,7 @@ namespace StronglyTypedIds
                 sb.AppendLine(resources.Comparable);
             }
 
-            if (useIComparable)
+            if (useIParsable)
             {
                 sb.AppendLine(resources.Parsable);
             }

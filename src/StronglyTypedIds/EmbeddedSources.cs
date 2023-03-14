@@ -131,7 +131,6 @@ namespace StronglyTypedIds
             public string EfCoreValueConverter { get; }
             public string DapperTypeHandler { get; }
             public string Comparable { get; }
-
             public string Parsable { get; }
 
             public ResourceCollection(
