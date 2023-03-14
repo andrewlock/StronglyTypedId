@@ -12,6 +12,7 @@
                 {
                     long longValue => new TESTID(longValue),
                     int intValue => new TESTID(intValue),
+                    decimal decimalValue => new TESTID((long)decimalValue),
                     short shortValue => new TESTID(shortValue),
                     string stringValue when  !string.IsNullOrEmpty(stringValue) && long.TryParse(stringValue, out var result) => new TESTID(result),
                     _ => throw new System.InvalidCastException($"Unable to cast object of type {value.GetType()} to TESTID"),

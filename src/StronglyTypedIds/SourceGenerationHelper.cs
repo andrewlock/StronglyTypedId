@@ -73,6 +73,7 @@ namespace StronglyTypedIds
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
+            var useIParsable = implementations.IsSet(StronglyTypedIdImplementations.IParsable);
 
             var parentsCount = 0;
 
@@ -130,13 +131,18 @@ namespace StronglyTypedIds
 
 
             sb.Append(resources.BaseId);
-            ReplaceInterfaces(sb, useIEquatable, useIComparable);
+            ReplaceInterfaces(sb, useIEquatable, useIComparable, useIParsable);
 
             // IEquatable is already implemented whether or not the interface is implemented
 
             if (useIComparable)
             {
                 sb.AppendLine(resources.Comparable);
+            }
+
+            if (useIParsable)
+            {
+                sb.AppendLine(resources.Parsable);
             }
 
             if (useEfCoreValueConverter)
@@ -185,7 +191,7 @@ namespace StronglyTypedIds
             return sb.ToString();
         }
 
-        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable)
+        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable, bool useIParsable)
         {
             var interfaces = new List<string>();
 
@@ -197,6 +203,11 @@ namespace StronglyTypedIds
             if (useIEquatable)
             {
                 interfaces.Add("System.IEquatable<TESTID>");
+            }
+
+            if (useIParsable)
+            {
+                interfaces.Add("System.IParsable<TESTID>");
             }
 
             if (interfaces.Count > 0)
