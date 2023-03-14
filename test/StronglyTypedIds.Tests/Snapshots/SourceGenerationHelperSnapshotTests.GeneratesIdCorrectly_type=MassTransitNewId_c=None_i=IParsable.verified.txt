@@ -36,12 +36,15 @@
 
         public static MyTestId Parse(string s, IFormatProvider? provider)
         {
-            throw new NotImplementedException();
+            return new MyTestId(Guid.Parse(s, provider));
         }
 
         public static bool TryParse(string? s, IFormatProvider? provider, out MyTestId result)
         {
-            throw new NotImplementedException();
+            long res = 0;
+            var ok = Guid.TryParse(s, provider, out res);
+            result = new MyTestId(res);
+            return ok;
         }
 
     }
