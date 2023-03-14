@@ -41,12 +41,15 @@
 
         public static MyTestId Parse(string s, IFormatProvider? provider)
         {
-            throw new NotImplementedException();
+            return new MyTestId(Guid.Parse(s, provider));
         }
 
         public static bool TryParse(string? s, IFormatProvider? provider, out MyTestId result)
         {
-            throw new NotImplementedException();
+            long res = 0;
+            var ok = Guid.TryParse(s, provider, out res);
+            result = new MyTestId(res);
+            return ok;
         }
 
 
@@ -77,7 +80,16 @@
                     _ => throw new System.InvalidCastException($"Unable to cast object of type {value.GetType()} to MyTestId"),
                 };
             }
+
+#pragma warning disable CA2255
+            [System.Runtime.CompilerServices.ModuleInitializerAttribute]
+            public static void AddTypeHandler()
+            {
+                Dapper.SqlMapper.AddTypeHandler(new DapperTypeHandler());
+            }
+#pragma warning restore CA2255
         }
+
 
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {

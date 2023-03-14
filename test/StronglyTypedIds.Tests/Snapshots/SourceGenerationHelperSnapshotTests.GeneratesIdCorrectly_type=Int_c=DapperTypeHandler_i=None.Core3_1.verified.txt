@@ -38,6 +38,7 @@
             public override void SetValue(System.Data.IDbDataParameter parameter, MyTestId value)
             {
                 parameter.Value = value.Value;
+                parameter.DbType = System.Data.DbType.Int32;
             }
 
             public override MyTestId Parse(object value)
@@ -50,5 +51,15 @@
                     _ => throw new System.InvalidCastException($"Unable to cast object of type {value.GetType()} to MyTestId"),
                 };
             }
+
+#pragma warning disable CA2255
+            [System.Runtime.CompilerServices.ModuleInitializerAttribute]
+            public static void AddTypeHandler()
+            {
+                Dapper.SqlMapper.AddTypeHandler(new DapperTypeHandler());
+            }
+#pragma warning restore CA2255
+
         }
+
     }

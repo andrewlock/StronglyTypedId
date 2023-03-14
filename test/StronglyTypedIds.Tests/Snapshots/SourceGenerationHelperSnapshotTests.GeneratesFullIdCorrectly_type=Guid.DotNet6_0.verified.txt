@@ -38,16 +38,17 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
         public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+
 #nullable enable
         public static MyTestId Parse(string s, System.IFormatProvider? provider)
         {
-            return new MyTestId(Guid.Parse(s));
+            return new MyTestId(Guid.Parse(s, provider));
         }
 
         public static bool TryParse(string? s, System.IFormatProvider? provider, out MyTestId result)
         {
             long res = 0;
-            var ok = Guid.TryParse(s, out res);
+            var ok = Guid.TryParse(s, provider, out res);
             result = new MyTestId(res);
             return ok;
         }
@@ -70,6 +71,7 @@
             public override void SetValue(System.Data.IDbDataParameter parameter, MyTestId value)
             {
                 parameter.Value = value.Value;
+                parameter.DbType = System.Data.DbType.Guid;
             }
 
             public override MyTestId Parse(object value)
@@ -81,7 +83,16 @@
                     _ => throw new System.InvalidCastException($"Unable to cast object of type {value.GetType()} to MyTestId"),
                 };
             }
+
+            [System.Runtime.CompilerServices.ModuleInitializerAttribute]
+            public static void AddTypeHandler()
+            {
+                Dapper.SqlMapper.AddTypeHandler(new DapperTypeHandler());
+            }
+#pragma warning restore CA2255
+
         }
+
 
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {

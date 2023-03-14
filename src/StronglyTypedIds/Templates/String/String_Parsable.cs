@@ -6,5 +6,6 @@
 
         public static bool TryParse(string? s, IFormatProvider? provider, out TESTID result)
         {
-            throw new NotImplementedException();
+            result = new TESTID(s);
+            return true;
         }
