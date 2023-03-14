@@ -264,4 +264,18 @@ namespace StronglyTypedIds
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
+
+        public static MyId Parse(string s, System.IFormatProvider? provider)
+        {
+            return new MyId(int.Parse(s));
+        }
+
+        public static bool TryParse(string? s, System.IFormatProvider? provider, out MyId result)
+        {
+            int res = 0;
+            var ok = int.TryParse(s, out res);
+            result = new MyId(res);
+            return ok;
+        }
+
     }

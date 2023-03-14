@@ -269,6 +269,20 @@ namespace MyTests.TestNameSpace
         public static bool operator !=(MyId a, MyId b) => !(a == b);
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
 
+        public static MyId Parse(string s, System.IFormatProvider? provider)
+        {
+            return new MyId(Guid.Parse(s));
+        }
+
+        public static bool TryParse(string? s, System.IFormatProvider? provider, out MyId result)
+        {
+            long res = 0;
+            var ok = Guid.TryParse(s, out res);
+            result = new MyId(res);
+            return ok;
+        }
+
+
         class MyIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<MyId>
         {
             public override MyId Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)

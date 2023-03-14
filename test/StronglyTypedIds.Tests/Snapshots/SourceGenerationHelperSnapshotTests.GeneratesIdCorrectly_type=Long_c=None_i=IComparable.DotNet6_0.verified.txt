@@ -33,4 +33,18 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
         public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+
+        public static MyTestId Parse(string s, System.IFormatProvider? provider)
+        {
+            return new MyTestId(long.Parse(s));
+        }
+
+        public static bool TryParse(string? s, System.IFormatProvider? provider, out MyTestId result)
+        {
+            long res = 0;
+            var ok = long.TryParse(s, out res);
+            result = new MyTestId(res);
+            return ok;
+        }
+
     }

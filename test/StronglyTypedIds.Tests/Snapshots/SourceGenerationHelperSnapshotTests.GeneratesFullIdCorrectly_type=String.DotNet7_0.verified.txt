@@ -56,6 +56,17 @@
             };
         }
 
+        public static MyTestId Parse(string s, IFormatProvider? provider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool TryParse(string? s, IFormatProvider? provider, out MyTestId result)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public class EfCoreValueConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyTestId, string>
         {
             public EfCoreValueConverter() : this(null) { }
