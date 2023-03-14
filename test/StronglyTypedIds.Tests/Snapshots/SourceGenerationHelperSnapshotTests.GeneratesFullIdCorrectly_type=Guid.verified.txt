@@ -38,7 +38,7 @@
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
         public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
-
+#nullable enable
         public static MyTestId Parse(string s, System.IFormatProvider? provider)
         {
             return new MyTestId(Guid.Parse(s));
@@ -51,6 +51,7 @@
             result = new MyTestId(res);
             return ok;
         }
+#nullable disable
 
 
         public class EfCoreValueConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyTestId, System.Guid>

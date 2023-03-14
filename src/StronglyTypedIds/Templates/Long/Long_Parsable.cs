@@ -1,4 +1,4 @@
-﻿
+﻿#nullable enable
         public static TESTID Parse(string s, System.IFormatProvider? provider)
         {
             return new TESTID(long.Parse(s));
@@ -11,3 +11,4 @@
             result = new TESTID(res);
             return ok;
         }
+#nullable disable
