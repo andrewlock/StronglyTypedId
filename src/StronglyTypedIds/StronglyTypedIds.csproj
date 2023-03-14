@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <PackageId>Tennisi.StronglyTypedId</PackageId>
     <Description>A source generator for creating strongly-typed IDs by decorating with a [StronglyTypedId] attribute</Description>
   </PropertyGroup>
