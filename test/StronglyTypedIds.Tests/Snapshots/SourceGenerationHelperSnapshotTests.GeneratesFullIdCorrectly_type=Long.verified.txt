@@ -62,12 +62,14 @@
                 {
                     long longValue => new MyTestId(longValue),
                     int intValue => new MyTestId(intValue),
+                    decimal decimalValue => new MyTestId((long)decimalValue),
                     short shortValue => new MyTestId(shortValue),
                     string stringValue when  !string.IsNullOrEmpty(stringValue) && long.TryParse(stringValue, out var result) => new MyTestId(result),
                     _ => throw new System.InvalidCastException($"Unable to cast object of type {value.GetType()} to MyTestId"),
                 };
             }
         }
+
 
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {
