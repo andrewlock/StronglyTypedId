@@ -18,6 +18,10 @@
             Value = value;
         }
 
+        public MyTestId()
+        {
+        }
+
         public static readonly MyTestId Empty = new MyTestId(0);
 
         public bool Equals(MyTestId other) => this.Value.Equals(other.Value);

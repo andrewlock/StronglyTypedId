@@ -18,6 +18,10 @@
             Value = value;
         }
 
+        public MyTestId()
+        {
+        }
+
         public static MyTestId New() => new MyTestId(MassTransit.NewId.Next());
         public static readonly MyTestId Empty = new MyTestId(MassTransit.NewId.Empty);
 

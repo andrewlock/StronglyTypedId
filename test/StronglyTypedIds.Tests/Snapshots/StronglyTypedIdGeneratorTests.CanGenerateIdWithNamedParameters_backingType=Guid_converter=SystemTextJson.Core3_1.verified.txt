@@ -252,6 +252,10 @@ namespace MyTests.TestNameSpace
             Value = value;
         }
 
+        public MyId()
+        {
+        }
+
         public static MyId New() => new MyId(System.Guid.NewGuid());
         public static readonly MyId Empty = new MyId(System.Guid.Empty);
 

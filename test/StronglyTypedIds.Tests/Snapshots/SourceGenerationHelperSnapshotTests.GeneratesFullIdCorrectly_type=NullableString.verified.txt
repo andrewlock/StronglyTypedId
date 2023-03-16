@@ -23,6 +23,10 @@
             Value = value;
         }
 
+        public MyTestId()
+        {
+        }
+
         public static readonly MyTestId Empty = new MyTestId(string.Empty);
 
         public bool Equals(MyTestId other)

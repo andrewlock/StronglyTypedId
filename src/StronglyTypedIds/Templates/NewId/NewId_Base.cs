@@ -7,6 +7,10 @@
             Value = value;
         }
 
+        public TESTID()
+        {
+        }
+
         public static TESTID New() => new TESTID(MassTransit.NewId.Next());
         public static readonly TESTID Empty = new TESTID(MassTransit.NewId.Empty);
 

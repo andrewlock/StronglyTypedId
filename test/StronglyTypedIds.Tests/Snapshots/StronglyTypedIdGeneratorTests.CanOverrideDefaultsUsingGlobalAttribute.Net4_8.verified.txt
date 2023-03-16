@@ -249,6 +249,10 @@ namespace StronglyTypedIds
             Value = value;
         }
 
+        public MyId()
+        {
+        }
+
         public static readonly MyId Empty = new MyId(0);
 
         public bool Equals(MyId other) => this.Value.Equals(other.Value);
