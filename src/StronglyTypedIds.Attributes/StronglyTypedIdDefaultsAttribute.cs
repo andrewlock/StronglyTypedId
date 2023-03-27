@@ -18,14 +18,18 @@ namespace StronglyTypedIds
         /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
         /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
         /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        /// <param name="constructor">Indicates how the constructor should be generated
+        /// Defaults to <see cref="StronglyTypedIdConstructor.Public"/></param>
         public StronglyTypedIdDefaultsAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
             StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
+            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default,
+            StronglyTypedIdConstructor constructor = StronglyTypedIdConstructor.Default)
         {
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+            Constructor = constructor;
         }
 
         /// <summary>
@@ -42,5 +46,10 @@ namespace StronglyTypedIds
         /// Interfaces and patterns the strongly typed id should implement
         /// </summary>
         public StronglyTypedIdImplementations Implementations { get; }
+
+        /// <summary>
+        /// Indicates how the constructor should be generated
+        /// </summary>
+        public StronglyTypedIdConstructor Constructor { get; }
     }
 }

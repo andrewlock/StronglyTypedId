@@ -1,12 +1,7 @@
 ﻿    readonly partial struct TESTID : INTERFACES
     {
         public MassTransit.NewId Value { get; }
-
-        public TESTID(MassTransit.NewId value)
-        {
-            Value = value;
-        }
-
+CONSTRUCTOR
         public static TESTID New() => new TESTID(MassTransit.NewId.Next());
         public static readonly TESTID Empty = new TESTID(MassTransit.NewId.Empty);
 

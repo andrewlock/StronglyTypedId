@@ -11,7 +11,7 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedBackingTypes))]
         public void ReturnsCorrectBackingType_WhenNoDefaultAttribute(StronglyTypedIdBackingType attributeValue, StronglyTypedIdBackingType expected)
         {
-            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, null);
 
@@ -22,8 +22,8 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedBackingTypes))]
         public void ReturnsCorrectBackingType_WhenHaveDefaultAttributeThatUsesDefault(StronglyTypedIdBackingType attributeValue, StronglyTypedIdBackingType expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
-            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
@@ -34,8 +34,8 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedBackingTypesWithDefault))]
         public void ReturnsCorrectBackingType_WhenHaveDefaultAttribute(StronglyTypedIdBackingType attributeValue, StronglyTypedIdBackingType defaultValue, StronglyTypedIdBackingType expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(defaultValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
-            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
+            var defaultAttribute = new StronglyTypedIdConfiguration(defaultValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(attributeValue, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
@@ -46,7 +46,7 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedConverters))]
         public void ReturnsCorrectConverters_WhenNoDefaultAttribute(StronglyTypedIdConverter attributeValue, StronglyTypedIdConverter expected)
         {
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, null);
 
@@ -57,8 +57,8 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedConverters))]
         public void ReturnsCorrectConverters_WhenHaveDefaultAttributeThatUsesDefault(StronglyTypedIdConverter attributeValue, StronglyTypedIdConverter expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default);
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
@@ -69,8 +69,8 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedConvertersWithDefault))]
         public void ReturnsCorrectConverters_WhenHaveDefaultAttribute(StronglyTypedIdConverter attributeValue, StronglyTypedIdConverter defaultValue, StronglyTypedIdConverter expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, defaultValue, StronglyTypedIdImplementations.Default);
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default);
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, defaultValue, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, attributeValue, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
@@ -81,7 +81,7 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedImplementations))]
         public void ReturnsCorrectImplementations_WhenNoDefaultAttribute(StronglyTypedIdImplementations attributeValue, StronglyTypedIdImplementations expected)
         {
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, null);
 
@@ -92,8 +92,8 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedImplementations))]
         public void ReturnsCorrectImplementations_WhenHaveDefaultAttributeThatUsesDefault(StronglyTypedIdImplementations attributeValue, StronglyTypedIdImplementations expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue);
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
@@ -104,14 +104,49 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(ExpectedImplementationsWithDefault))]
         public void ReturnsCorrectImplementations_WhenHaveDefaultAttribute(StronglyTypedIdImplementations attributeValue, StronglyTypedIdImplementations defaultValue, StronglyTypedIdImplementations expected)
         {
-            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, defaultValue);
-            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue);
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, defaultValue, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, attributeValue, StronglyTypedIdConstructor.Default);
 
             var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
 
             Assert.Equal(expected, result.Implementations);
         }
+        
+        [Theory]
+        [MemberData(nameof(ExpectedConstructors))]
+        public void ReturnsCorrectConstructor_WhenNoDefaultAttribute(StronglyTypedIdConstructor attributeValue, StronglyTypedIdConstructor expected)
+        {
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, attributeValue);
 
+            var result = StronglyTypedIdConfiguration.Combine(attributeValues, null);
+
+            Assert.Equal(expected, result.Constructor);
+        }
+
+        [Theory]
+        [MemberData(nameof(ExpectedConstructors))]
+        public void ReturnsCorrectConstructor_WhenHaveDefaultAttributeThatUsesDefault(StronglyTypedIdConstructor attributeValue, StronglyTypedIdConstructor expected)
+        {
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConstructor.Default);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, attributeValue);
+
+            var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
+
+            Assert.Equal(expected, result.Constructor);
+        }
+
+        [Theory]
+        [MemberData(nameof(ExpectedConstructorsWithDefault))]
+        public void ReturnsCorrectConstructor_WhenHaveDefaultAttribute(StronglyTypedIdConstructor attributeValue, StronglyTypedIdConstructor defaultValue, StronglyTypedIdConstructor expected)
+        {
+            var defaultAttribute = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, defaultValue);
+            var attributeValues = new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Default, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default, attributeValue);
+
+            var result = StronglyTypedIdConfiguration.Combine(attributeValues, defaultAttribute);
+
+            Assert.Equal(expected, result.Constructor);
+        }
+    
         public static IEnumerable<object[]> ExpectedBackingTypes()
         {
             foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
@@ -206,6 +241,37 @@ namespace StronglyTypedIds.Tests
             }
 
             yield return new object[] { StronglyTypedIdImplementations.Default, StronglyTypedIdImplementations.Default, StronglyTypedIdConfiguration.Defaults.Implementations };
+        }
+        
+        public static IEnumerable<object[]> ExpectedConstructors()
+        {
+            foreach (var backingType in EnumHelper.AllConstructors(includeDefault: false))
+            {
+                // attribute, expected
+                yield return new object[] { backingType, backingType };
+            }
+
+            yield return new object[] { StronglyTypedIdConstructor.Default, StronglyTypedIdConfiguration.Defaults.Constructor };
+        }
+
+        public static IEnumerable<object[]> ExpectedConstructorsWithDefault()
+        {
+            foreach (var attributeType in EnumHelper.AllConstructors(includeDefault: false))
+            {
+                foreach (var defaultType in EnumHelper.AllConstructors(includeDefault: true))
+                {
+                    // attribute, default, expected
+                    yield return new object[] { attributeType, defaultType, attributeType };
+                }
+            }
+
+            foreach (var defaultType in EnumHelper.AllConstructors(includeDefault: false))
+            {
+                // attribute, default, expected
+                yield return new object[] { StronglyTypedIdConstructor.Default, defaultType, defaultType };
+            }
+
+            yield return new object[] { StronglyTypedIdConstructor.Default, StronglyTypedIdConstructor.Default, StronglyTypedIdConfiguration.Defaults.Constructor };
         }
     }
 }

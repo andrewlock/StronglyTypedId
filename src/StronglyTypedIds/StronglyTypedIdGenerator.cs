@@ -22,6 +22,7 @@ namespace StronglyTypedIds
                 i.AddSource("StronglyTypedIdBackingType.g.cs", EmbeddedSources.StronglyTypedIdBackingTypeSource);
                 i.AddSource("StronglyTypedIdConverter.g.cs", EmbeddedSources.StronglyTypedIdConverterSource);
                 i.AddSource("StronglyTypedIdImplementations.g.cs", EmbeddedSources.StronglyTypedIdImplementationsSource);
+                i.AddSource("StronglyTypedIdConstructor.g.cs", EmbeddedSources.StronglyTypedIdConstructorSource);
             });
 
             IncrementalValuesProvider<StructDeclarationSyntax> structDeclarations = context.SyntaxProvider
@@ -76,6 +77,7 @@ namespace StronglyTypedIds
                         values.Converters,
                         values.BackingType,
                         values.Implementations,
+                        values.Constructor,
                         sb);
                     var fileName = SourceGenerationHelper.CreateSourceName(
                         idToGenerate.NameSpace,

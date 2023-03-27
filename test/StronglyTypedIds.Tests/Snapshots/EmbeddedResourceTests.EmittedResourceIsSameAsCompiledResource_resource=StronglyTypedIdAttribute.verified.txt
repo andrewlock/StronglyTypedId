@@ -33,14 +33,18 @@ namespace StronglyTypedIds
         /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
         /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Implementations"/>, which defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/>
         /// and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        /// <param name="constructor">Indicates how the constructor should be generated
+        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Constructor"/>, which defaults to <see cref="StronglyTypedIdConstructor.Default"/></param>
         public StronglyTypedIdAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
             StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
+            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default,
+            StronglyTypedIdConstructor constructor = StronglyTypedIdConstructor.Default)
         {
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+            Constructor = constructor;
         }
 
         /// <summary>
@@ -57,6 +61,11 @@ namespace StronglyTypedIds
         /// Interfaces and patterns the strongly typed id should implement
         /// </summary>
         public StronglyTypedIdImplementations Implementations { get; }
+        
+        /// <summary>
+        /// Indicates how the constructor should be generated
+        /// </summary>
+        public StronglyTypedIdConstructor Constructor { get; }
     }
 }
 #endif

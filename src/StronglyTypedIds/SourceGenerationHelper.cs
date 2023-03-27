@@ -12,8 +12,9 @@ namespace StronglyTypedIds
             ParentClass? parentClass,
             StronglyTypedIdConverter converters,
             StronglyTypedIdBackingType backingType,
-            StronglyTypedIdImplementations implementations)
-            => CreateId(idNamespace, idName, parentClass, converters, backingType, implementations, null);
+            StronglyTypedIdImplementations implementations,
+            StronglyTypedIdConstructor constructor)
+            => CreateId(idNamespace, idName, parentClass, converters, backingType, implementations, constructor, null);
 
         public static string CreateId(
             string idNamespace,
@@ -22,6 +23,7 @@ namespace StronglyTypedIds
             StronglyTypedIdConverter converters,
             StronglyTypedIdBackingType backingType,
             StronglyTypedIdImplementations implementations,
+            StronglyTypedIdConstructor constructor,
             StringBuilder? sb)
         {
             var resources = backingType switch
@@ -35,7 +37,7 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources, sb);
+            return CreateId(idNamespace, idName, parentClass, converters, implementations, constructor, resources, sb);
         }
 
         static string CreateId(
@@ -44,6 +46,7 @@ namespace StronglyTypedIds
             ParentClass? parentClass,
             StronglyTypedIdConverter converters,
             StronglyTypedIdImplementations implementations,
+            StronglyTypedIdConstructor constructor,
             EmbeddedSources.ResourceCollection resources,
             StringBuilder? sb)
         {
@@ -60,6 +63,11 @@ namespace StronglyTypedIds
             if (implementations == StronglyTypedIdImplementations.Default)
             {
                 throw new ArgumentException("Cannot use default implementations - must provide concrete values or None", nameof(implementations));
+            }
+
+            if (constructor == StronglyTypedIdConstructor.Default)
+            {
+                throw new ArgumentException("Cannot use default constructor - must provide concrete value or Public", nameof(constructor));
             }
 
             var hasNamespace = !string.IsNullOrEmpty(idNamespace);
@@ -124,6 +132,7 @@ namespace StronglyTypedIds
 
             sb.Append(resources.BaseId);
             ReplaceInterfaces(sb, useIEquatable, useIComparable);
+            ReplaceConstructor(sb, resources.Constructor, constructor);
 
             // IEquatable is already implemented whether or not the interface is implemented
 
@@ -194,6 +203,26 @@ namespace StronglyTypedIds
             else
             {
                 sb.Replace(": INTERFACES", string.Empty);
+            }
+        }
+        private static void ReplaceConstructor(StringBuilder sb, string template, StronglyTypedIdConstructor constructor)
+        {
+            var visibility = constructor switch
+            {
+                StronglyTypedIdConstructor.Public => "public",
+                StronglyTypedIdConstructor.Private => "private",
+                StronglyTypedIdConstructor.Internal => "internal",
+                StronglyTypedIdConstructor.None => null,
+                _ => null,
+            };
+
+            if (visibility is null)
+            {
+                sb.Replace("CONSTRUCTOR", string.Empty);
+            }
+            else
+            {
+                sb.Replace("CONSTRUCTOR", template.Replace("CONSTRUCTOR_VISIBILITY", visibility));
             }
         }
 
