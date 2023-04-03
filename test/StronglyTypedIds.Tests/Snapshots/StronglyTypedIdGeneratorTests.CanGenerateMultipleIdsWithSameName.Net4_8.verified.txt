@@ -222,9 +222,21 @@ namespace StronglyTypedIds
 
         // ReSharper disable once InconsistentNaming
         /// <summary>
-        /// Implement the <see cref="IParsable{T}"/> interface
+        /// Implement the <see cref="IParsable"/> interface
         /// </summary>
-        IParsable = 8
+        IParsable = 8,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IConvertible"/> interface
+        /// </summary>
+        IConvertible = 16,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IStronglyTypedId"/> interface
+        /// </summary>
+        IStronglyTypedId = 32
     }
 }
 
@@ -262,7 +274,6 @@ namespace MyContracts.V1
             if (ReferenceEquals(null, obj)) return false;
             return obj is MyId other && Equals(other);
         }
-
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();
@@ -366,7 +377,6 @@ namespace MyContracts.V2
             if (ReferenceEquals(null, obj)) return false;
             return obj is MyId other && Equals(other);
         }
-
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();

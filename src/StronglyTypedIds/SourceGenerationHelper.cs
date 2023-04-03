@@ -35,7 +35,7 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources, sb);
+            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources,backingType, sb);
         }
 
         static string CreateId(
@@ -45,6 +45,7 @@ namespace StronglyTypedIds
             StronglyTypedIdConverter converters,
             StronglyTypedIdImplementations implementations,
             EmbeddedSources.ResourceCollection resources,
+            StronglyTypedIdBackingType backingType,
             StringBuilder? sb)
         {
             if (string.IsNullOrEmpty(idName))
@@ -74,6 +75,8 @@ namespace StronglyTypedIds
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
             var useIParsable = implementations.IsSet(StronglyTypedIdImplementations.IParsable);
+            var useIConvertible = implementations.IsSet(StronglyTypedIdImplementations.IConvertible);
+            var useIStronglyTypedId = implementations.IsSet(StronglyTypedIdImplementations.IStronglyTypedId);
 
             var parentsCount = 0;
 
@@ -131,7 +134,7 @@ namespace StronglyTypedIds
 
 
             sb.Append(resources.BaseId);
-            ReplaceInterfaces(sb, useIEquatable, useIComparable, useIParsable);
+            ReplaceInterfaces(sb, useIEquatable, useIComparable, useIParsable, useIConvertible, useIStronglyTypedId, backingType);
 
             // IEquatable is already implemented whether or not the interface is implemented
 
@@ -143,6 +146,16 @@ namespace StronglyTypedIds
             if (useIParsable)
             {
                 sb.AppendLine(resources.Parsable);
+            }
+
+            if (useIConvertible)
+            {
+                sb.AppendLine(resources.Convertible);
+            }
+
+            if (useIStronglyTypedId)
+            {
+                sb.AppendLine(resources.StronglyTypedId);
             }
 
             if (useEfCoreValueConverter)
@@ -191,7 +204,23 @@ namespace StronglyTypedIds
             return sb.ToString();
         }
 
-        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable, bool useIParsable)
+
+        private static string BackingType(StronglyTypedIdBackingType backingType)
+        {
+            var resources = backingType switch
+            {
+                StronglyTypedIdBackingType.Guid => "System.Guid",
+                StronglyTypedIdBackingType.Int => "int",
+                StronglyTypedIdBackingType.Long => "long",
+                StronglyTypedIdBackingType.String => "string",
+                StronglyTypedIdBackingType.NullableString => "string?",
+                StronglyTypedIdBackingType.MassTransitNewId => "MassTransit.NewId",
+                _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
+            };
+            return resources;
+        }
+
+        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable, bool useIParsable, bool useIConvertible, bool useIStronglyTypedId, StronglyTypedIdBackingType backingType)
         {
             var interfaces = new List<string>();
 
@@ -208,6 +237,16 @@ namespace StronglyTypedIds
             if (useIParsable)
             {
                 interfaces.Add("System.IParsable<TESTID>");
+            }
+
+            if (useIConvertible)
+            {
+                interfaces.Add("System.IConvertible");
+            }
+
+            if (useIStronglyTypedId)
+            {
+                interfaces.Add($"IStronglyTypedId<{BackingType(backingType)}>");
             }
 
             if (interfaces.Count > 0)

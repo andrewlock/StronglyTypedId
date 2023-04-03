@@ -26,6 +26,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SwaggerSchemaFilter.cs"),
             false
         );
@@ -40,6 +42,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SwaggerSchemaFilter.cs"),
             false
         );
@@ -54,6 +58,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SwaggerSchemaFilter.cs"),
             false
         );
@@ -68,6 +74,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SwaggerSchemaFilter.cs"),
             false
         );
@@ -82,6 +90,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_SwaggerSchemaFilter.cs"),
             true
         );
@@ -96,6 +106,8 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_DapperTypeHandler.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_IComparable.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_Parsable.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_Convertible.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_SwaggerSchemaFilter.cs"),
             false
         );
@@ -132,6 +144,9 @@ namespace StronglyTypedIds
             public string DapperTypeHandler { get; }
             public string Comparable { get; }
             public string Parsable { get; }
+            public string Convertible { get; }
+
+            public string StronglyTypedId { get; }
 
             public ResourceCollection(
                 string header,
@@ -143,6 +158,8 @@ namespace StronglyTypedIds
                 string dapperTypeHandler,
                 string comparable,
                 string parsable,
+                string convertible,
+                string stronglyTypedId,
                 string swaggerSchemaFilter,
                 bool nullableEnable)
             {
@@ -155,7 +172,9 @@ namespace StronglyTypedIds
                 DapperTypeHandler = dapperTypeHandler;
                 Comparable = comparable;
                 Parsable = parsable;
+                Convertible = convertible;
                 NullableEnable = nullableEnable;
+                StronglyTypedId = stronglyTypedId;
                 Header = header;
             }
         }
