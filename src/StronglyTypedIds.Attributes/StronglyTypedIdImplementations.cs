@@ -36,8 +36,20 @@ namespace StronglyTypedIds
 
         // ReSharper disable once InconsistentNaming
         /// <summary>
-        /// Implement the <see cref="IParsable{T}"/> interface
+        /// Implement the <see cref="IParsable"/> interface
         /// </summary>
-        IParsable = 8
+        IParsable = 8,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IConvertible"/> interface
+        /// </summary>
+        IConvertible = 16,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IStronglyTypedId"/> interface
+        /// </summary>
+        IStronglyTypedId = 32
     }
 }

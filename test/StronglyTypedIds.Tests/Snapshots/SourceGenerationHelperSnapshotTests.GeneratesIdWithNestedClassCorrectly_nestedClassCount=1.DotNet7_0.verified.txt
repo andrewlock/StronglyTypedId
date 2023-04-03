@@ -34,7 +34,6 @@ namespace MyTestNamespace
             if (ReferenceEquals(null, obj)) return false;
             return obj is MyTestId other && Equals(other);
         }
-
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();

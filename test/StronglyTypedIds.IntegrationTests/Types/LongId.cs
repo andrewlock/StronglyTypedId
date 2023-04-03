@@ -39,4 +39,7 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IComparable)]
     public partial struct ComparableLongId { }
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IStronglyTypedId)]
+    public partial struct StronglyTypedIdLongId { }
 }

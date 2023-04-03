@@ -222,9 +222,21 @@ namespace StronglyTypedIds
 
         // ReSharper disable once InconsistentNaming
         /// <summary>
-        /// Implement the <see cref="IParsable{T}"/> interface
+        /// Implement the <see cref="IParsable"/> interface
         /// </summary>
-        IParsable = 8
+        IParsable = 8,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IConvertible"/> interface
+        /// </summary>
+        IConvertible = 16,
+
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Implement the <see cref="IStronglyTypedId"/> interface
+        /// </summary>
+        IStronglyTypedId = 32
     }
 }
 
@@ -261,6 +273,7 @@ namespace StronglyTypedIds
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();
+
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
