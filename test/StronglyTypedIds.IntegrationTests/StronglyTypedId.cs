@@ -1,2 +1,3 @@
-﻿public interface IStronglyTypedId<T>  {
+﻿//FAKE STUB
+public interface IStronglyTypedId<T>  {
 }

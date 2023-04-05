@@ -179,8 +179,14 @@ namespace StronglyTypedIds
         /// </summary>
         SwaggerSchemaFilter = 64,
 
+        /// <summary>
+        /// Creates a AutoMapper bidirectional converters
+        /// </summary>
+        AutoMapper = 128,
+
     }
 }
+
 #endif
 #if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
 

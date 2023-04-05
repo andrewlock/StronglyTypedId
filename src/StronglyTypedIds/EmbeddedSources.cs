@@ -29,6 +29,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Guid.Guid_AutoMapperTypeConverter.cs"),
             false
         );
 
@@ -45,6 +46,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Int.Int_AutoMapperTypeConverter.cs"),
             false
         );
 
@@ -61,6 +63,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.Long.Long_AutoMapperTypeConverter.cs"),
             false
         );
 
@@ -77,6 +80,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.String.String_AutoMapperTypeConverter.cs"),
             false
         );
 
@@ -93,6 +97,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NullableString.NullableString_AutoMapperTypeConverter.cs"),
             true
         );
 
@@ -109,6 +114,7 @@ namespace StronglyTypedIds
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_Convertible.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_StronglyTypedId.cs"),
             LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_SwaggerSchemaFilter.cs"),
+            LoadEmbeddedResource("StronglyTypedIds.Templates.NewId.NewId_AutoMapperTypeConverter.cs"),
             false
         );
 
@@ -142,6 +148,7 @@ namespace StronglyTypedIds
             public string TypeConverter { get; }
             public string EfCoreValueConverter { get; }
             public string DapperTypeHandler { get; }
+            public string AutoMapperTypeHandler { get; }
             public string Comparable { get; }
             public string Parsable { get; }
             public string Convertible { get; }
@@ -161,6 +168,7 @@ namespace StronglyTypedIds
                 string convertible,
                 string stronglyTypedId,
                 string swaggerSchemaFilter,
+                string autoMapperTypeHandler,
                 bool nullableEnable)
             {
                 SwaggerSchemaFilter = swaggerSchemaFilter;
@@ -170,6 +178,7 @@ namespace StronglyTypedIds
                 TypeConverter = typeConverter;
                 EfCoreValueConverter = efCoreValueConverter;
                 DapperTypeHandler = dapperTypeHandler;
+                AutoMapperTypeHandler = autoMapperTypeHandler;
                 Comparable = comparable;
                 Parsable = parsable;
                 Convertible = convertible;
