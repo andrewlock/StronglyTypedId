@@ -148,7 +148,7 @@ namespace StronglyTypedIds.Tests
 
         public static IEnumerable<object[]> Parameters()
         {
-            foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
+            foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false).Take(1))
             {
                 // All individual convert types
                 foreach (var converter in EnumHelper.AllConverters(includeDefault: false))

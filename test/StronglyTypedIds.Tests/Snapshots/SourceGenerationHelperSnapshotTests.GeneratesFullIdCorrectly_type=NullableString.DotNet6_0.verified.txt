@@ -205,6 +205,17 @@
 #pragma warning restore CA2255
 
 
+#if !FAKE_CODE
+        public class AutoMapperTypeConverter : AutoMapper.ITypeConverter<MyTestId, string?>
+        {
+            public string? Convert(MyTestId source, string? destination, AutoMapper.ResolutionContext context)
+            {
+                return source.Value;
+            }
+        }
+#endif
+
+
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)

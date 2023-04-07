@@ -71,6 +71,7 @@ namespace StronglyTypedIds
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
             var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
+            var useAutoMapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.AutoMapper);
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
@@ -166,6 +167,11 @@ namespace StronglyTypedIds
             if (useDapperTypeHandler)
             {
                 sb.AppendLine(resources.DapperTypeHandler);
+            }
+
+            if (useAutoMapperTypeHandler)
+            {
+                sb.AppendLine(resources.AutoMapperTypeHandler);
             }
 
             if (useTypeConverter)
