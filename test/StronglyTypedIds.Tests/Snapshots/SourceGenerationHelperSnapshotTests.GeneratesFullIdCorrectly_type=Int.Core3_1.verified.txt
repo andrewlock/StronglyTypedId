@@ -37,7 +37,11 @@
 
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
-        public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+
+        #pragma warning disable CA1036
+            public int CompareTo(MyTestId other) => Value.CompareTo(other.Value);
+        #pragma warning restore CA1036
+
 
 #nullable enable
         public static MyTestId Parse(string s, System.IFormatProvider? provider)

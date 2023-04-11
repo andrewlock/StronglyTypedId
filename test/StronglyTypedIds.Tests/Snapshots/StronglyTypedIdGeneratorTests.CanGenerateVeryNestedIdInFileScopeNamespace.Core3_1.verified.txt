@@ -291,7 +291,11 @@ namespace SomeNamespace
         public override string ToString() => Value.ToString();
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
+
+    #pragma warning disable CA1036
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
+    #pragma warning restore CA1036
+
 
         class MyIdTypeConverter : System.ComponentModel.TypeConverter
         {

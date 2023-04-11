@@ -1,4 +1,5 @@
-﻿        public int CompareTo(TESTID other)
+﻿#pragma warning disable CA1036
+        public int CompareTo(TESTID other)
         {
             return (Value, other.Value) switch
             {
@@ -8,3 +9,4 @@
                 (_, _) => Value.CompareTo(other.Value),
             };
         }
+#pragma warning restore CA1036
