@@ -1,4 +1,5 @@
-﻿    readonly partial struct TESTID : INTERFACES
+﻿    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types")]
+    readonly partial struct TESTID : INTERFACES
     {
         public string Value { get; }
 

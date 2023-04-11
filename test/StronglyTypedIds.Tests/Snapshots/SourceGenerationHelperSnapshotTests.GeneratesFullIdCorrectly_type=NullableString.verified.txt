@@ -14,6 +14,7 @@
     [System.Text.Json.Serialization.JsonConverter(typeof(MyTestIdSystemTextJsonConverter))]
     [System.ComponentModel.TypeConverter(typeof(MyTestIdTypeConverter))]
     [Swashbuckle.AspNetCore.Annotations.SwaggerSchemaFilter(typeof(MyTestIdSchemaFilter))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types")]
     readonly partial struct MyTestId : System.IComparable<MyTestId>, System.IEquatable<MyTestId>, System.IParsable<MyTestId>, System.IConvertible, IStronglyTypedId<string?>
     {
         public string? Value { get; }
@@ -46,6 +47,7 @@
 
         public static bool operator ==(MyTestId a, MyTestId b) => a.Equals(b);
         public static bool operator !=(MyTestId a, MyTestId b) => !(a == b);
+#pragma warning disable CA1036
         public int CompareTo(MyTestId other)
         {
             return (Value, other.Value) switch
@@ -56,6 +58,8 @@
                 (_, _) => Value.CompareTo(other.Value),
             };
         }
+#pragma warning restore CA1036
+
 
         public static MyTestId Parse(string s, IFormatProvider? provider)
         {
