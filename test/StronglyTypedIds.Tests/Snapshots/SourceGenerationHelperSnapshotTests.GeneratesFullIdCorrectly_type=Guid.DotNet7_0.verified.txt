@@ -51,7 +51,7 @@
 
         public static bool TryParse(string? s, System.IFormatProvider? provider, out MyTestId result)
         {
-            long res = 0;
+            Guid res = Guid.Empty;
             var ok = Guid.TryParse(s, provider, out res);
             result = new MyTestId(res);
             return ok;
