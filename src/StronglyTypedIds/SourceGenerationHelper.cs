@@ -233,6 +233,7 @@ namespace StronglyTypedIds
             if (useIComparable)
             {
                 interfaces.Add("System.IComparable<TESTID>");
+                interfaces.Add("System.IComparable");
             }
 
             if (useIEquatable)
