@@ -64,7 +64,7 @@
 
         public string ToString(System.IFormatProvider? provider)
         {
-            throw new System.NotImplementedException();
+            return Value.ToString(provider);
         }
 
         public object ToType(System.Type conversionType, System.IFormatProvider? provider)

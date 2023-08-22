@@ -73,16 +73,26 @@
 #pragma warning restore CA1036
 
 
-        public static MyTestId Parse(string s, IFormatProvider? provider)
+#nullable enable
+        public static MyTestId Parse(string s, System.IFormatProvider? provider)
         {
-            throw new NotImplementedException();
+            return new MyTestId(s.ToString(provider));
         }
 
-        public static bool TryParse(string? s, IFormatProvider? provider, out MyTestId result)
+        public static bool TryParse(string? s, System.IFormatProvider? provider, out MyTestId result)
         {
-            result = new MyTestId(s);
-            return true;
+            var ok = s != null;
+            if (ok)
+            {
+                result = new MyTestId(s!.ToString(provider));
+            }
+            else
+            {
+                result = new MyTestId("");
+            }
+            return ok;
         }
+#nullable disable
 
 
 //ICONVERTIBLE
@@ -150,7 +160,7 @@
 
         public string ToString(System.IFormatProvider? provider)
         {
-            throw new System.NotImplementedException();
+            return Value.ToString(provider);
         }
 
         public object ToType(System.Type conversionType, System.IFormatProvider? provider)
@@ -284,7 +294,7 @@
             {
                 if (objectType == typeof(MyTestId?))
                 {
-                    var value = serializer.Deserialize<string?>(reader);
+                    var value = serializer.Deserialize<string>(reader);
 
                     return value is null ? null : new MyTestId(value);
                 }
@@ -292,6 +302,7 @@
                 return new MyTestId(serializer.Deserialize<string>(reader));
             }
         }
+
 
         class MyTestIdSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<MyTestId>
         {

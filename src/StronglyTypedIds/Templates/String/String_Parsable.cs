@@ -1,11 +1,21 @@
 ﻿
-        public static TESTID Parse(string s, IFormatProvider? provider)
+#nullable enable
+        public static TESTID Parse(string s, System.IFormatProvider? provider)
         {
-            throw new NotImplementedException();
+            return new TESTID(s.ToString(provider));
         }
 
-        public static bool TryParse(string? s, IFormatProvider? provider, out TESTID result)
+        public static bool TryParse(string? s, System.IFormatProvider? provider, out TESTID result)
         {
-            result = new TESTID(s);
-            return true;
+            var ok = s != null;
+            if (ok)
+            {
+                result = new TESTID(s!.ToString(provider));
+            }
+            else
+            {
+                result = new TESTID("");
+            }
+            return ok;
         }
+#nullable disable
