@@ -73,9 +73,11 @@ This adds a `<PackageReference>` to your project. You can additionally mark the 
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   
-  <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" PrivateAssets="all" ExcludeAssets="runtime" />
-  <!-- -->
+  <ItemGroup>
+    <!-- Add the package -->
+    <PackageReference Include="StronglyTypedId" Version="1.0.0-beta06" PrivateAssets="all" ExcludeAssets="runtime" />
+    <!-- -->
+  </ItemGroup>
 
 </Project>
 ```
