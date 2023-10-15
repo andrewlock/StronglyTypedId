@@ -7,6 +7,10 @@
             Value = value;
         }
 
+        public TESTID()
+        {
+        }
+
         public static readonly TESTID Empty = new TESTID(string.Empty);
 
         public bool Equals(TESTID other)

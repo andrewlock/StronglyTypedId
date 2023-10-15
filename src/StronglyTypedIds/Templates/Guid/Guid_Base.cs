@@ -7,6 +7,10 @@
             Value = value;
         }
 
+        public TESTID()
+        {
+        }
+
         public static TESTID New() => new TESTID(System.Guid.NewGuid());
         public static readonly TESTID Empty = new TESTID(System.Guid.Empty);
 
