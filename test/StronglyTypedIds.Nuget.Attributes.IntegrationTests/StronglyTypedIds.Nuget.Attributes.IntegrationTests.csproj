@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="StronglyTypedId" Version="$(Version)" ExcludeAssets="compile;runtime" PrivateAssets="all" />
+    <PackageReference Include="Tennisi.StronglyTypedId" Version="$(Version)" ExcludeAssets="compile;runtime" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />

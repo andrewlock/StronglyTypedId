@@ -146,7 +146,7 @@ class Build : NukeBuild
 
     Target PushToNuGet => _ => _
         .DependsOn(Compile)
-        .OnlyWhenStatic(() => IsTag && IsServerBuild && IsWin)
+        .OnlyWhenStatic(() => true || ( IsTag && IsServerBuild && IsWin ))
         .Requires(() => NuGetToken)
         .After(Pack)
         .Executes(() =>

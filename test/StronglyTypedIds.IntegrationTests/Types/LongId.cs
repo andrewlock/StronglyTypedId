@@ -1,4 +1,4 @@
-﻿using StronglyTypedIds;
+﻿using AutoMapper;
 
 namespace StronglyTypedIds.IntegrationTests.Types
 {
@@ -26,6 +26,11 @@ namespace StronglyTypedIds.IntegrationTests.Types
     [StronglyTypedId(converters: StronglyTypedIdConverter.DapperTypeHandler, backingType: StronglyTypedIdBackingType.Long)]
     public partial struct DapperLongId { }
 
+#if NET5_0_OR_GREATER
+    [StronglyTypedId(converters: StronglyTypedIdConverter.SwaggerSchemaFilter, backingType: StronglyTypedIdBackingType.Long)]
+    public partial struct SwaggerLongId { }
+#endif
+
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable)]
     public partial struct BothLongId { }
 
@@ -34,4 +39,11 @@ namespace StronglyTypedIds.IntegrationTests.Types
 
     [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IComparable)]
     public partial struct ComparableLongId { }
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, implementations: StronglyTypedIdImplementations.IStronglyTypedId)]
+    public partial struct StronglyTypedIdLongId { }
+
+
+    [StronglyTypedId(backingType: StronglyTypedIdBackingType.Long, converters : StronglyTypedIdConverter.AutoMapper)]
+    public partial struct AutoMappedLongId { }
 }

@@ -35,7 +35,7 @@ namespace StronglyTypedIds
                 _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
             };
 
-            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources, sb);
+            return CreateId(idNamespace, idName, parentClass, converters, implementations, resources,backingType, sb);
         }
 
         static string CreateId(
@@ -45,6 +45,7 @@ namespace StronglyTypedIds
             StronglyTypedIdConverter converters,
             StronglyTypedIdImplementations implementations,
             EmbeddedSources.ResourceCollection resources,
+            StronglyTypedIdBackingType backingType,
             StringBuilder? sb)
         {
             if (string.IsNullOrEmpty(idName))
@@ -64,14 +65,19 @@ namespace StronglyTypedIds
 
             var hasNamespace = !string.IsNullOrEmpty(idNamespace);
 
+            var useSchemaFilter = converters.IsSet(StronglyTypedIdConverter.SwaggerSchemaFilter);
             var useTypeConverter = converters.IsSet(StronglyTypedIdConverter.TypeConverter);
             var useNewtonsoftJson = converters.IsSet(StronglyTypedIdConverter.NewtonsoftJson);
             var useSystemTextJson = converters.IsSet(StronglyTypedIdConverter.SystemTextJson);
             var useEfCoreValueConverter = converters.IsSet(StronglyTypedIdConverter.EfCoreValueConverter);
             var useDapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.DapperTypeHandler);
+            var useAutoMapperTypeHandler = converters.IsSet(StronglyTypedIdConverter.AutoMapper);
 
             var useIEquatable = implementations.IsSet(StronglyTypedIdImplementations.IEquatable);
             var useIComparable = implementations.IsSet(StronglyTypedIdImplementations.IComparable);
+            var useIParsable = implementations.IsSet(StronglyTypedIdImplementations.IParsable);
+            var useIConvertible = implementations.IsSet(StronglyTypedIdImplementations.IConvertible);
+            var useIStronglyTypedId = implementations.IsSet(StronglyTypedIdImplementations.IStronglyTypedId);
 
             var parentsCount = 0;
 
@@ -122,14 +128,35 @@ namespace StronglyTypedIds
                 sb.AppendLine(EmbeddedSources.TypeConverterAttributeSource);
             }
 
+            if (useSchemaFilter)
+            {
+                sb.AppendLine(EmbeddedSources.SwaggerSchemaFilterAttributeSource);
+            }
+
+
             sb.Append(resources.BaseId);
-            ReplaceInterfaces(sb, useIEquatable, useIComparable);
+            ReplaceInterfaces(sb, useIEquatable, useIComparable, useIParsable, useIConvertible, useIStronglyTypedId, backingType);
 
             // IEquatable is already implemented whether or not the interface is implemented
 
             if (useIComparable)
             {
                 sb.AppendLine(resources.Comparable);
+            }
+
+            if (useIParsable)
+            {
+                sb.AppendLine(resources.Parsable);
+            }
+
+            if (useIConvertible)
+            {
+                sb.AppendLine(resources.Convertible);
+            }
+
+            if (useIStronglyTypedId)
+            {
+                sb.AppendLine(resources.StronglyTypedId);
             }
 
             if (useEfCoreValueConverter)
@@ -140,6 +167,11 @@ namespace StronglyTypedIds
             if (useDapperTypeHandler)
             {
                 sb.AppendLine(resources.DapperTypeHandler);
+            }
+
+            if (useAutoMapperTypeHandler)
+            {
+                sb.AppendLine(resources.AutoMapperTypeHandler);
             }
 
             if (useTypeConverter)
@@ -155,6 +187,11 @@ namespace StronglyTypedIds
             if (useSystemTextJson)
             {
                 sb.AppendLine(resources.SystemTextJson);
+            }
+
+            if (useSchemaFilter)
+            {
+                sb.AppendLine(resources.SwaggerSchemaFilter);
             }
 
             sb.Replace("TESTID", idName);
@@ -173,7 +210,23 @@ namespace StronglyTypedIds
             return sb.ToString();
         }
 
-        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable)
+
+        private static string BackingType(StronglyTypedIdBackingType backingType)
+        {
+            var resources = backingType switch
+            {
+                StronglyTypedIdBackingType.Guid => "System.Guid",
+                StronglyTypedIdBackingType.Int => "int",
+                StronglyTypedIdBackingType.Long => "long",
+                StronglyTypedIdBackingType.String => "string",
+                StronglyTypedIdBackingType.NullableString => "string?",
+                StronglyTypedIdBackingType.MassTransitNewId => "MassTransit.NewId",
+                _ => throw new ArgumentException("Unknown backing type: " + backingType, nameof(backingType)),
+            };
+            return resources;
+        }
+
+        private static void ReplaceInterfaces(StringBuilder sb, bool useIEquatable, bool useIComparable, bool useIParsable, bool useIConvertible, bool useIStronglyTypedId, StronglyTypedIdBackingType backingType)
         {
             var interfaces = new List<string>();
 
@@ -185,6 +238,21 @@ namespace StronglyTypedIds
             if (useIEquatable)
             {
                 interfaces.Add("System.IEquatable<TESTID>");
+            }
+
+            if (useIParsable)
+            {
+                interfaces.Add("System.IParsable<TESTID>");
+            }
+
+            if (useIConvertible)
+            {
+                interfaces.Add("System.IConvertible");
+            }
+
+            if (useIStronglyTypedId)
+            {
+                interfaces.Add($"IStronglyTypedId<{BackingType(backingType)}>");
             }
 
             if (interfaces.Count > 0)

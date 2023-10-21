@@ -16,7 +16,6 @@
             if (ReferenceEquals(null, obj)) return false;
             return obj is TESTID other && Equals(other);
         }
-
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();
