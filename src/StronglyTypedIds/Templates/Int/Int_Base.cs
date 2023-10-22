@@ -1,12 +1,7 @@
 ﻿    readonly partial struct TESTID : INTERFACES
     {
-        public int Value { get; }
-
-        public TESTID(int value)
-        {
-            Value = value;
-        }
-
+        public int Value { get; } 
+CONSTRUCTOR
         public static readonly TESTID Empty = new TESTID(0);
 
         public bool Equals(TESTID other) => this.Value.Equals(other.Value);

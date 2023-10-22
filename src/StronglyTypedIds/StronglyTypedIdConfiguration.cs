@@ -8,15 +8,19 @@ namespace StronglyTypedIds
         public StronglyTypedIdConverter Converters { get; }
 
         public StronglyTypedIdImplementations Implementations { get; }
+        
+        public StronglyTypedIdConstructor Constructor { get; }
 
         public StronglyTypedIdConfiguration(
             StronglyTypedIdBackingType backingType,
             StronglyTypedIdConverter converters,
-            StronglyTypedIdImplementations implementations)
+            StronglyTypedIdImplementations implementations,
+            StronglyTypedIdConstructor constructor)
         {
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+            Constructor = constructor;
         }
 
         /// <summary>
@@ -27,7 +31,8 @@ namespace StronglyTypedIds
         public static readonly StronglyTypedIdConfiguration Defaults = new(
             backingType: StronglyTypedIdBackingType.Guid,
             converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.NewtonsoftJson,
-            implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable);
+            implementations: StronglyTypedIdImplementations.IEquatable | StronglyTypedIdImplementations.IComparable,
+            constructor: StronglyTypedIdConstructor.Public);
 
         /// <summary>
         /// Combines multiple <see cref="StronglyTypedIdConfiguration"/> values associated
@@ -62,7 +67,15 @@ namespace StronglyTypedIds
                 (var specificValue, _) => specificValue
             };
 
-            return new StronglyTypedIdConfiguration(backingType, converter, implementations);
+            var constructor = (attributeValues.Constructor, globalValues?.Constructor) switch
+            {
+                (StronglyTypedIdConstructor.Default, null) => Defaults.Constructor,
+                (StronglyTypedIdConstructor.Default, StronglyTypedIdConstructor.Default) => Defaults.Constructor,
+                (StronglyTypedIdConstructor.Default, var globalDefault) => globalDefault.Value,
+                (var specificValue, _) => specificValue
+            };
+            
+            return new StronglyTypedIdConfiguration(backingType, converter, implementations, constructor);
         }
     }
 }

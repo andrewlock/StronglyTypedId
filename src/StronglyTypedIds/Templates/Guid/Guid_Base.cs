@@ -1,12 +1,7 @@
 ﻿    readonly partial struct TESTID : INTERFACES
     {
         public System.Guid Value { get; }
-
-        public TESTID(System.Guid value)
-        {
-            Value = value;
-        }
-
+CONSTRUCTOR
         public static TESTID New() => new TESTID(System.Guid.NewGuid());
         public static readonly TESTID Empty = new TESTID(System.Guid.Empty);
 

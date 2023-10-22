@@ -11,16 +11,25 @@ namespace StronglyTypedIds.Tests
                 .Cast<StronglyTypedIdBackingType>()
                 .Where(value => value != StronglyTypedIdBackingType.Default || includeDefault);
 
-        public static IEnumerable<StronglyTypedIdConverter> AllConverters(bool includeDefault = true) 
+        public static IEnumerable<StronglyTypedIdConverter> AllConverters(bool includeDefault = true, bool includeNone = true) 
             => Enum.GetValues(typeof(StronglyTypedIdConverter))
                 .Cast<StronglyTypedIdConverter>()
-                .Where(value => value != StronglyTypedIdConverter.Default || includeDefault);
+                .Where(value => (value != StronglyTypedIdConverter.Default || includeDefault) 
+                                && (value != StronglyTypedIdConverter.None || includeNone));
 
-        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true) 
+        public static IEnumerable<StronglyTypedIdImplementations> AllImplementations(bool includeDefault = true, bool includeNone = true)
             => Enum.GetValues(typeof(StronglyTypedIdImplementations))
                 .Cast<StronglyTypedIdImplementations>()
-                .Where(value => value != StronglyTypedIdImplementations.Default || includeDefault);
+                .Where(value => (value != StronglyTypedIdImplementations.Default || includeDefault)
+                                && (value != StronglyTypedIdImplementations.None || includeNone));
 
+        public static IEnumerable<StronglyTypedIdConstructor> AllConstructors(
+            bool includeDefault = true,
+            bool includePublic = true) 
+            => Enum.GetValues(typeof(StronglyTypedIdConstructor))
+                .Cast<StronglyTypedIdConstructor>()
+                .Where(value => (value != StronglyTypedIdConstructor.Default || includeDefault) 
+                                && (value != StronglyTypedIdConstructor.Public || includePublic));
         public static IEnumerable<StronglyTypedIdConverter> AllConverterCombinations(bool includeDefault = true, bool includeNone = true)
         {
             // get highest value

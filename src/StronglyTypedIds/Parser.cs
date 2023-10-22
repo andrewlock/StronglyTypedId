@@ -122,6 +122,7 @@ internal static class Parser
                 StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default;
                 StronglyTypedIdConverter converter = StronglyTypedIdConverter.Default;
                 StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default;
+                StronglyTypedIdConstructor constructor = StronglyTypedIdConstructor.Default;
 
                 if (!attribute.ConstructorArguments.IsEmpty)
                 {
@@ -139,6 +140,9 @@ internal static class Parser
 
                     switch (args.Length)
                     {
+                        case 4:
+                            constructor = (StronglyTypedIdConstructor)args[3].Value!;
+                            goto case 3;
                         case 3:
                             implementations = (StronglyTypedIdImplementations)args[2].Value!;
                             goto case 2;
@@ -173,6 +177,9 @@ internal static class Parser
                                 case "implementations":
                                     implementations = (StronglyTypedIdImplementations)typedConstant.Value!;
                                     break;
+                                case "constructor":
+                                    constructor = (StronglyTypedIdConstructor)typedConstant.Value!;
+                                    break;
                             }
                         }
                     }
@@ -201,7 +208,7 @@ internal static class Parser
                     reportDiagnostic(InvalidImplementationsDiagnostic.Create(structDeclarationSyntax));
                 }
 
-                config = new StronglyTypedIdConfiguration(backingType, converter, implementations);
+                config = new StronglyTypedIdConfiguration(backingType, converter, implementations, constructor);
                 break;
             }
 
@@ -269,6 +276,7 @@ internal static class Parser
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default;
             StronglyTypedIdConverter converter = StronglyTypedIdConverter.Default;
             StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default;
+            StronglyTypedIdConstructor constructor = StronglyTypedIdConstructor.Default;
             bool hasMisconfiguredInput = false;
 
             if (!attribute.ConstructorArguments.IsEmpty)
@@ -287,6 +295,9 @@ internal static class Parser
 
                 switch (args.Length)
                 {
+                    case 4:
+                        constructor = (StronglyTypedIdConstructor)args[3].Value!;
+                        goto case 3;
                     case 3:
                         implementations = (StronglyTypedIdImplementations)args[2].Value!;
                         goto case 2;
@@ -320,6 +331,9 @@ internal static class Parser
                                 break;
                             case "implementations":
                                 implementations = (StronglyTypedIdImplementations)typedConstant.Value!;
+                                break;
+                            case "constructor":
+                                constructor = (StronglyTypedIdConstructor)typedConstant.Value!;
                                 break;
                         }
                     }
@@ -360,7 +374,7 @@ internal static class Parser
                 }
             }
 
-            return new StronglyTypedIdConfiguration(backingType, converter, implementations);
+            return new StronglyTypedIdConfiguration(backingType, converter, implementations, constructor);
         }
 
         return null;
