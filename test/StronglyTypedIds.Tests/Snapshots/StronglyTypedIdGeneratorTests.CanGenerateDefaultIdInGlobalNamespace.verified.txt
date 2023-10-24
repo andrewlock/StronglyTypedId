@@ -7,7 +7,7 @@ namespace StronglyTypedIds
     /// <summary>
     /// Place on partial structs to make the type a strongly-typed ID
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
     [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
     internal sealed class StronglyTypedIdAttribute : Attribute
     {
@@ -22,6 +22,7 @@ namespace StronglyTypedIds
         /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
         /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Implementations"/>, which defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/>
         /// and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        [Obsolete("This overload is no longer used. Please use the StronglyTypedId(Template) or StronglyTypedId(string) constructor")]
         public StronglyTypedIdAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
             StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
@@ -30,6 +31,34 @@ namespace StronglyTypedIds
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID.
+        /// </summary>
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdAttribute(string templateName)
+        {
+            TemplateName = templateName;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID.
+        /// </summary>
+        /// <param name="template">The built-in template to use to generate the ID.</param>
+        public StronglyTypedIdAttribute(Template template)
+        {
+            Template = template;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID, using the default template
+        /// </summary>
+        public StronglyTypedIdAttribute()
+        {
         }
 
         /// <summary>
@@ -46,6 +75,16 @@ namespace StronglyTypedIds
         /// Interfaces and patterns the strongly typed id should implement
         /// </summary>
         public StronglyTypedIdImplementations Implementations { get; }
+
+        /// <summary>
+        /// The template to use to generate the strongly-typed ID value.
+        /// </summary>
+        public string? TemplateName { get; }
+
+        /// <summary>
+        /// The template to use to generate the strongly-typed ID value.
+        /// </summary>
+        public Template? Template { get; }
     }
 }
 #endif
@@ -56,7 +95,8 @@ using System;
 namespace StronglyTypedIds
 {
     /// <summary>
-    /// Used to control the default Place on partial structs to make the type a strongly-typed ID
+    /// Used to control the default strongly typed ID values. Apply to an assembly using
+    /// <code>[assembly:StronglyTypedIdDefaults(Template.Int)]</code> for example
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
     [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
@@ -71,6 +111,7 @@ namespace StronglyTypedIds
         /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
         /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
         /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        [Obsolete("This overload is no longer used. Please use the StronglyTypedId(Template) or StronglyTypedId(string) constructor")]
         public StronglyTypedIdDefaultsAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
             StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
@@ -79,6 +120,27 @@ namespace StronglyTypedIds
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+        }
+
+        /// <summary>
+        /// Set the default template to use for strongly typed IDs
+        /// </summary>
+        /// <param name="template">The built-in template to use to generate the ID.</param>
+        public StronglyTypedIdDefaultsAttribute(Template template)
+        {
+            Template = template;
+        }
+
+        /// <summary>
+        /// Set the default template to use for strongly typed IDs
+        /// </summary>
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(string templateName)
+        {
+            TemplateName = templateName;
         }
 
         /// <summary>
@@ -95,124 +157,16 @@ namespace StronglyTypedIds
         /// Interfaces and patterns the strongly typed id should implement
         /// </summary>
         public StronglyTypedIdImplementations Implementations { get; }
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// The <see cref="Type"/> to use to store the value of a strongly-typed ID
-    /// </summary>
-    internal enum StronglyTypedIdBackingType
-    {
-        /// <summary>
-        /// Use the default backing type (either the globally configured default, or Guid)
-        /// </summary>
-        Default = 0,
-        
-        Guid = 1,
-        Int = 2,
-        String = 3,
-        Long = 4,
-        NullableString = 5,
-        MassTransitNewId = 6,
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Converters used to to serialize/deserialize strongly-typed ID values
-    /// </summary>
-    [Flags]
-    internal enum StronglyTypedIdConverter
-    {
-        // Used with HasFlag, so needs to be 1, 2, 4 etc
 
         /// <summary>
-        /// Don't create any converters for the strongly typed ID
+        /// The default template to use to generate the strongly-typed ID value.
         /// </summary>
-        None = 0,
+        public string? TemplateName { get; }
 
         /// <summary>
-        /// Use the default converters for the strongly typed Id.
-        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
-        /// <see cref="TypeConverter"/> and <see cref="NewtonsoftJson"/>
+        /// The default template to use to generate the strongly-typed ID value.
         /// </summary>
-        Default = 1,
-
-        /// <summary>
-        /// Creates a <see cref="TypeConverter"/> for converting from the strongly typed ID to and from a string
-        /// </summary>
-        TypeConverter = 2,
-
-        /// <summary>
-        /// Creates a Newtonsoft.Json.JsonConverter for serializing the strongly typed id to its primitive value
-        /// </summary>
-        NewtonsoftJson = 4,
-
-        /// <summary>
-        /// Creates a System.Text.Json.Serialization.JsonConverter for serializing the strongly typed id to its primitive value
-        /// </summary>
-        SystemTextJson = 8,
-
-        /// <summary>
-        /// Creates an EF Core Value Converter for extracting the primitive value
-        /// </summary>
-        EfCoreValueConverter = 16,
-
-        /// <summary>
-        /// Creates a Dapper TypeHandler for converting to and from the type
-        /// </summary>
-        DapperTypeHandler = 32,
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Interfaces and patterns the strongly typed id should implement
-    /// </summary>
-    [Flags]
-    internal enum StronglyTypedIdImplementations
-    {
-        // Used with HasFlag, so needs to be 1, 2, 4 etc
-
-        /// <summary>
-        /// Don't implement any additional members for the strongly typed ID
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// Use the default implementations for the strongly typed Id.
-        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
-        /// <see cref="IEquatable"/> and <see cref="IComparable"/>
-        /// </summary>
-        Default = 1,
-
-        // ReSharper disable once InconsistentNaming
-        /// <summary>
-        /// Implement the <see cref="IEquatable{T}"/> interface
-        /// </summary>
-        IEquatable = 2,
-
-        // ReSharper disable once InconsistentNaming
-        /// <summary>
-        /// Implement the <see cref="IComparable{T}"/> interface
-        /// </summary>
-        IComparable = 4,
+        public Template? Template { get; }
     }
 }
 #endif
@@ -227,19 +181,19 @@ namespace StronglyTypedIds
 
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
-    [Newtonsoft.Json.JsonConverter(typeof(MyIdNewtonsoftJsonConverter))]
-    [System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
-    readonly partial struct MyId : System.IComparable<MyId>, System.IEquatable<MyId>
+#nullable enable
+    [global::System.ComponentModel.TypeConverter(typeof(TypeConverter))]
+    readonly partial struct MyId : global::System.IComparable<MyId>, global::System.IEquatable<MyId>
     {
-        public System.Guid Value { get; }
+        public global::System.Guid Value { get; }
 
-        public MyId(System.Guid value)
+        public MyId(global::System.Guid value)
         {
             Value = value;
         }
 
-        public static MyId New() => new MyId(System.Guid.NewGuid());
-        public static readonly MyId Empty = new MyId(System.Guid.Empty);
+        public static MyId New() => new MyId(global::System.Guid.NewGuid());
+        public static readonly MyId Empty = new MyId(global::System.Guid.Empty);
 
         public bool Equals(MyId other) => this.Value.Equals(other.Value);
         public override bool Equals(object obj)
@@ -253,35 +207,36 @@ namespace StronglyTypedIds
         public override string ToString() => Value.ToString();
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
+
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
 
-        class MyIdTypeConverter : System.ComponentModel.TypeConverter
+        class MyIdTypeConverter : global::System.ComponentModel.TypeConverter
         {
-            public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext context, global::System.Type sourceType)
             {
-                return sourceType == typeof(System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+                return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
             }
 
-            public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+            public override object ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext context, global::System.Globalization.CultureInfo culture, object value)
             {
                 return value switch
                 {
-                    System.Guid guidValue => new MyId(guidValue),
-                    string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new MyId(result),
+                    global::System.Guid guidValue => new MyId(guidValue),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new MyId(result),
                     _ => base.ConvertFrom(context, culture, value),
                 };
             }
 
-            public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext context, global::System.Type sourceType)
             {
-                return sourceType == typeof(System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+                return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
             }
 
-            public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+            public override object ConvertTo(global::System.ComponentModel.ITypeDescriptorContext context, global::System.Globalization.CultureInfo culture, object value, global::System.Type destinationType)
             {
                 if (value is MyId idValue)
                 {
-                    if (destinationType == typeof(System.Guid))
+                    if (destinationType == typeof(global::System.Guid))
                     {
                         return idValue.Value;
                     }
@@ -293,26 +248,6 @@ namespace StronglyTypedIds
                 }
 
                 return base.ConvertTo(context, culture, value, destinationType);
-            }
-        }
-
-        class MyIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
-        {
-            public override bool CanConvert(System.Type objectType)
-            {
-                return objectType == typeof(MyId);
-            }
-
-            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
-            {
-                var id = (MyId)value;
-                serializer.Serialize(writer, id.Value);
-            }
-
-            public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
-            {
-                var guid = serializer.Deserialize<System.Guid?>(reader);
-                return guid.HasValue ? new MyId(guid.Value) : null;
             }
         }
     }

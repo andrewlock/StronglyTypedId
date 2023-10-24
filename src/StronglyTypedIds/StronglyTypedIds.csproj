@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <PackageId>StronglyTypedId</PackageId>
     <Description>A source generator for creating strongly-typed IDs by decorating with a [StronglyTypedId] attribute</Description>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +19,7 @@
     <Compile Remove="Templates\**\*.cs" />
     <EmbeddedResource Include="Templates\**\*.cs" />
     <EmbeddedResource Include="..\StronglyTypedIds.Attributes\*.cs" Link="Templates\Sources\%(Filename)%(Extension)" />
+    <Compile Update="EmbeddedSources.Guid.cs" DependentUpon="EmbeddedSources.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ namespace StronglyTypedIds
     /// <summary>
     /// Place on partial structs to make the type a strongly-typed ID
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
     [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
     public sealed class StronglyTypedIdAttribute : Attribute
     {
@@ -20,6 +20,7 @@ namespace StronglyTypedIds
         /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
         /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Implementations"/>, which defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/>
         /// and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
+        [Obsolete("This overload is no longer used. Please use the StronglyTypedId(Template) or StronglyTypedId(string) constructor")]
         public StronglyTypedIdAttribute(
             StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
             StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
@@ -28,6 +29,34 @@ namespace StronglyTypedIds
             BackingType = backingType;
             Converters = converters;
             Implementations = implementations;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID.
+        /// </summary>
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdAttribute(string templateName)
+        {
+            TemplateName = templateName;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID.
+        /// </summary>
+        /// <param name="template">The built-in template to use to generate the ID.</param>
+        public StronglyTypedIdAttribute(Template template)
+        {
+            Template = template;
+        }
+
+        /// <summary>
+        /// Make the struct a strongly typed ID, using the default template
+        /// </summary>
+        public StronglyTypedIdAttribute()
+        {
         }
 
         /// <summary>
@@ -44,5 +73,15 @@ namespace StronglyTypedIds
         /// Interfaces and patterns the strongly typed id should implement
         /// </summary>
         public StronglyTypedIdImplementations Implementations { get; }
+
+        /// <summary>
+        /// The template to use to generate the strongly-typed ID value.
+        /// </summary>
+        public string? TemplateName { get; }
+
+        /// <summary>
+        /// The template to use to generate the strongly-typed ID value.
+        /// </summary>
+        public Template? Template { get; }
     }
 }

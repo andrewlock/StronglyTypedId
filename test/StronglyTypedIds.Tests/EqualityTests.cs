@@ -34,20 +34,6 @@ public class EqualityTests
     }
 
     [Fact]
-    public void StronglyTypedIdConfigurationHasExpectedEqualityBehaviour()
-    {
-        var id1 = GetId();
-        var id2 = GetId();
-        Assert.True(id1.Equals(id2));
-        Assert.Equal(id1, id2);
-    }
-
-    private static StronglyTypedIdConfiguration GetId()
-    {
-        return new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default);
-    }
-
-    [Fact]
     public void StructToGenerateHasExpectedEqualityBehaviour()
     {
         var instance1 = GetStruct();
@@ -61,7 +47,7 @@ public class EqualityTests
             new(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                config: new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default),
+                templateName: "Guid",
                 parent: null);
     }
 
@@ -80,7 +66,7 @@ public class EqualityTests
             return new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                config: new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default),
+                templateName: "Guid",
                 parent: new ParentClass("class", "b", "", null));
         }
     }
@@ -100,7 +86,7 @@ public class EqualityTests
             var instance = new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                config: new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default),
+                templateName: "Guid",
                 parent: new ParentClass("class", "b", "", null));
 
             return new Result<(StructToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
@@ -122,7 +108,7 @@ public class EqualityTests
             var instance = new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                config: new StronglyTypedIdConfiguration(StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.Default, StronglyTypedIdImplementations.Default),
+                templateName: "Guid",
                 parent: new ParentClass("class", "b", "", null));
             var diagnostics = new DiagnosticInfo(new DiagnosticDescriptor(
                     InvalidBackingTypeDiagnostic.Id, InvalidBackingTypeDiagnostic.Title, InvalidBackingTypeDiagnostic.Message, category: Constants.Usage,
