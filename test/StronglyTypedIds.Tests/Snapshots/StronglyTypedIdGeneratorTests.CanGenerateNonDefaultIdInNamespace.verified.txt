@@ -351,7 +351,7 @@ namespace SomeNamespace
 
         public override int GetHashCode() => Value.GetHashCode();
 
-        public override string ToString() => Value.ToString();
+        public override string ToString() => Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture);
 
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
@@ -392,7 +392,7 @@ namespace SomeNamespace
 
                     if (destinationType == typeof(string))
                     {
-                        return idValue.Value.ToString();
+                        return idValue.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture);
                     }
                 }
 

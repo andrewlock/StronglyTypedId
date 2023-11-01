@@ -22,6 +22,7 @@ internal static partial class EmbeddedSources
         {
             Template.Guid => GuidTemplate,
             Template.Int => IntTemplate,
+            Template.Long => LongTemplate,
             _ => string.Empty,
         };
     

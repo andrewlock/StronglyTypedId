@@ -24,9 +24,12 @@ partial struct IntId { }
 
 [StronglyTypedId("int-full")]
 partial struct ConvertersIntId { }
-//
-// [StronglyTypedId(Template.Long)]
-// partial struct LongId { }
+
+[StronglyTypedId(Template.Long)]
+partial struct LongId { }
+
+[StronglyTypedId("long-full")]
+partial struct ConvertersLongId { }
     
 [StronglyTypedId("newid")]
 partial struct NewIdId1 { }

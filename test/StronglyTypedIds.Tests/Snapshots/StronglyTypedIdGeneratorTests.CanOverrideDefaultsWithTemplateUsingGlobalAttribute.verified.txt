@@ -321,13 +321,14 @@ namespace StronglyTypedIds
 #nullable enable
     [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
     [global::System.Text.Json.Serialization.JsonConverter(typeof(MyIdSystemTextJsonConverter))]
-    partial struct MyId: global::System.IComparable<MyId>, global::System.IEquatable<MyId>, global::System.IFormattable
+    partial struct MyId :
 #if NET6_0_OR_GREATER
-        ,global::System.ISpanFormattable
+        global::System.ISpanFormattable,
+#endif
 #if NET7_0_OR_GREATER
-        global::System.IParsable<MyId>, global::System.ISpanParsable<MyId>
+        global::System.IParsable<MyId>, global::System.ISpanParsable<MyId>,
 #endif
-#endif
+        global::System.IComparable<MyId>, global::System.IEquatable<MyId>, global::System.IFormattable
     {
         public int Value { get; }
 
@@ -348,7 +349,7 @@ namespace StronglyTypedIds
 
         public override int GetHashCode() => Value.GetHashCode();
 
-        public override string ToString() => Value.ToString();
+        public override string ToString() => Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture);
 
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
@@ -389,7 +390,7 @@ namespace StronglyTypedIds
 
                     if (destinationType == typeof(string))
                     {
-                        return idValue.Value.ToString();
+                        return idValue.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture);
                     }
                 }
 
