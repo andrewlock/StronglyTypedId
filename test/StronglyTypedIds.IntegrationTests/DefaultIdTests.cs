@@ -71,20 +71,6 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.NotEqual((object)bar, (object)foo);
         }
 
-        [Fact]
-        public void WhenNoTypeConverter_SerializesWithValueProperty()
-        {
-            var foo = DefaultId1.New();
-
-            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
-            var systemText = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":\"" + foo.Value + "\"}";
-
-            Assert.Equal(expected, newtonsoft);
-            Assert.Equal(expected, systemText);
-        }
-
         [Theory]
         [InlineData("78104553-f1cd-41ec-bcb6-d3a8ff8d994d")]
         public void TypeConverter_CanConvertToAndFrom(string value)

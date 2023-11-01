@@ -9,12 +9,12 @@ namespace StronglyTypedIds.IntegrationTests
         [ModuleInitializer]
         public static void AddHandlers()
         {
-            SqlMapper.AddTypeHandler(new DapperGuidId.DapperTypeHandler());
-            SqlMapper.AddTypeHandler(new DapperIntId.DapperTypeHandler());
-            SqlMapper.AddTypeHandler(new DapperStringId.DapperTypeHandler());
-            SqlMapper.AddTypeHandler(new DapperLongId.DapperTypeHandler());
-            SqlMapper.AddTypeHandler(new DapperNullableStringId.DapperTypeHandler());
-            SqlMapper.AddTypeHandler(new DapperNewIdId.DapperTypeHandler());
+            SqlMapper.AddTypeHandler(new ConvertersGuidId.DapperTypeHandler());
+            SqlMapper.AddTypeHandler(new ConvertersIntId.DapperTypeHandler());
+            // SqlMapper.AddTypeHandler(new DapperStringId.DapperTypeHandler());
+            // SqlMapper.AddTypeHandler(new DapperLongId.DapperTypeHandler());
+            // SqlMapper.AddTypeHandler(new DapperNullableStringId.DapperTypeHandler());
+            // SqlMapper.AddTypeHandler(new DapperNewIdId.DapperTypeHandler());
         }
     }
 }

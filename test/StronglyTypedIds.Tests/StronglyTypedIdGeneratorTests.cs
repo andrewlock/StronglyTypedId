@@ -32,21 +32,65 @@ public partial struct MyId {}";
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanGenerateIdInNamespace()
+        [Theory]
+        [InlineData("")]
+        [InlineData("Template.Guid")]
+        public Task CanGenerateIdInNamespace(string template)
         {
-            const string input = @"using StronglyTypedIds;
-
-namespace SomeNamespace
-{
-    [StronglyTypedId()]
-    public partial struct MyId {}
-}";
+            var input = $$"""
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId({{template}})]
+                    public partial struct MyId {}
+                }
+                """;
             var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
 
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateNonDefaultIdInNamespace()
+        {
+            var input = $$"""
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId(Template.Int)]
+                    public partial struct MyId {}
+                }
+                """;
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateForCustomTemplate()
+        {
+            var input = """
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId("newid")]
+                    public partial struct MyId {}
+                }
+                """;
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 
@@ -93,6 +137,32 @@ public class ParentClass
 
 namespace SomeNamespace;
 
+public partial class ParentClass
+{
+    internal partial record InnerClass
+    {
+        public readonly partial record struct InnerStruct
+        {
+            [StronglyTypedId]
+            public readonly partial struct MyId {}
+        }
+    }
+}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateGenericVeryNestedIdInFileScopeNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace;
+
 public class ParentClass<T> 
     where T: new() 
 {
@@ -114,11 +184,30 @@ public class ParentClass<T>
         }
 
         [Fact]
-        public Task CanOverrideDefaultsUsingGlobalAttribute()
+        public Task CanOverrideDefaultsWithTemplateUsingGlobalAttribute()
         {
             const string input = """
                 using StronglyTypedIds;
-                [assembly:StronglyTypedIdDefaults("int")]
+                [assembly:StronglyTypedIdDefaults(Template.Int)]
+                
+                [StronglyTypedId]
+                public partial struct MyId {}
+                """;
+
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute()
+        {
+            const string input = """
+                using StronglyTypedIds;
+                [assembly:StronglyTypedIdDefaults("newid")]
                 
                 [StronglyTypedId]
                 public partial struct MyId {}

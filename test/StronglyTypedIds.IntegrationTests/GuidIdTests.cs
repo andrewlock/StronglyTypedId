@@ -77,7 +77,7 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanSerializeToGuid_WithTypeConverter()
         {
-            var foo = NewtonsoftJsonGuidId.New();
+            var foo = GuidId1.New();
 
             var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
             var serializedGuid = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
@@ -88,7 +88,7 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanSerializeToGuid_WithSystemTextJsonProvider()
         {
-            var foo = SystemTextJsonGuidId.New();
+            var foo = GuidId1.New();
 
             var serializedFoo = SystemTextJsonSerializer.Serialize(foo);
             var serializedGuid = SystemTextJsonSerializer.Serialize(foo.Value);
@@ -97,14 +97,26 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanDeserializeFromGuid_WithSystemTextJsonProvider()
+        {
+            var value = Guid.NewGuid();
+            var foo = new GuidId1(value);
+            var serializedGuid = SystemTextJsonSerializer.Serialize(value);
+
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<GuidId1>(serializedGuid);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact]
         public void CanDeserializeFromGuid_WithNewtonsoftJsonProvider()
         {
             var value = Guid.NewGuid();
-            var foo = new NewtonsoftJsonGuidId(value);
+            var foo = new ConvertersGuidId(value);
             var serializedGuid = NewtonsoftJsonSerializer.SerializeObject(value);
-
-            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<NewtonsoftJsonGuidId>(serializedGuid);
-
+        
+            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<ConvertersGuidId>(serializedGuid);
+        
             Assert.Equal(foo, deserializedFoo);
         }
 
@@ -112,57 +124,33 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanSerializeToNullableInt_WithNewtonsoftJsonProvider()
         {
             var entity = new EntityWithNullableId { Id = null };
-
+        
             var json = NewtonsoftJsonSerializer.SerializeObject(entity);
             var deserialize = NewtonsoftJsonSerializer.DeserializeObject<EntityWithNullableId>(json);
-
+        
             Assert.NotNull(deserialize);
             Assert.Null(deserialize.Id);
         }
 
         [Fact]
-        public void CanDeserializeFromGuid_WithSystemTextJsonProvider()
-        {
-            var value = Guid.NewGuid();
-            var foo = new SystemTextJsonGuidId(value);
-            var serializedGuid = SystemTextJsonSerializer.Serialize(value);
-
-            var deserializedFoo = SystemTextJsonSerializer.Deserialize<SystemTextJsonGuidId>(serializedGuid);
-
-            Assert.Equal(foo, deserializedFoo);
-        }
-
-        [Fact]
         public void CanSerializeToGuid_WithBothJsonConverters()
         {
-            var foo = BothJsonGuidId.New();
-
+            var foo = ConvertersGuidId.New();
+        
             var serializedFoo1 = NewtonsoftJsonSerializer.SerializeObject(foo);
             var serializedGuid1 = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
-
+        
             var serializedFoo2 = SystemTextJsonSerializer.Serialize(foo);
             var serializedGuid2 = SystemTextJsonSerializer.Serialize(foo.Value);
-
+        
             Assert.Equal(serializedFoo1, serializedGuid1);
             Assert.Equal(serializedFoo2, serializedGuid2);
         }
 
         [Fact]
-        public void WhenNoJsonConverter_SystemTextJsonSerializesWithValueProperty()
-        {
-            var foo = NoJsonGuidId.New();
-
-            var serialized = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":\"" + foo.Value + "\"}";
-
-            Assert.Equal(expected, serialized);
-        }
-
-        [Fact]
         public void WhenNoJsonConverter_NewtonsoftSerializesWithoutValueProperty()
         {
-            var foo = NoJsonGuidId.New();
+            var foo = GuidId1.New();
 
             var serialized = NewtonsoftJsonSerializer.SerializeObject(foo);
 
@@ -172,34 +160,20 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void WhenNoTypeConverter_SerializesWithValueProperty()
-        {
-            var foo = NoConverterGuidId.New();
-
-            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
-            var systemText = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":\"" + foo.Value + "\"}";
-
-            Assert.Equal(expected, newtonsoft);
-            Assert.Equal(expected, systemText);
-        }
-
-        [Fact]
         public void WhenEfCoreValueConverterUsesValueConverter()
         {
             var connection = new SqliteConnection("DataSource=:memory:");
             connection.Open();
-
+        
             var options = new DbContextOptionsBuilder<TestDbContext>()
                 .UseSqlite(connection)
                 .Options;
-
+        
             using (var context = new TestDbContext(options))
             {
                 context.Database.EnsureCreated();
                 context.Entities.Add(
-                    new TestEntity { Id = EfCoreGuidId.New() });
+                    new TestEntity { Id = ConvertersGuidId.New() });
                 context.SaveChanges();
             }
             using (var context = new TestDbContext(options))
@@ -214,21 +188,21 @@ namespace StronglyTypedIds.IntegrationTests
         {
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
-
-            var results = await connection.QueryAsync<DapperGuidId>("SELECT '5640dad4-862a-4738-9e3c-c76dc227eb66'");
-
+        
+            var results = await connection.QueryAsync<ConvertersGuidId>("SELECT '5640dad4-862a-4738-9e3c-c76dc227eb66'");
+        
             var value = Assert.Single(results);
-            Assert.Equal(value, new DapperGuidId(Guid.Parse("5640dad4-862a-4738-9e3c-c76dc227eb66")));
+            Assert.Equal(value, new ConvertersGuidId(Guid.Parse("5640dad4-862a-4738-9e3c-c76dc227eb66")));
         }
 
         [Theory]
         [InlineData("78104553-f1cd-41ec-bcb6-d3a8ff8d994d")]
         public void TypeConverter_CanConvertToAndFrom(string value)
         {
-            var converter = TypeDescriptor.GetConverter(typeof(NoJsonGuidId));
+            var converter = TypeDescriptor.GetConverter(typeof(GuidId1));
             var id = converter.ConvertFrom(value);
-            Assert.IsType<NoJsonGuidId>(id);
-            Assert.Equal(new NoJsonGuidId(Guid.Parse(value)), id);
+            Assert.IsType<GuidId1>(id);
+            Assert.Equal(new GuidId1(Guid.Parse(value)), id);
 
             var reconverted = converter.ConvertTo(id, value.GetType());
             Assert.Equal(value, reconverted);
@@ -237,8 +211,8 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanCompareDefaults()
         {
-            ComparableGuidId original = default;
-            var other = ComparableGuidId.Empty;
+            GuidId1 original = default;
+            var other = GuidId1.Empty;
 
             var compare1 = original.CompareTo(other);
             var compare2 = other.CompareTo(original);
@@ -248,11 +222,11 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanEquateDefaults()
         {
-            EquatableGuidId original = default;
-            var other = EquatableGuidId.Empty;
+            GuidId1 original = default;
+            var other = GuidId1.Empty;
 
-            var equals1 = (original as IEquatable<EquatableGuidId>).Equals(other);
-            var equals2 = (other as IEquatable<EquatableGuidId>).Equals(original);
+            var equals1 = (original as IEquatable<GuidId1>).Equals(other);
+            var equals2 = (other as IEquatable<GuidId1>).Equals(original);
 
             Assert.Equal(equals1, equals2);
         }
@@ -260,100 +234,117 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void ImplementsInterfaces()
         {
-            Assert.IsAssignableFrom<IEquatable<BothGuidId>>(BothGuidId.Empty);
-            Assert.IsAssignableFrom<IComparable<BothGuidId>>(BothGuidId.Empty);
-
-            Assert.IsAssignableFrom<IEquatable<EquatableGuidId>>(EquatableGuidId.Empty);
-            Assert.IsAssignableFrom<IComparable<ComparableGuidId>>(ComparableGuidId.Empty);
-
+            Assert.IsAssignableFrom<IEquatable<GuidId1>>(GuidId1.Empty);
+            Assert.IsAssignableFrom<IComparable<GuidId1>>(GuidId1.Empty);
+            Assert.IsAssignableFrom<IFormattable>(GuidId1.Empty);
+            
+#pragma warning disable CS0183
 #pragma warning disable 184
-            Assert.False(GuidId1.Empty is IComparable<GuidId1>);
-            Assert.False(GuidId1.Empty is IEquatable<GuidId1>);
+            Assert.True(GuidId1.Empty is IComparable<GuidId1>);
+            Assert.True(GuidId1.Empty is IEquatable<GuidId1>);
 #pragma warning restore 184
+#pragma warning restore CS0183
+
+#if NET6_0_OR_GREATER
+            Assert.IsAssignableFrom<ISpanFormattable>(GuidId1.Empty);
+#endif
+#if NET7_0_OR_GREATER
+            // doesn't compile if doesn't implement it 
+            ParseAs<GuidId1>(Guid.NewGuid().ToString());
+            ParseSpan<GuidId1>(Guid.NewGuid().ToString().AsSpan());
+
+            T ParseAs<T>(string s) where T: IParsable<T> {
+                return T.Parse(s, null);
+            }
+
+            T ParseSpan<T>(ReadOnlySpan<char> s) where T: ISpanParsable<T> {
+                return T.Parse(s, null);
+            }
+#endif
         }
-//
-// #if NET6_0_OR_GREATER
-//         [Fact]
-//         public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
-//         {
-//             var connection = new SqliteConnection("DataSource=:memory:");
-//             connection.Open();
-//
-//             var options = new DbContextOptionsBuilder<ConventionsDbContext>()
-//                 .UseSqlite(connection)
-//                 .Options;
-//
-//             using (var context = new ConventionsDbContext(options))
-//             {
-//                 context.Database.EnsureCreated();
-//                 context.Entities.Add(
-//                     new TestEntity { Id = EfCoreGuidId.New() });
-//                 context.SaveChanges();
-//             }
-//             using (var context = new ConventionsDbContext(options))
-//             {
-//                 var all = context.Entities.ToList();
-//                 Assert.Single(all);
-//             }
-//         }
-//
-//         public class ConventionsDbContext : DbContext
-//         {
-//             public DbSet<TestEntity> Entities { get; set; }
-//
-//             public ConventionsDbContext(DbContextOptions options) : base(options)
-//             {
-//             }
-//
-//             protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-//             {
-//                 configurationBuilder
-//                     .Properties<EfCoreGuidId>()
-//                     .HaveConversion<EfCoreGuidId.EfCoreValueConverter>();
-//             }
-//
-//             protected override void OnModelCreating(ModelBuilder modelBuilder)
-//             {
-//                 modelBuilder
-//                     .Entity<TestEntity>(builder =>
-//                     {
-//                         builder
-//                             .Property(x => x.Id)
-//                             .ValueGeneratedNever();
-//                     });
-//             }
-//         }
-// #endif
-//
-//         public class TestDbContext : DbContext
-//         {
-//             public DbSet<TestEntity> Entities { get; set; }
-//
-//             public TestDbContext(DbContextOptions options) : base(options)
-//             {
-//             }
-//
-//             protected override void OnModelCreating(ModelBuilder modelBuilder)
-//             {
-//                 modelBuilder
-//                     .Entity<TestEntity>(builder =>
-//                     {
-//                         builder
-//                             .Property(x => x.Id)
-//                             .HasConversion(new EfCoreGuidId.EfCoreValueConverter())
-//                             .ValueGeneratedNever();
-//                     });
-//             }
-//         }
-//
-//         public class TestEntity
-//         {
-//             public EfCoreGuidId Id { get; set; }
-//         }
-//
-//         public class EntityWithNullableId
-//         {
-//             public NewtonsoftJsonGuidId? Id { get; set; }
-//         }
+
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<ConventionsDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ConventionsDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities.Add(
+                    new TestEntity { Id = ConvertersGuidId.New() });
+                context.SaveChanges();
+            }
+            using (var context = new ConventionsDbContext(options))
+            {
+                var all = context.Entities.ToList();
+                Assert.Single(all);
+            }
+        }
+
+        internal class ConventionsDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public ConventionsDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+            {
+                configurationBuilder
+                    .Properties<ConvertersGuidId>()
+                    .HaveConversion<ConvertersGuidId.EfCoreValueConverter>();
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+#endif
+
+        internal class TestDbContext : DbContext
+        {
+            public DbSet<TestEntity> Entities { get; set; }
+
+            public TestDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder
+                    .Entity<TestEntity>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .HasConversion(new ConvertersGuidId.EfCoreValueConverter())
+                            .ValueGeneratedNever();
+                    });
+            }
+        }
+
+        internal class TestEntity
+        {
+            public ConvertersGuidId Id { get; set; }
+        }
+
+        internal class EntityWithNullableId
+        {
+            public ConvertersGuidId? Id { get; set; }
+        }
     }
 }

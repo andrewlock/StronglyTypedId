@@ -21,48 +21,7 @@
 //                 idName: idName,
 //                 idNamespace: IdNamespace,
 //                 parentClass: null,
-//                 converters: StronglyTypedIdConverter.None,
-//                 backingType: StronglyTypedIdBackingType.Guid,
-//                 implementations: StronglyTypedIdImplementations.None
-//             ));
-//         }
-//
-//         [Fact]
-//         public void ThrowsWhenDefaultConverterIsUsed()
-//         {
-//             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
-//                 idName: "MyTestId",
-//                 idNamespace: IdNamespace,
-//                 parentClass: null,
-//                 converters: StronglyTypedIdConverter.Default,
-//                 backingType: StronglyTypedIdBackingType.Guid,
-//                 implementations: StronglyTypedIdImplementations.None
-//             ));
-//         }
-//
-//         [Fact]
-//         public void ThrowsWhenDefaultBackingTypeIsUsed()
-//         {
-//             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
-//                 idName: "MyTestId",
-//                 idNamespace: IdNamespace,
-//                 parentClass: null,
-//                 converters: StronglyTypedIdConverter.None,
-//                 backingType: StronglyTypedIdBackingType.Default,
-//                 implementations: StronglyTypedIdImplementations.None
-//             ));
-//         }
-//
-//         [Fact]
-//         public void ThrowsWhenDefaultImplementationsIsUsed()
-//         {
-//             Assert.Throws<ArgumentException>(() => SourceGenerationHelper.CreateId(
-//                 idName: "MyTestId",
-//                 idNamespace: IdNamespace,
-//                 parentClass: null,
-//                 converters: StronglyTypedIdConverter.None,
-//                 backingType: StronglyTypedIdBackingType.Guid,
-//                 implementations: StronglyTypedIdImplementations.Default
+//                 template: "N/A"
 //             ));
 //         }
 //

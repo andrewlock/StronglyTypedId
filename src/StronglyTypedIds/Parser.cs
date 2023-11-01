@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -70,7 +71,10 @@ internal static class Parser
         ParentClass? parentClass = GetParentClasses(structSyntax);
         var name = structSymbol.Name;
 
-        var toGenerate = new StructToGenerate(name: name, nameSpace: nameSpace, templateName: templateName, parent: parentClass);
+        var toGenerate = template.HasValue
+            ? new StructToGenerate(name: name, nameSpace: nameSpace, template: template.Value, parent: parentClass)
+            : new StructToGenerate(name: name, nameSpace: nameSpace, templateName: templateName, parent: parentClass);
+
         return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
     }
 
@@ -240,10 +244,12 @@ internal static class Parser
         while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))
         {
             parentClass = new ParentClass(
-                keyword: parentIdClass.Keyword.ValueText,
-                name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
-                constraints: parentIdClass.ConstraintClauses.ToString(),
-                child: parentClass);
+                Modifiers: parentIdClass.Modifiers.ToString(),
+                Keyword: parentIdClass.Keyword.ValueText,
+                Name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
+                Constraints: parentIdClass.ConstraintClauses.ToString(),
+                Child: parentClass,
+                IsGeneric: parentIdClass.Arity > 0);
 
             parentIdClass = (parentIdClass.Parent as TypeDeclarationSyntax);
         }
@@ -253,6 +259,7 @@ internal static class Parser
         static bool IsAllowedKind(SyntaxKind kind) =>
             kind == SyntaxKind.ClassDeclaration ||
             kind == SyntaxKind.StructDeclaration ||
+            kind == SyntaxKind.RecordStructDeclaration ||
             kind == SyntaxKind.RecordDeclaration;
     }
 }

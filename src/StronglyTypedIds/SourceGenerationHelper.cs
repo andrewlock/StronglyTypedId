@@ -40,10 +40,22 @@ namespace StronglyTypedIds
 {");
             }
 
+            var hasGenericParent = false;
             while (parentClass is { } parent)
             {
+                sb.Append("    ");
+
+                if (!string.IsNullOrEmpty(parent.Modifiers))
+                {
+                    sb.Append(parent.Modifiers).Append(' ');
+                }
+
+                if (parent.Modifiers.IndexOf("partial", StringComparison.Ordinal) == -1)
+                {
+                    sb.Append("partial ");
+                }
+
                 sb
-                    .Append("    partial ")
                     .Append(parent.Keyword)
                     .Append(' ')
                     .Append(parent.Name)
@@ -52,11 +64,15 @@ namespace StronglyTypedIds
                     .AppendLine(@"
     {");
                 parentsCount++;
+                hasGenericParent |= parent.IsGeneric;
                 parentClass = parent.Child;
             }
             
-            // TODO: can't add this if it's a generic class
-            sb.AppendLine("    [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]");
+            if (!hasGenericParent)
+            {
+                sb.AppendLine("    [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]");
+                sb.AppendLine("    [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]");
+            }
 
             sb.AppendLine(template);
 

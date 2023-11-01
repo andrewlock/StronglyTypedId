@@ -30,18 +30,9 @@ internal readonly record struct StructToGenerate
     public ParentClass? Parent { get; }
 }
 
-internal sealed record Result<TValue>
+internal sealed record Result<TValue>(TValue Value, EquatableArray<DiagnosticInfo> Errors)
     where TValue : IEquatable<TValue>?
 {
-    public Result(TValue value, EquatableArray<DiagnosticInfo> errors)
-    {
-        Value = value;
-        Errors = errors;
-    }
-
-    public TValue Value { get; }
-    public EquatableArray<DiagnosticInfo> Errors { get; }
-
     public static Result<(TValue, bool)> Fail()
         => new((default!, false), EquatableArray<DiagnosticInfo>.Empty);
 }
@@ -64,3 +55,5 @@ internal readonly record struct Defaults
     public string? TemplateName { get; }
     public Template? Template { get; }
 }
+
+internal record ParentClass(string Modifiers, string Keyword, string Name, string Constraints, ParentClass? Child, bool IsGeneric);

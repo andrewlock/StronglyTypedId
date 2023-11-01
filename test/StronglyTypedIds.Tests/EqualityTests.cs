@@ -17,7 +17,7 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        ParentClass GetParentClass() => new("struct", "TestName", "where T : class", null);
+        ParentClass GetParentClass() => new(null, "struct", "TestName", "where T : class", null, false);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        ParentClass GetParentClass() => new("struct", "TestName", "where T : class", new ParentClass("class", "b", "", null));
+        ParentClass GetParentClass() => new(null, "struct", "TestName", "where T : class", new ParentClass(null, "class", "b", "", null, false), false);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 templateName: "Guid",
-                parent: new ParentClass("class", "b", "", null));
+                parent: new ParentClass(null, "class", "b", "", null, false));
         }
     }
     
@@ -87,7 +87,7 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 templateName: "Guid",
-                parent: new ParentClass("class", "b", "", null));
+                parent: new ParentClass(null, "class", "b", "", null, false));
 
             return new Result<(StructToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
         }
@@ -109,7 +109,7 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 templateName: "Guid",
-                parent: new ParentClass("class", "b", "", null));
+                parent: new ParentClass(null, "class", "b", "", null, false));
             var diagnostics = new DiagnosticInfo(new DiagnosticDescriptor(
                     InvalidBackingTypeDiagnostic.Id, InvalidBackingTypeDiagnostic.Title, InvalidBackingTypeDiagnostic.Message, category: Constants.Usage,
                     defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true),

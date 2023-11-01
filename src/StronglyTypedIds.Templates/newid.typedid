@@ -1,0 +1,89 @@
+    [System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]
+    readonly partial struct PLACEHOLDERID : INTERFACES
+    {
+        public MassTransit.NewId Value { get; }
+
+        public PLACEHOLDERID(MassTransit.NewId value)
+        {
+            Value = value;
+        }
+
+        public static PLACEHOLDERID New() => new PLACEHOLDERID(MassTransit.NewId.Next());
+        public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(MassTransit.NewId.Empty);
+
+        public bool Equals(PLACEHOLDERID other) => this.Value.Equals(other.Value);
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is PLACEHOLDERID other && Equals(other);
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override string ToString() => Value.ToString();
+        public static bool operator ==(PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
+        public static bool operator !=(PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
+
+        public int CompareTo(PLACEHOLDERID other) => Value.CompareTo(other.Value);
+
+        class PLACEHOLDERIDTypeConverter : System.ComponentModel.TypeConverter
+        {
+            public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            {
+                return sourceType == typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || 
+                       sourceType == typeof(string) || base.CanConvertFrom
+                (context, sourceType);
+            }
+
+            public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+            {
+                return value switch
+                {
+                    MassTransit.NewId newIdValue => new PLACEHOLDERID(newIdValue),
+                    System.Guid guidValue => new PLACEHOLDERID(MassTransit.NewId.FromGuid(guidValue)),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new PLACEHOLDERID(MassTransit.NewId.FromGuid(result)),
+                    _ => base.ConvertFrom(context, culture, value),
+                };
+            }
+
+            public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            {
+                return sourceType == typeof(System.Guid) || sourceType == typeof(MassTransit.NewId) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+            }
+
+            public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+            {
+                if (value is PLACEHOLDERID idValue)
+                {
+                    if (destinationType == typeof(MassTransit.NewId))
+                    {
+                        return idValue.Value;
+                    }
+
+                    if (destinationType == typeof(System.Guid)) 
+                    {
+                        return idValue.Value.ToGuid();
+                    }
+
+                    if (destinationType == typeof(string))
+                    {
+                        return idValue.Value.ToGuid().ToString();
+                    }
+                }
+
+                return base.ConvertTo(context, culture, value, destinationType);
+            }
+        }
+
+        class PLACEHOLDERIDSystemTextJsonConverter : System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
+        {
+            public override PLACEHOLDERID Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+            {
+                return new PLACEHOLDERID(MassTransit.NewId.FromGuid(reader.GetGuid()));
+            }
+
+            public override void Write(System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, System.Text.Json.JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.Value.ToGuid());
+            }
+        }

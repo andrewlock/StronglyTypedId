@@ -21,6 +21,7 @@ internal static partial class EmbeddedSources
         => template switch
         {
             Template.Guid => GuidTemplate,
+            Template.Int => IntTemplate,
             _ => string.Empty,
         };
     

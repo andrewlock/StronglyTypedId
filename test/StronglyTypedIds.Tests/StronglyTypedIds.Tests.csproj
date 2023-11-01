@@ -19,16 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Templates\*.txt" Link="Templates\%(Filename)%(Extension)" />
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Templates\guid.typedid">
-      <Link>Templates\guid.typedid</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Templates\int.typedid">
-      <Link>Templates\int.typedid</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Templates\long.typedid">
-      <Link>Templates\long.typedid</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +31,10 @@
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateVeryNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace.DotNet7_0.received.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Snapshots\" />
   </ItemGroup>
 
 </Project>

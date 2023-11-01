@@ -14,6 +14,7 @@ namespace StronglyTypedIds.Tests
             "StronglyTypedIdBackingType",
             "StronglyTypedIdConverter",
             "StronglyTypedIdImplementations",
+            "Template",
         };
 
         [Theory]

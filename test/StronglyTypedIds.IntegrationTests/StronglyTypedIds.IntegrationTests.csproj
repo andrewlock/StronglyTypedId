@@ -14,6 +14,7 @@
   
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\..\src\StronglyTypedIds\Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />

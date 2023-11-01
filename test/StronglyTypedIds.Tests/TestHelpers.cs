@@ -48,7 +48,7 @@ namespace StronglyTypedIds.Tests
             texts.AddRange(assembly.GetManifestResourceNames()
                 .Select(name => new TestAdditionalText(
                     text: LoadEmbeddedResource(assembly, name),
-                    path: $"C:\\test\\Templates\\{Path.GetExtension(Path.GetFileNameWithoutExtension(name)).Substring(1)}.txt")));
+                    path: $"C:\\test\\Templates\\{Path.GetExtension(Path.GetFileNameWithoutExtension(name)).Substring(1)}.typedid")));
 
             return texts.ToImmutable();
         }

@@ -3,13 +3,14 @@ namespace StronglyTypedIds;
 internal static partial class EmbeddedSources
 {
     private const string GuidTemplate = """
-        partial struct PLACEHOLDERID: global::System.IComparable<PLACEHOLDERID>, global::System.IEquatable<PLACEHOLDERID>, global::System.IFormattable
+        partial struct PLACEHOLDERID :
     #if NET6_0_OR_GREATER
-            ,global::System.ISpanFormattable
-    #if NET7_OR_GREATER
-            global::System.IParsable<PLACEHOLDERID>, global::System.ISpanParsable<PLACEHOLDERID>
+            global::System.ISpanFormattable,
     #endif
+    #if NET7_0_OR_GREATER
+            global::System.IParsable<PLACEHOLDERID>, global::System.ISpanParsable<PLACEHOLDERID>,
     #endif
+        global::System.IComparable<PLACEHOLDERID>, global::System.IEquatable<PLACEHOLDERID>, global::System.IFormattable
         {
             public global::System.Guid Value { get; }
     
@@ -21,7 +22,6 @@ internal static partial class EmbeddedSources
             public static PLACEHOLDERID New() => new PLACEHOLDERID(global::System.Guid.NewGuid());
             public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(global::System.Guid.Empty);
     
-            
             /// <inheritdoc cref="global::System.IEquatable{T}"/>
             public bool Equals(PLACEHOLDERID other) => this.Value.Equals(other.Value);
             public override bool Equals(object? obj)
@@ -57,7 +57,7 @@ internal static partial class EmbeddedSources
                     };
                 }
     
-                public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext context, global::System.Type? sourceType)
+                public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
                 {
                     return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
                 }
