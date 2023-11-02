@@ -216,8 +216,10 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.IsAssignableFrom<IComparable<LongId>>(LongId.Empty);
 
 #pragma warning disable 184
+#pragma warning disable CS0183
             Assert.True(LongId.Empty is IComparable<LongId>);
             Assert.True(LongId.Empty is IEquatable<LongId>);
+#pragma warning restore CS0183
 #pragma warning restore 184
             
 #if NET6_0_OR_GREATER

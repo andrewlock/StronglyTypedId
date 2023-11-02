@@ -120,9 +120,9 @@ internal static partial class EmbeddedSources
                     return false;
                 }
     
-                if (int.TryParse(input, provider, out var guid))
+                if (int.TryParse(input, provider, out var value))
                 {
-                    result = new(guid);
+                    result = new(value);
                     return true;
                 }
     
@@ -134,7 +134,7 @@ internal static partial class EmbeddedSources
             /// <inheritdoc cref="global::System.IFormattable"/>
             public string ToString(
     #if NET7_0_OR_GREATER
-                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat)]
     #endif
                 string? format,
                 global::System.IFormatProvider? formatProvider)
@@ -162,12 +162,12 @@ internal static partial class EmbeddedSources
             public static bool TryParse(global::System.ReadOnlySpan<char> input, global::System.IFormatProvider? provider, out PLACEHOLDERID result)
             {
     #if NET7_0_OR_GREATER
-                if (int.TryParse(input, provider, out var guid))
+                if (int.TryParse(input, provider, out var value))
     #else
-                if (int.TryParse(input, out var guid))
+                if (int.TryParse(input, out var value))
     #endif
                 {
-                    result = new(guid);
+                    result = new(value);
                     return true;
                 }
     
