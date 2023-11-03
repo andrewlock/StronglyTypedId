@@ -14,7 +14,7 @@ namespace StronglyTypedIds.IntegrationTests
             SqlMapper.AddTypeHandler(new ConvertersLongId.DapperTypeHandler());
             SqlMapper.AddTypeHandler(new ConvertersStringId.DapperTypeHandler());
             SqlMapper.AddTypeHandler(new ConvertersNullableStringId.DapperTypeHandler());
-            // SqlMapper.AddTypeHandler(new DapperNewIdId.DapperTypeHandler());
+            SqlMapper.AddTypeHandler(new NewIdId1.DapperTypeHandler());
         }
     }
 }

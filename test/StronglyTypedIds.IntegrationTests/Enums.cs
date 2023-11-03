@@ -30,12 +30,12 @@ partial struct LongId { }
 
 [StronglyTypedId("long-full")]
 partial struct ConvertersLongId { }
-    
-[StronglyTypedId("newid")]
+
+[StronglyTypedId("newid-full")]
 partial struct NewIdId1 { }
 
-[StronglyTypedId("newid")]
-public partial struct NewIdId2 { }
+[StronglyTypedId("newid-full")]
+partial struct NewIdId2 { }
 
 [StronglyTypedId(Template.String)]
 partial struct StringId
