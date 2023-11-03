@@ -60,9 +60,12 @@ partial struct StringId
 [StronglyTypedId("string-full")]
 partial struct ConvertersStringId { }
 
-// [StronglyTypedId(Template.NullableString)]
-// partial struct NullableStringId { }
-//
+[StronglyTypedId(Template.NullableString)]
+partial struct NullableStringId { }
+
+[StronglyTypedId("nullablestring-full")]
+partial struct ConvertersNullableStringId { }
+
 
 // public partial class SomeType<T> where T : new()
 // {

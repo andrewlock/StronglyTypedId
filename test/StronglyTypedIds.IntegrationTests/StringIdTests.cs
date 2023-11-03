@@ -230,12 +230,12 @@ namespace StronglyTypedIds.IntegrationTests
 #pragma warning restore 184
 
 #if NET6_0_OR_GREATER
-            Assert.IsAssignableFrom<ISpanFormattable>(IntId.Empty);
+            Assert.IsAssignableFrom<ISpanFormattable>(StringId.Empty);
 #endif
 #if NET7_0_OR_GREATER
             // doesn't compile if doesn't implement it 
-            ParseAs<IntId>("123");
-            ParseSpan<IntId>("123".AsSpan());
+            ParseAs<StringId>("123");
+            ParseSpan<StringId>("123".AsSpan());
 
             T ParseAs<T>(string s) where T : IParsable<T>
             {

@@ -24,6 +24,7 @@ internal static partial class EmbeddedSources
             Template.Int => IntTemplate,
             Template.Long => LongTemplate,
             Template.String => StringTemplate,
+            Template.NullableString => NullableStringTemplate,
             _ => string.Empty,
         };
     
