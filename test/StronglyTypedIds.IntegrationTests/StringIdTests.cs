@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -103,6 +105,40 @@ namespace StronglyTypedIds.IntegrationTests
 
             Assert.Equal(serializedFoo, serializedString);
         }
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider()
+        {
+            var value = new TypeWithDictionaryKeys()
+            {
+                Values = new()
+            };
+
+            var key = new StringId("78104553-f1cd-41ec-bcb6-d3a8ff8d994d");
+            value.Values.Add(key, "My Value");
+            var opts = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            var serialized = SystemTextJsonSerializer.Serialize(value, opts);
+
+            var expected = $$"""
+                             {
+                               "values": {
+                                 "78104553-f1cd-41ec-bcb6-d3a8ff8d994d": "My Value"
+                               }
+                             }
+                             """;
+            Assert.Equal(serialized, expected);
+
+            var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
+
+            Assert.NotNull(deserialized.Values);
+            Assert.True(deserialized.Values.ContainsKey(key));
+            Assert.Equal("My Value", deserialized.Values[key]);
+        }
+#endif
 
         [Fact]
         public void CanDeserializeFromString_WithNewtonsoftJsonProvider()
@@ -336,6 +372,11 @@ namespace StronglyTypedIds.IntegrationTests
         internal class EntityWithNullableId
         {
             public ConvertersStringId? Id { get; set; }
+        }
+
+        internal class TypeWithDictionaryKeys
+        {
+            public Dictionary<StringId, string> Values { get; set; }
         }
     }
 }

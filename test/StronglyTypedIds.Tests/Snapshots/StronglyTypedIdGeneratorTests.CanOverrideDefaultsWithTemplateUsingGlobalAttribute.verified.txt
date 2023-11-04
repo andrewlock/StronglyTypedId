@@ -411,7 +411,7 @@ namespace StronglyTypedIds
 
 #if NET6_0_OR_GREATER
             public override MyId ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                => new(reader.GetInt32());
+                => new(int.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the MyId property was null")));
 
             public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
                 => writer.WritePropertyName(value.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture));

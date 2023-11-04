@@ -93,7 +93,7 @@ internal static partial class EmbeddedSources
     
     #if NET6_0_OR_GREATER
                 public override PLACEHOLDERID ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                    => new(reader.GetInt32());
+                    => new(int.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the PLACEHOLDERID property was null")));
     
                 public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                     => writer.WritePropertyName(value.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture));

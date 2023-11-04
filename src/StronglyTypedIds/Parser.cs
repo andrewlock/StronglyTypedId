@@ -243,9 +243,18 @@ internal static class Parser
 
         while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))
         {
+            var keyword = parentIdClass is RecordDeclarationSyntax record
+                ? record.ClassOrStructKeyword.Kind() switch
+                {
+                    SyntaxKind.StructKeyword => "record struct",
+                    SyntaxKind.ClassKeyword => "record class",
+                    _ => "record",
+                }
+                : parentIdClass.Keyword.ValueText;
+
             parentClass = new ParentClass(
                 Modifiers: parentIdClass.Modifiers.ToString(),
-                Keyword: parentIdClass.Keyword.ValueText,
+                Keyword: keyword,
                 Name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
                 Constraints: parentIdClass.ConstraintClauses.ToString(),
                 Child: parentClass,

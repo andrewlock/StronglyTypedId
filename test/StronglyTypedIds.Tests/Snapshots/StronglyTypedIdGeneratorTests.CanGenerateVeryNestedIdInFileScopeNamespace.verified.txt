@@ -325,7 +325,7 @@ namespace SomeNamespace
     {
     internal partial record InnerClass 
     {
-    public readonly partial record InnerStruct 
+    public readonly partial record struct InnerStruct 
     {
     [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
     [global::System.Text.Json.Serialization.JsonConverter(typeof(MyIdSystemTextJsonConverter))]
@@ -420,7 +420,7 @@ namespace SomeNamespace
 
 #if NET6_0_OR_GREATER
             public override MyId ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                => new(global::System.Guid.Parse(reader.GetString()!));
+                => new(global::System.Guid.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the MyId property was null")));
 
             public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
                 => writer.WritePropertyName(value.Value.ToString());

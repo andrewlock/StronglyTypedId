@@ -66,18 +66,17 @@ partial struct NullableStringId { }
 [StronglyTypedId("nullablestring-full")]
 partial struct ConvertersNullableStringId { }
 
+public partial class SomeType<T> where T : new()
+{
+    public partial record struct NestedType<TKey, TValue>
+    {
+        public partial struct MoreNesting
+        {
+            [StronglyTypedId]
+            public readonly partial struct VeryNestedId
+            {
+            }
+        }
+    }
+}
 
-// public partial class SomeType<T> where T : new()
-// {
-//     public partial record struct NestedType<TKey, TValue>
-//     {
-//         public partial struct MoreNesting
-//         {
-//             [StronglyTypedId]
-//             public readonly partial struct VeryNestedIds
-//             {
-//             }
-//         }
-//     }
-// }
-//

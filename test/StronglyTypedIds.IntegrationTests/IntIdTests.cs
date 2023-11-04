@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -97,6 +99,40 @@ public class IntIdTests
 
         Assert.Equal(serializedFoo, serializedInt);
     }
+
+#if NET6_0_OR_GREATER
+    [Fact]
+    public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider()
+    {
+        var value = new TypeWithDictionaryKeys()
+        {
+            Values = new()
+        };
+        var key = new IntId(123);
+        value.Values.Add(key, "My Value");
+        var opts = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
+        var serialized = SystemTextJsonSerializer.Serialize(value, opts);
+
+        var expected = $$"""
+                         {
+                           "values": {
+                             "123": "My Value"
+                           }
+                         }
+                         """;
+        Assert.Equal(serialized, expected);
+
+        var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
+
+        Assert.NotNull(deserialized.Values);
+        Assert.True(deserialized.Values.ContainsKey(key));
+        Assert.Equal("My Value", deserialized.Values[key]);
+    }
+#endif
 
     [Fact]
     public void CanDeserializeFromInt_WithNewtonsoftJsonProvider()
@@ -326,5 +362,10 @@ public class IntIdTests
     internal class EntityWithNullableId
     {
         public ConvertersIntId? Id { get; set; }
+    }
+
+    internal class TypeWithDictionaryKeys
+    {
+        public Dictionary<IntId, string> Values { get; set; }
     }
 }
