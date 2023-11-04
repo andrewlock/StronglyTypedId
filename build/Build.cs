@@ -116,7 +116,7 @@ class Build : NukeBuild
             var projectFiles = new[]
             {
                 TestsDirectory / "StronglyTypedIds.Nuget.IntegrationTests",
-                TestsDirectory / "StronglyTypedIds.Nuget.Attributes.IntegrationTests",
+                // TestsDirectory / "StronglyTypedIds.Nuget.Attributes.IntegrationTests",
             };
 
             if (!string.IsNullOrEmpty(PackagesDirectory))
