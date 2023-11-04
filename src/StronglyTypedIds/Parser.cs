@@ -39,7 +39,7 @@ internal static class Parser
                 continue;
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName);
+            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, ref diagnostics);
         }
 
         var hasPartialModifier = false;
@@ -114,7 +114,7 @@ internal static class Parser
                 continue;
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName);
+            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, ref diagnostics);
 
             if (hasMisconfiguredInput)
             {
@@ -139,23 +139,22 @@ internal static class Parser
         return new Result<(Defaults, bool)>((defaults, true), errors);
     }
 
-    private static bool GetConstructorValues(AttributeData attribute, out Template? template, out string? templateName)
+    private static bool GetConstructorValues(AttributeData attribute, out Template? template, out string? templateName, ref List<DiagnosticInfo>? diagnostics)
     {
         var hasMisconfiguredInput = false;
         template = null;
         templateName = null;
 
-        if (!attribute.ConstructorArguments.IsEmpty)
+        if (attribute.ConstructorArguments is { IsEmpty: false } args)
         {
             // make sure we don't have any errors
-            ImmutableArray<TypedConstant> args = attribute.ConstructorArguments;
-
             foreach (TypedConstant arg in args)
             {
                 if (arg.Kind == TypedConstantKind.Error)
                 {
                     // have an error, so don't try and do any generation
                     hasMisconfiguredInput = true;
+                    break;
                 }
             }
 
@@ -168,15 +167,20 @@ internal static class Parser
                 templateName = args[0].Value as string;
                 if (string.IsNullOrWhiteSpace(templateName))
                 {
-                    // TODO: add diagnostic
+                    if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+                    {
+                        diagnostics ??= new();
+                        diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
+                    }
+
                     hasMisconfiguredInput = true;
                 }
             }
         }
 
-        if (!attribute.NamedArguments.IsEmpty)
+        if (attribute.NamedArguments is { IsEmpty: false } namedArgs)
         {
-            foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
+            foreach (KeyValuePair<string, TypedConstant> arg in namedArgs)
             {
                 TypedConstant typedConstant = arg.Value;
                 if (typedConstant.Kind == TypedConstantKind.Error)
@@ -194,7 +198,12 @@ internal static class Parser
                     templateName = typedConstant.Value as string;
                     if (string.IsNullOrWhiteSpace(templateName))
                     {
-                        // TODO: add diagnostic
+                        if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+                        {
+                            diagnostics ??= new();
+                            diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
+                        }
+
                         hasMisconfiguredInput = true;
                     }
                 }
