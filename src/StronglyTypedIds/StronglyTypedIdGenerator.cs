@@ -23,9 +23,6 @@ namespace StronglyTypedIds
             {
                 i.AddSource("StronglyTypedIdAttribute.g.cs", EmbeddedSources.StronglyTypedIdAttributeSource);
                 i.AddSource("StronglyTypedIdDefaultsAttribute.g.cs", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
-                i.AddSource("StronglyTypedIdBackingType.g.cs", EmbeddedSources.StronglyTypedIdBackingTypeSource);
-                i.AddSource("StronglyTypedIdConverter.g.cs", EmbeddedSources.StronglyTypedIdConverterSource);
-                i.AddSource("StronglyTypedIdImplementations.g.cs", EmbeddedSources.StronglyTypedIdImplementationsSource);
                 i.AddSource("Template.g.cs", EmbeddedSources.TemplateSource);
             });
 

@@ -11,9 +11,6 @@ namespace StronglyTypedIds.Tests
         {
             "StronglyTypedIdAttribute",
             "StronglyTypedIdDefaultsAttribute",
-            "StronglyTypedIdBackingType",
-            "StronglyTypedIdConverter",
-            "StronglyTypedIdImplementations",
             "Template",
         };
 
@@ -21,7 +18,7 @@ namespace StronglyTypedIds.Tests
         [MemberData(nameof(EmbeddedResources))]
         public Task EmittedResourceIsSameAsCompiledResource(string resource)
         {
-            var embedded = EmbeddedSources.LoadTemplateForEmitting(resource);
+            var embedded = EmbeddedSources.LoadAttributeTemplateForEmitting(resource);
 
             return Verifier.Verify(embedded)
                 .UseDirectory("Snapshots")

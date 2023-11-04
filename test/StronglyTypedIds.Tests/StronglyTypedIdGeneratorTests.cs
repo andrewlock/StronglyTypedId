@@ -81,7 +81,7 @@ public partial struct MyId {}";
                 using StronglyTypedIds;
                 namespace SomeNamespace
                 {
-                    [StronglyTypedId("newid")]
+                    [StronglyTypedId("newid-full")]
                     public partial struct MyId {}
                 }
                 """;
@@ -207,7 +207,7 @@ public class ParentClass<T>
         {
             const string input = """
                 using StronglyTypedIds;
-                [assembly:StronglyTypedIdDefaults("newid")]
+                [assembly:StronglyTypedIdDefaults("newid-full")]
                 
                 [StronglyTypedId]
                 public partial struct MyId {}

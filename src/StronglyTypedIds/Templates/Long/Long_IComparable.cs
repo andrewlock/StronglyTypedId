@@ -1,1 +1,0 @@
-﻿        public int CompareTo(TESTID other) => Value.CompareTo(other.Value);
