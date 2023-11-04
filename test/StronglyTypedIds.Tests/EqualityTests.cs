@@ -111,7 +111,7 @@ public class EqualityTests
                 templateName: "Guid",
                 parent: new ParentClass(null, "class", "b", "", null, false));
             var diagnostics = new DiagnosticInfo(new DiagnosticDescriptor(
-                    InvalidBackingTypeDiagnostic.Id, InvalidBackingTypeDiagnostic.Title, InvalidBackingTypeDiagnostic.Message, category: Constants.Usage,
+                    NotPartialDiagnostic.Id, NotPartialDiagnostic.Title, NotPartialDiagnostic.Message, category: Constants.Usage,
                     defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true),
                 Location.Create("somepath.cs", new TextSpan(), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
 
