@@ -24,7 +24,10 @@ internal static partial class EmbeddedSources
             Template.NullableString => NullableStringTemplate,
             _ => string.Empty,
         };
-    
+
+    internal static string LoadEmbeddedTypedId(string templateName)
+        => LoadEmbeddedResource($"StronglyTypedIds.Templates.{templateName}");
+
     internal static string LoadEmbeddedResource(string resourceName)
     {
         var resourceStream = ThisAssembly.GetManifestResourceStream(resourceName);
