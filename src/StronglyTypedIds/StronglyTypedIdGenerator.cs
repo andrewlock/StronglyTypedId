@@ -94,7 +94,7 @@ namespace StronglyTypedIds
                     if (defaults.Template is { } templateId)
                     {
                         // Explicit template
-                        return (EmbeddedSources.GetTemplate(templateId), true, true, (DiagnosticInfo?) null);
+                        return ((string?) EmbeddedSources.GetTemplate(templateId), true, true, (DiagnosticInfo?) null);
                     }
 
                     // We have already checked for a null template name and flagged it as an error
