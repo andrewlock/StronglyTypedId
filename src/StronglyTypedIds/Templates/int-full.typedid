@@ -1,3 +1,5 @@
+    [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]
+    [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]
     [global::Newtonsoft.Json.JsonConverter(typeof(PLACEHOLDERIDNewtonsoftJsonConverter))]
     partial struct PLACEHOLDERID :
 #if NET6_0_OR_GREATER

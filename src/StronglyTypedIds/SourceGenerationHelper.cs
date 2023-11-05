@@ -9,14 +9,8 @@ namespace StronglyTypedIds
             string idNamespace,
             string idName,
             ParentClass? parentClass,
-            string template)
-            => CreateId(idNamespace, idName, parentClass, template, null);
-
-        public static string CreateId(
-            string idNamespace,
-            string idName,
-            ParentClass? parentClass,
             string template,
+            bool addDefaultAttributes,
             StringBuilder? sb)
         {
             if (string.IsNullOrEmpty(idName))
@@ -68,7 +62,7 @@ namespace StronglyTypedIds
                 parentClass = parent.Child;
             }
             
-            if (!hasGenericParent)
+            if (addDefaultAttributes && !hasGenericParent)
             {
                 sb.AppendLine("    [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]");
                 sb.AppendLine("    [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]");

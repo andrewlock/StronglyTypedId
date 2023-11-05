@@ -54,17 +54,17 @@ namespace StronglyTypedIds
 
             context.RegisterSourceOutput(
                 structAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(Diagnostic.Create(info.Descriptor, info.Location)));
+                static (context, info) => context.ReportDiagnostic(info));
 
             context.RegisterSourceOutput(
                 defaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(Diagnostic.Create(info.Descriptor, info.Location)));
+                static (context, info) => context.ReportDiagnostic(info));
 
             IncrementalValuesProvider<StructToGenerate> structs = structAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.info);
 
-            IncrementalValueProvider<(string? Content, bool isValid, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
+            IncrementalValueProvider<(string? Content, bool isValid, bool IsBuiltIn, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
@@ -74,27 +74,27 @@ namespace StronglyTypedIds
                     if (all.Left.IsDefaultOrEmpty)
                     {
                         // no default attributes, valid, but no content
-                        return (null, true, null);
+                        return (null, true, true, null);
                     }
 
                     // technically we can never have more than one `Defaults` here
                     // but check for it just in case
                     if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
                     {
-                        return (null, false, null);
+                        return (null, false, true, null);
                     }
 
                     var defaults = all.Left[0];
                     if (defaults.HasMultiple)
                     {
                         // not valid
-                        return (null, false, null);
+                        return (null, false, true, null);
                     }
 
                     if (defaults.Template is { } templateId)
                     {
                         // Explicit template
-                        return (EmbeddedSources.GetTemplate(templateId), true, (DiagnosticInfo?) null);
+                        return (EmbeddedSources.GetTemplate(templateId), true, true, (DiagnosticInfo?) null);
                     }
 
                     // We have already checked for a null template name and flagged it as an error
@@ -106,16 +106,16 @@ namespace StronglyTypedIds
                             if (string.Equals(templateDetails.Name, defaultsTemplateName, StringComparison.Ordinal))
                             {
                                 // This _could_ be empty, but we use it anyway (and add a comment in the template)
-                                return (templateDetails.Content ?? GetEmptyTemplateContent(defaultsTemplateName!), true, null);
+                                return (templateDetails.Content ?? GetEmptyTemplateContent(defaultsTemplateName!), true, false, null);
                             }
                         }
                     
                         // Template name specified, but we don't have a template for it
-                        return (null, false, UnknownTemplateDiagnostic.CreateInfo(defaults!.TemplateLocation!, defaultsTemplateName!));
+                        return (null, false, true, UnknownTemplateDiagnostic.CreateInfo(defaults.TemplateLocation!, defaultsTemplateName!));
                     }
             
                     // only get here if the template name was null/empty, which is already reported
-                    return (null, false, null);
+                    return (null, false, true, null);
                 });
 
             var structsWithDefaultsAndTemplates = structs
@@ -129,17 +129,17 @@ namespace StronglyTypedIds
         private static void Execute(
             StructToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
-            (string? Content, bool IsValid, DiagnosticInfo? Diagnostics) defaults, 
+            (string? Content, bool IsValid, bool IsBuiltInTemplate, DiagnosticInfo? Diagnostics) defaults, 
             SourceProductionContext context)
         {
             var sb = new StringBuilder();
             if (defaults.Diagnostics is { } diagnostic)
             {
                 // report error with the default template
-                context.ReportDiagnostic(Diagnostic.Create(diagnostic.Descriptor, diagnostic.Location));
+                context.ReportDiagnostic(diagnostic);
             }
 
-            if (!TryGetTemplateContent(idToGenerate, templates, defaults.IsValid, defaults.Content, context, out var templateContent))
+            if (!TryGetTemplateContent(idToGenerate, templates, defaults, in context, out var templateContent, out var addDefaultAttributes))
             {
                 return;
             }
@@ -149,6 +149,7 @@ namespace StronglyTypedIds
                 idToGenerate.Name,
                 idToGenerate.Parent,
                 templateContent,
+                addDefaultAttributes,
                 sb);
 
             var fileName = SourceGenerationHelper.CreateSourceName(
@@ -161,15 +162,16 @@ namespace StronglyTypedIds
         private static bool TryGetTemplateContent(
             in StructToGenerate idToGenerate,
             in ImmutableArray<(string Path, string Name, string? Content)> templates,
-            bool haveValidDefault,
-            string? defaultContent,
+            (string? Content, bool IsValid, bool IsBuiltInTemplate, DiagnosticInfo? Diagnostics) defaults,
             in SourceProductionContext context,
-            [NotNullWhen(true)] out string? templateContent)
+            [NotNullWhen(true)] out string? templateContent,
+            out bool addDefaultAttributes)
         {
             // built-in template specified
             if (idToGenerate.Template is { } templateId)
             {
                 templateContent = EmbeddedSources.GetTemplate(templateId);
+                addDefaultAttributes = true;
                 return true;
             }
 
@@ -181,25 +183,38 @@ namespace StronglyTypedIds
                     if (string.Equals(templateDetails.Name, idToGenerate.TemplateName, StringComparison.Ordinal))
                     {
                         templateContent = templateDetails.Content ?? GetEmptyTemplateContent(idToGenerate.TemplateName!);
+                        addDefaultAttributes = false;
                         return true;
                     }
                 }
 
                 // the template wasn't found, so it must be invalid. Don't generate anything
                 var info = UnknownTemplateDiagnostic.CreateInfo(idToGenerate.TemplateLocation!, idToGenerate.TemplateName!);
-                context.ReportDiagnostic(Diagnostic.Create(info.Descriptor, info.Location));
+                context.ReportDiagnostic(info);
                 templateContent = null;
+                addDefaultAttributes = false;
                 return false;
             }
 
             // nothing specified, use the default (if we have one)
-            if (haveValidDefault)
+            if (defaults.IsValid)
             {
-                templateContent = defaultContent ?? EmbeddedSources.GetTemplate(Template.Guid);
+                if (defaults.Content is { } content)
+                {
+                    templateContent = content;
+                    addDefaultAttributes = defaults.IsBuiltInTemplate;
+                }
+                else
+                {
+                    templateContent = EmbeddedSources.GetTemplate(Template.Guid);
+                    addDefaultAttributes = true;
+                }
+
                 return true;
             }
 
             templateContent = null;
+            addDefaultAttributes = true;
             return false;
         }
 

@@ -67,6 +67,11 @@ internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnu
         return _array.AsSpan();
     }
 
+    /// <summary>
+    /// Gets the underlying array if there is one
+    /// </summary>
+    public T[]? GetArray() => _array;
+
     /// <sinheritdoc/>
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
