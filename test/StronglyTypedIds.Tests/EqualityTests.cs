@@ -47,7 +47,26 @@ public class EqualityTests
             new(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
+                template: Template.Guid,
+                parent: null);
+    }
+    
+    [Fact]
+    public void StructToGenerateWithTemplateAndLocationHasExpectedEqualityBehaviour()
+    {
+        var instance1 = GetStruct();
+        var instance2 = GetStruct();
+
+        Assert.Equal(instance1, instance2);
+        Assert.True(instance1.Equals(instance2));
+        Assert.True(instance1 == instance2);
+
+        StructToGenerate GetStruct() =>
+            new(
+                name: "MyStruct",
+                nameSpace: "MyNamespace",
                 templateName: "Guid",
+                templateLocation: new LocationInfo("Some path", new TextSpan(0, 100), new LinePositionSpan(new LinePosition(23, 2), new LinePosition(23, 15))),
                 parent: null);
     }
 
@@ -66,7 +85,7 @@ public class EqualityTests
             return new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                templateName: "Guid",
+                template: Template.Guid,
                 parent: new ParentClass(null, "class", "b", "", null, false));
         }
     }
@@ -86,7 +105,7 @@ public class EqualityTests
             var instance = new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                templateName: "Guid",
+                template: Template.Guid,
                 parent: new ParentClass(null, "class", "b", "", null, false));
 
             return new Result<(StructToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
@@ -108,7 +127,7 @@ public class EqualityTests
             var instance = new StructToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                templateName: "Guid",
+                template: Template.Guid,
                 parent: new ParentClass(null, "class", "b", "", null, false));
             var diagnostics = new DiagnosticInfo(new DiagnosticDescriptor(
                     NotPartialDiagnostic.Id, NotPartialDiagnostic.Title, NotPartialDiagnostic.Message, category: Constants.Usage,

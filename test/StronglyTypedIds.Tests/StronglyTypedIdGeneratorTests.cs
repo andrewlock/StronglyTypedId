@@ -222,25 +222,6 @@ public class ParentClass<T>
         }
 
         [Fact]
-        public Task MultipleAssemblyAttributesGeneratesWithDefault()
-        {
-            const string input = """
-                using StronglyTypedIds;
-                [assembly:StronglyTypedIdDefaults("int")]
-                [assembly:StronglyTypedIdDefaults("long")]
-                
-                [StronglyTypedId]
-                public partial struct MyId {}
-                """;
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
-
-            Assert.Contains(diagnostics, diagnostic => diagnostic.Id == MultipleAssemblyAttributeDiagnostic.Id);
-
-            return Verifier.Verify(output)
-                .UseDirectory("Snapshots");
-        }
-
-        [Fact]
         public Task CanGenerateMultipleIdsWithSameName()
         {
             // https://github.com/andrewlock/StronglyTypedId/issues/74

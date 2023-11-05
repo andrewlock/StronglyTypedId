@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -28,6 +26,7 @@ internal static class Parser
         List<DiagnosticInfo>? diagnostics = null;
         Template? template = null;
         string? templateName = null;
+        LocationInfo? templateLocation = null;
 
         foreach (AttributeData attribute in structSymbol.GetAttributes())
         {
@@ -39,7 +38,7 @@ internal static class Parser
                 continue;
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, ref diagnostics);
+            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, out templateLocation, ref diagnostics);
         }
 
         var hasPartialModifier = false;
@@ -73,7 +72,7 @@ internal static class Parser
 
         var toGenerate = template.HasValue
             ? new StructToGenerate(name: name, nameSpace: nameSpace, template: template.Value, parent: parentClass)
-            : new StructToGenerate(name: name, nameSpace: nameSpace, templateName: templateName, parent: parentClass);
+            : new StructToGenerate(name: name, nameSpace: nameSpace, templateName: templateName, templateLocation: templateLocation!, parent: parentClass);
 
         return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
     }
@@ -90,9 +89,13 @@ internal static class Parser
         // We only return the first config that we find
         string? templateName = null;
         Template? template = null;
+        LocationInfo? templateLocation = null;
         List<DiagnosticInfo>? diagnostics = null;
         bool hasMisconfiguredInput = false;
+        bool hasMultiple = false;
 
+        // if we have multiple attributes we still check them, so that we can add extra diagnostics if necessary
+        // the "first" one found won't be flagged as a duplicate though.
         foreach (AttributeData attribute in assemblyAttributes)
         {
             if (!((attribute.AttributeClass?.Name == "StronglyTypedIdDefaultsAttribute" ||
@@ -105,22 +108,15 @@ internal static class Parser
 
             if (!string.IsNullOrWhiteSpace(templateName) || template.HasValue)
             {
+                hasMultiple = true;
                 if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
                 {
                     diagnostics ??= new();
                     diagnostics.Add(MultipleAssemblyAttributeDiagnostic.CreateInfo(s));
                 }
-
-                continue;
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, ref diagnostics);
-
-            if (hasMisconfiguredInput)
-            {
-                // skip further generator execution and let compiler generate the errors
-                break;
-            }
+            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, out templateLocation, ref diagnostics);
         }
 
         var errors = diagnostics is null
@@ -133,17 +129,18 @@ internal static class Parser
         }
 
         var defaults = template.HasValue
-            ? new Defaults(template.Value)
-            : new Defaults(templateName!);
+            ? new Defaults(template.Value, hasMultiple)
+            : new Defaults(templateName!, templateLocation!, hasMultiple);
 
         return new Result<(Defaults, bool)>((defaults, true), errors);
     }
 
-    private static bool GetConstructorValues(AttributeData attribute, out Template? template, out string? templateName, ref List<DiagnosticInfo>? diagnostics)
+    private static bool GetConstructorValues(AttributeData attribute, out Template? template, out string? templateName, out LocationInfo? templateLocation, ref List<DiagnosticInfo>? diagnostics)
     {
         var hasMisconfiguredInput = false;
         template = null;
         templateName = null;
+        templateLocation = null;
 
         if (attribute.ConstructorArguments is { IsEmpty: false } args)
         {
@@ -165,15 +162,23 @@ internal static class Parser
             else
             {
                 templateName = args[0].Value as string;
+                var syntaxNode = attribute.ApplicationSyntaxReference?.GetSyntax(); 
                 if (string.IsNullOrWhiteSpace(templateName))
                 {
-                    if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+                    if (syntaxNode is { } s)
                     {
                         diagnostics ??= new();
                         diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
                     }
 
                     hasMisconfiguredInput = true;
+                }
+                else
+                {
+                    if (syntaxNode is { } s)
+                    {
+                        templateLocation = LocationInfo.CreateFrom(s);
+                    }
                 }
             }
         }
@@ -196,15 +201,23 @@ internal static class Parser
                 else
                 {
                     templateName = typedConstant.Value as string;
+                    var syntaxNode = attribute.ApplicationSyntaxReference?.GetSyntax(); 
                     if (string.IsNullOrWhiteSpace(templateName))
                     {
-                        if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+                        if (syntaxNode is { } s)
                         {
                             diagnostics ??= new();
                             diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
                         }
 
                         hasMisconfiguredInput = true;
+                    }
+                    else
+                    {
+                        if (syntaxNode is { } s)
+                        {
+                            templateLocation = LocationInfo.CreateFrom(s);
+                        }
                     }
                 }
 
