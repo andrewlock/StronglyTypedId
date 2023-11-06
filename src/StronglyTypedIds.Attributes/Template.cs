@@ -24,6 +24,5 @@ namespace StronglyTypedIds
         Int,
         String,
         Long,
-        NullableString,
     }
 }
