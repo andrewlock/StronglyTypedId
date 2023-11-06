@@ -16,6 +16,6 @@ internal static class UnknownTemplateDiagnostic
 
     public static DiagnosticDescriptor CreateDescriptor()
         => new(
-            Id, Title, "Could not find '{0}.typedid' template. Ensure the template exists and has a build action of 'Additional Files'.",
-            category: Constants.Usage, defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            Id, Title, "Could not find '{0}.typedid' template. Ensure the template exists in the project and has a build action of 'Additional Files'.",
+            category: Constants.Usage, defaultSeverity: DiagnosticSeverity.Error, isEnabledByDefault: true);
 }
