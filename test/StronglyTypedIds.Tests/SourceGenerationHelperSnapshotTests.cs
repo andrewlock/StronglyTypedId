@@ -95,7 +95,7 @@ namespace StronglyTypedIds.Tests
             // combine them all
             var combinedConverter = EnumHelper.AllConverters(includeDefault: false)
                 .Aggregate(StronglyTypedIdConverter.None, (prev, current) => prev | current);
-
+            
             // combine them all
             var combinedImplementation = EnumHelper.AllImplementations(includeDefault: false)
                 .Aggregate(StronglyTypedIdImplementations.None, (prev, current) => prev | current);

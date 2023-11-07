@@ -57,5 +57,10 @@ namespace StronglyTypedIds
         /// </summary>
         AutoMapper = 128,
 
+        /// <summary>
+        /// Creates a LinqToDb bidirectional converters
+        /// </summary>
+        LinqToDb = 256,
+
     }
 }

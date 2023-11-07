@@ -1,22 +1,9 @@
 <Project>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0'">
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0*" />
     <PackageReference Include="System.Text.Json" Version="7.0.0*" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.12" />
-    <PackageReference Include="System.Text.Json" Version="6.0.7" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />    
-  </ItemGroup>
-
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) OR '$(TargetFramework)' == 'net48'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.17" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
   <ItemGroup>

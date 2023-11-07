@@ -10,7 +10,7 @@
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types")]
-    readonly partial struct MyTestId : System.IEquatable<MyTestId>
+    readonly partial struct MyTestId : System.IEquatable<MyTestId>, StronglyTypedIds.IInternalStronglyTypedId<System.Guid>
     {
         public System.Guid Value { get; }
 

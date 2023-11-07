@@ -29,7 +29,7 @@
 
         public decimal ToDecimal(System.IFormatProvider? provider)
         {
-            throw new System.NotImplementedException();
+            return (decimal)Value;
         }
 
         public double ToDouble(System.IFormatProvider? provider)
