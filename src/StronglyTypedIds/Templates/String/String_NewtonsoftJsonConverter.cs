@@ -16,7 +16,7 @@
             {
                 if (objectType == typeof(TESTID?))
                 {
-                    var value = serializer.Deserialize<string?>(reader);
+                    var value = serializer.Deserialize<string>(reader);
 
                     return value is null ? null : new TESTID(value);
                 }

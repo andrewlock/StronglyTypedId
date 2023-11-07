@@ -1,4 +1,5 @@
-﻿    readonly partial struct TESTID : INTERFACES
+﻿    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types")]
+    readonly partial struct TESTID : INTERFACES
     {
         public string? Value { get; }
 
@@ -27,5 +28,6 @@
 
         public override int GetHashCode() => Value?.GetHashCode() ?? 0;
         public override string? ToString() => Value;
+
         public static bool operator ==(TESTID a, TESTID b) => a.Equals(b);
         public static bool operator !=(TESTID a, TESTID b) => !(a == b);

@@ -1,3 +1,5 @@
+using System;
+
 namespace StronglyTypedIds;
 
 internal class ParentClass

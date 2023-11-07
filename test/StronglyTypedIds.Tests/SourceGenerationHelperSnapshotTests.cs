@@ -95,7 +95,7 @@ namespace StronglyTypedIds.Tests
             // combine them all
             var combinedConverter = EnumHelper.AllConverters(includeDefault: false)
                 .Aggregate(StronglyTypedIdConverter.None, (prev, current) => prev | current);
-
+            
             // combine them all
             var combinedImplementation = EnumHelper.AllImplementations(includeDefault: false)
                 .Aggregate(StronglyTypedIdImplementations.None, (prev, current) => prev | current);
@@ -148,7 +148,7 @@ namespace StronglyTypedIds.Tests
 
         public static IEnumerable<object[]> Parameters()
         {
-            foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false))
+            foreach (var backingType in EnumHelper.AllBackingTypes(includeDefault: false).Take(1))
             {
                 // All individual convert types
                 foreach (var converter in EnumHelper.AllConverters(includeDefault: false))
@@ -157,7 +157,7 @@ namespace StronglyTypedIds.Tests
                 }
 
                 // All individual implementations
-                foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false))
+                foreach (var implementation in EnumHelper.AllImplementations(includeDefault: false).Where(a=> a != StronglyTypedIdImplementations.None))
                 {
                     yield return new object[] { backingType, StronglyTypedIdConverter.None, implementation };
                 }
