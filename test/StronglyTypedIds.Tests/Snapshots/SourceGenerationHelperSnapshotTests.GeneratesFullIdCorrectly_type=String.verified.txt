@@ -240,6 +240,26 @@
 #endif
 
 
+#if !FAKE_CODE
+public static void UseLinqToDbConverter(LinqToDB.DataOptions opts)
+{
+    var mappingSchema = new LinqToDB.Mapping.MappingSchema();
+
+    mappingSchema.SetDataType(typeof(MyTestId), LinqToDB.DataType.VarChar);
+    mappingSchema
+        .SetConvertExpression<MyTestId, LinqToDB.Data.DataParameter>(a => new LinqToDB.Data.DataParameter() { DataType = LinqToDB.DataType.VarChar, Value = a.Value});
+
+    LinqToDB.DataOptionsExtensions.UseMappingSchema(opts, mappingSchema);
+}
+
+public static MyTestId op_Implicit(string value)
+{
+    return new MyTestId(value);
+}
+
+#endif
+
+
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)

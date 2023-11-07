@@ -103,7 +103,7 @@
 
         public decimal ToDecimal(System.IFormatProvider? provider)
         {
-            throw new System.NotImplementedException();
+            return (decimal)Value;
         }
 
         public double ToDouble(System.IFormatProvider? provider)
@@ -219,6 +219,25 @@
                 return source.Value;
             }
         }
+#endif
+
+
+#if !FAKE_CODE
+public static void UseLinqToDbConverter(LinqToDB.DataOptions opts)
+{
+    var mappingSchema = new LinqToDB.Mapping.MappingSchema();
+
+    mappingSchema.SetDataType(typeof(MyTestId), LinqToDB.DataType.Decimal);
+    mappingSchema
+        .SetConvertExpression<MyTestId, LinqToDB.Data.DataParameter>(a => new LinqToDB.Data.DataParameter() { DataType = LinqToDB.DataType.Decimal, Value = a.Value});
+
+    LinqToDB.DataOptionsExtensions.UseMappingSchema(opts, mappingSchema);
+}
+
+public static MyTestId op_Implicit(decimal value)
+{
+    return new MyTestId((long)value);
+}
 #endif
 
 

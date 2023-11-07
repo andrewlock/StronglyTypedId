@@ -220,6 +220,11 @@
 #endif
 
 
+#if !FAKE_CODE
+
+#endif
+
+
         class MyTestIdTypeConverter : System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
