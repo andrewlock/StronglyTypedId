@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="StronglyTypedId" Version="$(Version)" ExcludeAssets="compile;runtime" PrivateAssets="all" />
+    <PackageReference Include="StronglyTypedId.Templates" Version="$(Version)" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />

@@ -245,3 +245,6 @@ ModelManifest.xml
 .fake/
 tools/*
 !tools/packages.config
+
+# NuGet testing
+globalPackagesFolder

@@ -24,7 +24,10 @@
     <Compile Update="EmbeddedSources.*.cs" DependentUpon="EmbeddedSources.cs" />
     <Compile Remove="Templates\**\*.cs" />
     <EmbeddedResource Include="Templates\**\*.cs" />
-    <EmbeddedResource Include="Templates\*.typedid" />
+    <EmbeddedResource Include="..\StronglyTypedIds.Templates\guid-full.typedid" Link="Templates\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\StronglyTypedIds.Templates\int-full.typedid" Link="Templates\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\StronglyTypedIds.Templates\long-full.typedid" Link="Templates\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\StronglyTypedIds.Templates\string-full.typedid" Link="Templates\%(Filename)%(Extension)" />
     <EmbeddedResource Include="..\StronglyTypedIds.Attributes\*.cs" Link="Templates\Sources\%(Filename)%(Extension)" />
   </ItemGroup>
 
@@ -32,11 +35,6 @@
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\StronglyTypedIds.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\StronglyTypedIds.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="StronglyTypedId.targets" Pack="true" PackagePath="build" Visible="false" />
-    <None Include="Templates\*.typedid" Pack="true" PackagePath="build/AdditionalFiles" Visible="false" />
   </ItemGroup>
 
 </Project>
