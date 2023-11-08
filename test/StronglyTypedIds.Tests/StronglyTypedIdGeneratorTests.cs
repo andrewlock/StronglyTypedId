@@ -24,7 +24,7 @@ namespace StronglyTypedIds.Tests
 
 [StronglyTypedId]
 public partial struct MyId {}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -45,7 +45,7 @@ public partial struct MyId {}";
                     public partial struct MyId {}
                 }
                 """;
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -65,7 +65,7 @@ public partial struct MyId {}";
                     public partial struct MyId {}
                 }
                 """;
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -85,7 +85,7 @@ public partial struct MyId {}";
                     public partial struct MyId {}
                 }
                 """;
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -102,7 +102,7 @@ public partial struct MyId {}";
 namespace SomeNamespace;
 [StronglyTypedId]
 public partial struct MyId {}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -122,7 +122,7 @@ public class ParentClass
     [StronglyTypedId]
     public partial struct MyId {}
 }";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -148,7 +148,7 @@ public partial class ParentClass
         }
     }
 }";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -175,7 +175,7 @@ public class ParentClass<T>
         }
     }
 }";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -194,7 +194,7 @@ public class ParentClass<T>
                 public partial struct MyId {}
                 """;
 
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -213,7 +213,7 @@ public class ParentClass<T>
                 public partial struct MyId {}
                 """;
 
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -240,7 +240,7 @@ namespace MyContracts.V2
 }";
 
             // This only includes the last ID but that's good enough for this
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 

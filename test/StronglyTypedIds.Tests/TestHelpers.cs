@@ -14,7 +14,7 @@ namespace StronglyTypedIds.Tests
 {
     internal static class TestHelpers
     {
-        public static (ImmutableArray<Diagnostic> Diagnostics, string Output) GetGeneratedOutput<T>(string source)
+        public static (ImmutableArray<Diagnostic> Diagnostics, string Output) GetGeneratedOutput<T>(string source, bool includeAttributes = true)
             where T : IIncrementalGenerator, new()
         {
             var attr = new StronglyTypedIdAttribute();
@@ -35,7 +35,13 @@ namespace StronglyTypedIds.Tests
                 .Create(new T())
                 .AddAdditionalTexts(LoadEmbeddedResourcesAsAdditionalText())
                 .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
-            var output = string.Join("\n", outputCompilation.SyntaxTrees.Skip(originalTreeCount).Select(t => t.ToString())); 
+
+            // If we don't want the attributes, we try to get all the potential resource streams and exclude them
+            var countsToExclude = includeAttributes
+                ? originalTreeCount
+                : originalTreeCount + typeof(T).Assembly.GetManifestResourceNames().Count(x => x.StartsWith("StronglyTypedIds.Templates.Sources."));
+
+            var output = string.Join("\n", outputCompilation.SyntaxTrees.Skip(countsToExclude).Select(t => t.ToString())); 
 
             return (diagnostics, output);
         }
