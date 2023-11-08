@@ -38,24 +38,7 @@ partial struct NewIdId1 { }
 partial struct NewIdId2 { }
 
 [StronglyTypedId(Template.String)]
-partial struct StringId
-{
-    public bool TryFormat2(
-        global::System.Span<char> destination,
-        out int charsWritten,
-        global::System.ReadOnlySpan<char> format = default)
-    {
-        if (destination.Length > Value.Length)
-        {
-            MemoryExtensions.AsSpan(Value).CopyTo(destination);
-            charsWritten = Value.Length;
-            return true;
-        }
-            
-        charsWritten = default;
-        return false;
-    }
-}
+partial struct StringId { }
 
 [StronglyTypedId("string-full")]
 partial struct ConvertersStringId { }

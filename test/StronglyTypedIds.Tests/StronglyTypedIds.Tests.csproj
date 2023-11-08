@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src\StronglyTypedIds\Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
