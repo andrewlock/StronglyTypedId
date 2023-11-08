@@ -1,0 +1,9 @@
+    partial struct PLACEHOLDERID
+    {
+        public class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<PLACEHOLDERID>
+        {
+            public override void SetValue(global::System.Data.IDbDataParameter parameter, PLACEHOLDERID value)
+            {
+                parameter.Value = value.Value;
+            }
+    }
