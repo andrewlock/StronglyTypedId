@@ -52,6 +52,9 @@ partial struct StringId { }
 [StronglyTypedId("string-full")]
 partial struct ConvertersStringId { }
 
+[StronglyTypedId(Template.String, "string-efcore", "string-dapper", "string-newtonsoftjson")]
+partial struct ConvertersStringId2 { }
+
 [StronglyTypedId("nullablestring-full")]
 partial struct NullableStringId { }
 
