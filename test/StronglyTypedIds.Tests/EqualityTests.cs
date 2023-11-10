@@ -7,6 +7,8 @@ namespace StronglyTypedIds.Tests;
 
 public class EqualityTests
 {
+    private static LocationInfo _templateLocation = new("Some path", new TextSpan(0, 100), new LinePositionSpan(new LinePosition(23, 2), new LinePosition(23, 15)));
+
     [Fact]
     public void ParentClassHasExpectedEqualityBehaviour()
     {
@@ -48,7 +50,9 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
-                parent: null);
+                null,
+                parent: null,
+                _templateLocation);
     }
     
     [Fact]
@@ -65,8 +69,9 @@ public class EqualityTests
             new(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
-                templateName: "Guid",
-                templateLocation: new LocationInfo("Some path", new TextSpan(0, 100), new LinePositionSpan(new LinePosition(23, 2), new LinePosition(23, 15))),
+                template: Template.Int,
+                templateNames: new[] {"Guid"},
+                templateLocation: _templateLocation,
                 parent: null);
     }
 
@@ -86,7 +91,9 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
-                parent: new ParentClass(null, "class", "b", "", null, false));
+                templateNames: null,
+                parent: new ParentClass(null, "class", "b", "", null, false),
+                _templateLocation);
         }
     }
     
@@ -106,7 +113,9 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
-                parent: new ParentClass(null, "class", "b", "", null, false));
+                templateNames: null,
+                parent: new ParentClass(null, "class", "b", "", null, false),
+                _templateLocation);
 
             return new Result<(StructToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
         }
@@ -128,7 +137,9 @@ public class EqualityTests
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
-                parent: new ParentClass(null, "class", "b", "", null, false));
+                templateNames: null,
+                parent: new ParentClass(null, "class", "b", "", null, false),
+                _templateLocation);
             var diagnostics = new DiagnosticInfo(new DiagnosticDescriptor(
                     NotPartialDiagnostic.Id, NotPartialDiagnostic.Title, NotPartialDiagnostic.Message, category: Constants.Usage,
                     defaultSeverity: DiagnosticSeverity.Warning, isEnabledByDefault: true),

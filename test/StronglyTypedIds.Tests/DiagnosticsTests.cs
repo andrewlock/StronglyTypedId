@@ -12,10 +12,9 @@ public class DiagnosticsTests
     public const string NoIdGenerationSnapshotName = "NoGeneratedIds";
 
     [Theory]
-    [InlineData("null")]
     [InlineData("\"\"")]
     [InlineData("\"       \"")]
-    public Task EmptyTemplate_GivesInvalidTemplateNameDiagnostic_AndDoesntGenerate(string template)
+    public void EmptyTemplate_GivesInvalidTemplateNameDiagnostic_AndDoesntGenerate(string template)
     {
         var input = $$"""
                       using StronglyTypedIds;
@@ -23,18 +22,14 @@ public class DiagnosticsTests
                       [StronglyTypedId({{template}})]
                       public partial struct MyId {}
                       """;
-        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
         Assert.Contains(diagnostics, diagnostic => diagnostic.Id == InvalidTemplateNameDiagnostic.Id);
-
-        return Verifier.Verify(output)
-            .DisableRequireUniquePrefix()
-            .UseDirectory("Snapshots")
-            .UseFileName(NoIdGenerationSnapshotName);
+        Assert.Empty(output);
     }
 
     [Fact]
-    public Task MultipleAssemblyAttributes_GivesMultipleAttributeDiagnostic_AndDoesntGenerate()
+    public void MultipleAssemblyAttributes_GivesMultipleAttributeDiagnostic_AndDoesntGenerate()
     {
         const string input = """
                              using StronglyTypedIds;
@@ -44,18 +39,14 @@ public class DiagnosticsTests
                              [StronglyTypedId]
                              public partial struct MyId {}
                              """;
-        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
         Assert.Contains(diagnostics, diagnostic => diagnostic.Id == MultipleAssemblyAttributeDiagnostic.Id);
-
-        return Verifier.Verify(output)
-            .DisableRequireUniquePrefix()
-            .UseDirectory("Snapshots")
-            .UseFileName(NoIdGenerationSnapshotName);
+        Assert.Empty(output);
     }
 
     [Fact]
-    public Task InvalidTemplate_GivesDiagnostic_AndDoesntGenerate()
+    public void InvalidTemplate_GivesDiagnostic_AndDoesntGenerate()
     {
         const string input = """
                              using StronglyTypedIds;
@@ -63,18 +54,14 @@ public class DiagnosticsTests
                              [StronglyTypedId("some-template")]
                              public partial struct MyId {}
                              """;
-        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
         Assert.Contains(diagnostics, diagnostic => diagnostic.Id == UnknownTemplateDiagnostic.Id);
-
-        return Verifier.Verify(output)
-            .DisableRequireUniquePrefix()
-            .UseDirectory("Snapshots")
-            .UseFileName(NoIdGenerationSnapshotName);
+        Assert.Empty(output);
     }
 
     [Fact]
-    public Task InvalidTemplateInDefaultsAttribute_GivesDiagnostic_AndDoesntGenerate()
+    public void InvalidTemplateInDefaultsAttribute_GivesDiagnostic_AndDoesntGenerate()
     {
         const string input = """
                              using StronglyTypedIds;
@@ -83,13 +70,10 @@ public class DiagnosticsTests
                              [StronglyTypedId]
                              public partial struct MyId {}
                              """;
-        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
         Assert.Contains(diagnostics, diagnostic => diagnostic.Id == UnknownTemplateDiagnostic.Id);
 
-        return Verifier.Verify(output)
-            .DisableRequireUniquePrefix()
-            .UseDirectory("Snapshots")
-            .UseFileName(NoIdGenerationSnapshotName);
+        Assert.Empty(output);
     }
 }

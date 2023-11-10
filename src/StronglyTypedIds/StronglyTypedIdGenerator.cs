@@ -64,7 +64,7 @@ namespace StronglyTypedIds
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.info);
 
-            IncrementalValueProvider<(string? Content, bool isValid, bool IsBuiltIn, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
+            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
@@ -74,48 +74,63 @@ namespace StronglyTypedIds
                     if (all.Left.IsDefaultOrEmpty)
                     {
                         // no default attributes, valid, but no content
-                        return (null, true, true, null);
+                        return (EquatableArray<(string Name, string Content)>.Empty, true, null);
                     }
 
                     // technically we can never have more than one `Defaults` here
                     // but check for it just in case
                     if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
                     {
-                        return (null, false, true, null);
+                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
                     }
 
                     var defaults = all.Left[0];
                     if (defaults.HasMultiple)
                     {
                         // not valid
-                        return (null, false, true, null);
+                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
                     }
 
+                    (string, string)? builtInTemplate = null;
                     if (defaults.Template is { } templateId)
                     {
                         // Explicit template
-                        return ((string?) EmbeddedSources.GetTemplate(templateId), true, true, (DiagnosticInfo?) null);
+                        builtInTemplate = (string.Empty, EmbeddedSources.GetTemplate(templateId));
                     }
 
-                    // We have already checked for a null template name and flagged it as an error
-                    var defaultsTemplateName = defaults.TemplateName;
-                    if(!string.IsNullOrEmpty(defaultsTemplateName))
+                    var templateNames = defaults.TemplateNames.GetArray();
+                    if (templateNames is null or {Length: 0})
                     {
-                        foreach (var templateDetails in all.Right)
+                        if (builtInTemplate.HasValue)
                         {
-                            if (string.Equals(templateDetails.Name, defaultsTemplateName, StringComparison.Ordinal))
-                            {
-                                // This _could_ be empty, but we use it anyway (and add a comment in the template)
-                                return (templateDetails.Content ?? GetEmptyTemplateContent(defaultsTemplateName!), true, false, null);
-                            }
+                            // valid, only built-in
+                            var template = new EquatableArray<(string Name, string Content)>(new[] {builtInTemplate.Value});
+                            return (template, true, (DiagnosticInfo?) null);
                         }
-                    
-                        // Template name specified, but we don't have a template for it
-                        return (null, false, true, UnknownTemplateDiagnostic.CreateInfo(defaults.TemplateLocation!, defaultsTemplateName!));
+
+                        // not valid, need something
+                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
                     }
-            
-                    // only get here if the template name was null/empty, which is already reported
-                    return (null, false, true, null);
+
+                    // We have already checked for null/empty template name and flagged it as an error
+                    if (!GetContent(
+                            templateNames,
+                            defaults.TemplateLocation!,
+                            builtInTemplate.HasValue,
+                            in all.Right,
+                            out var contents, 
+                            out var diagnostic))
+                    {
+                        return (EquatableArray<(string Name, string Content)>.Empty, false, diagnostic);
+                    }
+
+                    if (builtInTemplate.HasValue)
+                    {
+                        contents[^1] = builtInTemplate.Value;
+                    }
+
+                    // Ok, we have all the templates
+                    return (new EquatableArray<(string Name, string Content)>(contents), true, null);                        
                 });
 
             var structsWithDefaultsAndTemplates = structs
@@ -129,96 +144,168 @@ namespace StronglyTypedIds
         private static void Execute(
             StructToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
-            (string? Content, bool IsValid, bool IsBuiltInTemplate, DiagnosticInfo? Diagnostics) defaults, 
+            (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
             SourceProductionContext context)
         {
             var sb = new StringBuilder();
-            if (defaults.Diagnostics is { } diagnostic)
+            if (defaults.Diagnostic is { } diagnostic)
             {
                 // report error with the default template
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (!TryGetTemplateContent(idToGenerate, templates, defaults, in context, out var templateContent, out var addDefaultAttributes))
+            if (!TryGetTemplateContent(idToGenerate, templates, defaults, in context, out var templateContents))
             {
                 return;
             }
 
-            var result = SourceGenerationHelper.CreateId(
-                idToGenerate.NameSpace,
-                idToGenerate.Name,
-                idToGenerate.Parent,
-                templateContent,
-                addDefaultAttributes,
-                sb);
+            foreach (var (name, content) in templateContents)
+            {
+                var result = SourceGenerationHelper.CreateId(
+                    idToGenerate.NameSpace,
+                    idToGenerate.Name,
+                    idToGenerate.Parent,
+                    content,
+                    addDefaultAttributes: string.IsNullOrEmpty(name),
+                    sb);
 
-            var fileName = SourceGenerationHelper.CreateSourceName(
-                idToGenerate.NameSpace,
-                idToGenerate.Parent,
-                idToGenerate.Name);
-            context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
+                var fileName = SourceGenerationHelper.CreateSourceName(
+                    sb,
+                    idToGenerate.NameSpace,
+                    idToGenerate.Parent,
+                    idToGenerate.Name,
+                    name);
+
+                context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
+            }
         }
 
         private static bool TryGetTemplateContent(
             in StructToGenerate idToGenerate,
             in ImmutableArray<(string Path, string Name, string? Content)> templates,
-            (string? Content, bool IsValid, bool IsBuiltInTemplate, DiagnosticInfo? Diagnostics) defaults,
+            (EquatableArray<(string Name, string Content)> Contents, bool IsValid, DiagnosticInfo? Diagnostics) defaults,
             in SourceProductionContext context,
-            [NotNullWhen(true)] out string? templateContent,
-            out bool addDefaultAttributes)
+            [NotNullWhen(true)] out (string Name, string Content)[]? templateContents)
         {
-            // built-in template specified
+            (string, string)? builtIn = null;
             if (idToGenerate.Template is { } templateId)
             {
-                templateContent = EmbeddedSources.GetTemplate(templateId);
-                addDefaultAttributes = true;
-                return true;
+                // built-in template specified
+                var content = EmbeddedSources.GetTemplate(templateId);
+                builtIn = (string.Empty, content);
             }
 
-            // custom template specified
-            if (!string.IsNullOrEmpty(idToGenerate.TemplateName))
+            if (idToGenerate.TemplateNames.GetArray() is {Length: > 0} templateNames)
             {
-                foreach (var templateDetails in templates)
+                // custom template specified
+                if (GetContent(
+                        templateNames,
+                        idToGenerate.TemplateLocation,
+                        builtIn.HasValue,
+                        in templates,
+                        out templateContents,
+                        out var diagnostic))
                 {
-                    if (string.Equals(templateDetails.Name, idToGenerate.TemplateName, StringComparison.Ordinal))
+                    if (builtIn.HasValue)
                     {
-                        templateContent = templateDetails.Content ?? GetEmptyTemplateContent(idToGenerate.TemplateName!);
-                        addDefaultAttributes = false;
-                        return true;
+                        templateContents[^1] = builtIn.Value;
                     }
+                    
+                    return true;
                 }
 
-                // the template wasn't found, so it must be invalid. Don't generate anything
-                var info = UnknownTemplateDiagnostic.CreateInfo(idToGenerate.TemplateLocation!, idToGenerate.TemplateName!);
-                context.ReportDiagnostic(info);
-                templateContent = null;
-                addDefaultAttributes = false;
+                // One of the templates wasn't found, so it must be invalid. Don't generate anything
+                if (diagnostic is { })
+                {
+                    context.ReportDiagnostic(diagnostic);
+                }
+
+                templateContents = null;
                 return false;
             }
 
-            // nothing specified, use the default (if we have one)
+            if (builtIn.HasValue)
+            {
+                templateContents = new[] {builtIn.Value};
+                return true;
+            }
+
+            // nothing specified, use the defaults (if we have them)
             if (defaults.IsValid)
             {
-                if (defaults.Content is { } content)
+                if (defaults.Contents.GetArray() is {Length: > 0} allContent)
                 {
-                    templateContent = content;
-                    addDefaultAttributes = defaults.IsBuiltInTemplate;
+                    templateContents = allContent;
                 }
                 else
                 {
-                    templateContent = EmbeddedSources.GetTemplate(Template.Guid);
-                    addDefaultAttributes = true;
+                    templateContents = new[] {(string.Empty, EmbeddedSources.GetTemplate(Template.Guid))};
                 }
 
                 return true;
             }
 
-            templateContent = null;
-            addDefaultAttributes = true;
+            // not valid
+            templateContents = null;
             return false;
         }
 
         private static string GetEmptyTemplateContent(string templateName)
             => $"// The {templateName}.typeid template was empty, you'll need to add some content";
+
+        private static bool GetContent(
+            string[] templateNames,
+            LocationInfo? location,
+            bool haveStandardTemplate,
+            in ImmutableArray<(string Path, string Name, string? Content)> templates,
+            [NotNullWhen(true)] out (string Name, string Content)[]? output,
+            out DiagnosticInfo? diagnostic)
+        {
+            // Length + 1 to optionally add the extra template 
+            var totalTemplates = haveStandardTemplate ? templateNames.Length + 1 : templateNames.Length;
+            (string, string)[]? contents = null;
+            for (int i = 0; i < templateNames.Length; i++)
+            {
+                var templateName = templateNames[i];
+                if (string.IsNullOrEmpty(templateName))
+                {
+                    output = null;
+                    diagnostic = location is not null
+                        ? InvalidTemplateNameDiagnostic.CreateInfo(location)
+                        : null;
+                    return false;
+                }
+                
+                var foundTemplate = false;
+
+                foreach (var templateDetails in templates)
+                {
+                    if (string.Equals(templateDetails.Name, templateName, StringComparison.Ordinal))
+                    {
+                        // This _could_ be empty, but we use it anyway (and add a comment in the template)
+                        var content = templateDetails.Content ?? GetEmptyTemplateContent(templateName);
+                        contents ??= new (string, string)[totalTemplates];
+                        contents[i] = (templateName, content);
+                        foundTemplate = true;
+                        break;
+                    }
+                }
+
+                if (!foundTemplate)
+                {
+                    // Template name specified, but we don't have a template for it
+                    // bail out early
+                    output = null;
+                    diagnostic = location is not null
+                        ? UnknownTemplateDiagnostic.CreateInfo(location, templateName)
+                        : null;
+                    return false;
+                }
+            }
+
+            output = contents!; // only case this wouldn't be true is if templateNames is empty
+            diagnostic = null;
+            return true;
+        }
     }
 }

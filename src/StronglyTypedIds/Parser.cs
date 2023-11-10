@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -25,8 +26,8 @@ internal static class Parser
         var hasMisconfiguredInput = false;
         List<DiagnosticInfo>? diagnostics = null;
         Template? template = null;
-        string? templateName = null;
-        LocationInfo? templateLocation = null;
+        string[]? templateNames = null;
+        LocationInfo? attributeLocation = null;
 
         foreach (AttributeData attribute in structSymbol.GetAttributes())
         {
@@ -38,7 +39,13 @@ internal static class Parser
                 continue;
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, out templateLocation, ref diagnostics);
+            (var result, (template, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
+
+            if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+            {
+                attributeLocation = LocationInfo.CreateFrom(s);
+            }
         }
 
         var hasPartialModifier = false;
@@ -70,9 +77,13 @@ internal static class Parser
         ParentClass? parentClass = GetParentClasses(structSyntax);
         var name = structSymbol.Name;
 
-        var toGenerate = template.HasValue
-            ? new StructToGenerate(name: name, nameSpace: nameSpace, template: template.Value, parent: parentClass)
-            : new StructToGenerate(name: name, nameSpace: nameSpace, templateName: templateName, templateLocation: templateLocation!, parent: parentClass);
+        var toGenerate =new StructToGenerate(
+            name: name, 
+            nameSpace: nameSpace, 
+            template: template, 
+            templateNames: templateNames, 
+            templateLocation: attributeLocation!,
+            parent: parentClass);
 
         return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
     }
@@ -87,9 +98,9 @@ internal static class Parser
         }
 
         // We only return the first config that we find
-        string? templateName = null;
+        string[]? templateNames = null;
         Template? template = null;
-        LocationInfo? templateLocation = null;
+        LocationInfo? attributeLocation = null;
         List<DiagnosticInfo>? diagnostics = null;
         bool hasMisconfiguredInput = false;
         bool hasMultiple = false;
@@ -106,17 +117,24 @@ internal static class Parser
                 continue;
             }
 
-            if (!string.IsNullOrWhiteSpace(templateName) || template.HasValue)
+            var syntax = attribute.ApplicationSyntaxReference?.GetSyntax();
+            if (templateNames is not null || template.HasValue || hasMisconfiguredInput)
             {
                 hasMultiple = true;
-                if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+                if (syntax is not null)
                 {
                     diagnostics ??= new();
-                    diagnostics.Add(MultipleAssemblyAttributeDiagnostic.CreateInfo(s));
+                    diagnostics.Add(MultipleAssemblyAttributeDiagnostic.CreateInfo(syntax));
                 }
             }
 
-            hasMisconfiguredInput |= GetConstructorValues(attribute, out template, out templateName, out templateLocation, ref diagnostics);
+            (var result, (template, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
+
+            if (syntax is not null)
+            {
+                attributeLocation = LocationInfo.CreateFrom(syntax);
+            }
         }
 
         var errors = diagnostics is null
@@ -128,104 +146,161 @@ internal static class Parser
             return new Result<(Defaults, bool)>((default, false), errors);
         }
 
-        var defaults = template.HasValue
-            ? new Defaults(template.Value, hasMultiple)
-            : new Defaults(templateName!, templateLocation!, hasMultiple);
+        var defaults = new Defaults(template, templateNames, attributeLocation!, hasMultiple);
 
         return new Result<(Defaults, bool)>((defaults, true), errors);
     }
 
-    private static bool GetConstructorValues(AttributeData attribute, out Template? template, out string? templateName, out LocationInfo? templateLocation, ref List<DiagnosticInfo>? diagnostics)
+    private static (bool HasMisconfiguredInput, (Template? Template, string[]? TemplateNames)) GetConstructorValues(AttributeData attribute)
     {
-        var hasMisconfiguredInput = false;
-        template = null;
-        templateName = null;
-        templateLocation = null;
+        (Template? Template, string? Name, string[]? Names)? results1 = null;
+        (Template? Template, string? Name, string[]? Names)? results2 = null;
 
         if (attribute.ConstructorArguments is { IsEmpty: false } args)
         {
-            // make sure we don't have any errors
-            foreach (TypedConstant arg in args)
+            // we should have at most 2 args (params count as one arg)
+            if (args.Length > 2)
             {
-                if (arg.Kind == TypedConstantKind.Error)
-                {
-                    // have an error, so don't try and do any generation
-                    hasMisconfiguredInput = true;
-                    break;
-                }
+                // have an error, so don't try and do any generation
+                return (true, default);
             }
 
-            if (args[0].Value is int enumValue)
+            // Should always have at least one arg, but it might be an empty array
+            var (success, results) = TryGetTypedConstant(args[0]);
+
+            if (success)
             {
-                template = (Template) enumValue;
+                results1 = results;
             }
             else
             {
-                templateName = args[0].Value as string;
-                var syntaxNode = attribute.ApplicationSyntaxReference?.GetSyntax(); 
-                if (string.IsNullOrWhiteSpace(templateName))
-                {
-                    if (syntaxNode is { } s)
-                    {
-                        diagnostics ??= new();
-                        diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
-                    }
+                // have an error, so don't try and do any generation
+                return (true, default);
+            }
 
-                    hasMisconfiguredInput = true;
+            if (args.Length == 2)
+            {
+                (success, results) = TryGetTypedConstant(args[1]);
+
+                if (success)
+                {
+                    results2 = results;
                 }
                 else
                 {
-                    if (syntaxNode is { } s)
-                    {
-                        templateLocation = LocationInfo.CreateFrom(s);
-                    }
+                    // have an error, so don't try and do any generation
+                    return (true, default);
                 }
             }
         }
-
+        
         if (attribute.NamedArguments is { IsEmpty: false } namedArgs)
         {
             foreach (KeyValuePair<string, TypedConstant> arg in namedArgs)
             {
-                TypedConstant typedConstant = arg.Value;
-                if (typedConstant.Kind == TypedConstantKind.Error)
-                {
-                    hasMisconfiguredInput = true;
-                    break;
-                }
+                // Should always have at least one arg, but it might be an empty array
+                var (success, results) = TryGetTypedConstant(arg.Value);
 
-                if (typedConstant.Value is int enumValue)
+                if (success)
                 {
-                    template = (Template) enumValue;
-                }
-                else
-                {
-                    templateName = typedConstant.Value as string;
-                    var syntaxNode = attribute.ApplicationSyntaxReference?.GetSyntax(); 
-                    if (string.IsNullOrWhiteSpace(templateName))
+                    if (results1 is null)
                     {
-                        if (syntaxNode is { } s)
-                        {
-                            diagnostics ??= new();
-                            diagnostics.Add(InvalidTemplateNameDiagnostic.CreateInfo(s));
-                        }
-
-                        hasMisconfiguredInput = true;
+                        results1 = results;
+                    }
+                    else if(results2 is null)
+                    {
+                        results2 = results;
                     }
                     else
                     {
-                        if (syntaxNode is { } s)
-                        {
-                            templateLocation = LocationInfo.CreateFrom(s);
-                        }
+                        // must be an error
+                        return (true, default);
                     }
                 }
-
-                break;
+                else
+                {
+                    // have an error, so don't try and do any generation
+                    return (true, default);
+                }
             }
         }
 
-        return hasMisconfiguredInput;
+
+        // consolidate
+        var template = results1?.Template ?? results2?.Template;
+        var name = results1?.Name ?? results2?.Name;
+        var names = results1?.Names ?? results2?.Names;
+
+        if (name is not null)
+        {
+            if (names is {Length: > 0} ns)
+            {
+                names = new string[ns.Length + 1];
+                ns.CopyTo(names, 0);
+                names[^1] = name;
+            }
+            else
+            {
+                names = new[] {name};
+            }
+        }
+
+        return (false, (template, names));
+
+        static (bool IsValid, (Template? Template, string? Name, string[]? Names)) TryGetTypedConstant(in TypedConstant arg)
+        {
+            if (arg.Kind is TypedConstantKind.Error)
+            {
+                return (false, default);
+            }
+
+            if (arg.Kind is TypedConstantKind.Primitive
+                && arg.Value is string stringValue)
+            {
+                var name = string.IsNullOrWhiteSpace(stringValue)
+                    ? string.Empty
+                    : stringValue;
+
+                return (true, (null, name, null));
+            }
+
+            if (arg.Kind is TypedConstantKind.Enum
+                && arg.Value is int intValue)
+            {
+                return (true, ((Template) intValue, null, null));
+            }
+
+            if (arg.Kind is TypedConstantKind.Array)
+            {
+                var values = arg.Values;
+
+                // if null is passed, it's treated the same as an empty array   
+                if (values.IsDefaultOrEmpty)
+                {
+                    return (true, (null, null, Array.Empty<string>()));
+                }
+
+                var names = new string[values.Length];
+                for (var i = 0; i < values.Length; i++)
+                {
+                    if (values[i].Kind == TypedConstantKind.Error)
+                    {
+                        // Abandon generation
+                        return (false, default);
+                    }
+
+                    var value = values[i].Value as string;
+                    names[i] = string.IsNullOrWhiteSpace(value)
+                        ? string.Empty
+                        : value!;
+                }
+
+                return (true, (null, null, names));
+            }
+
+            // Some other type, weird, shouldn't be able to get this
+            return (false, default);
+        }
     }
 
     private static string GetNameSpace(StructDeclarationSyntax structSymbol)

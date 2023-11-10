@@ -35,6 +35,7 @@ public partial struct MyId {}";
         [Theory]
         [InlineData("")]
         [InlineData("Template.Guid")]
+        [InlineData("template: Template.Guid")]
         public Task CanGenerateIdInNamespace(string template)
         {
             var input = $$"""
@@ -54,14 +55,16 @@ public partial struct MyId {}";
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanGenerateNonDefaultIdInNamespace()
+        [Theory]
+        [InlineData("Template.Int")]
+        [InlineData("template: Template.Int")]
+        public Task CanGenerateNonDefaultIdInNamespace(string template)
         {
             var input = $$"""
                 using StronglyTypedIds;
                 namespace SomeNamespace
                 {
-                    [StronglyTypedId(Template.Int)]
+                    [StronglyTypedId({{template}})]
                     public partial struct MyId {}
                 }
                 """;
@@ -74,14 +77,16 @@ public partial struct MyId {}";
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanGenerateForCustomTemplate()
+        [Theory]
+        [InlineData("\"newid-full\"")]
+        [InlineData("templateNames: \"newid-full\"")]
+        public Task CanGenerateForCustomTemplate(string templateName)
         {
-            var input = """
+            var input = $$"""
                 using StronglyTypedIds;
                 namespace SomeNamespace
                 {
-                    [StronglyTypedId("newid-full")]
+                    [StronglyTypedId({{templateName}})]
                     public partial struct MyId {}
                 }
                 """;
@@ -183,12 +188,14 @@ public class ParentClass<T>
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanOverrideDefaultsWithTemplateUsingGlobalAttribute()
+        [Theory]
+        [InlineData("Template.Int")]
+        [InlineData("template: Template.Int")]
+        public Task CanOverrideDefaultsWithTemplateUsingGlobalAttribute(string template)
         {
-            const string input = """
+            var input = $$"""
                 using StronglyTypedIds;
-                [assembly:StronglyTypedIdDefaults(Template.Int)]
+                [assembly:StronglyTypedIdDefaults({{template}})]
                 
                 [StronglyTypedId]
                 public partial struct MyId {}
@@ -199,15 +206,18 @@ public class ParentClass<T>
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute()
+        [Theory]
+        [InlineData("\"newid-full\"")]
+        [InlineData("templateName: \"newid-full\"")]
+        public Task CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute(string templateNames)
         {
-            const string input = """
+            var input = $$"""
                 using StronglyTypedIds;
-                [assembly:StronglyTypedIdDefaults("newid-full")]
+                [assembly:StronglyTypedIdDefaults({{templateNames}})]
                 
                 [StronglyTypedId]
                 public partial struct MyId {}
@@ -218,6 +228,7 @@ public class ParentClass<T>
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 

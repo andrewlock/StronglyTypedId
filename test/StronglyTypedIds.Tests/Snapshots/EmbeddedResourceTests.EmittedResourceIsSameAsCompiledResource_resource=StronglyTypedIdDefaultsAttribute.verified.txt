@@ -27,9 +27,12 @@ namespace StronglyTypedIds
         /// Set the default template to use for strongly typed IDs
         /// </summary>
         /// <param name="template">The built-in template to use to generate the ID.</param>
-        public StronglyTypedIdDefaultsAttribute(global::StronglyTypedIds.Template template)
+        /// <param name="templateNames">The names of additional custom templates to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateNames"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(global::StronglyTypedIds.Template template, params string[] templateNames)
         {
-            Template = template;
         }
 
         /// <summary>
@@ -41,18 +44,18 @@ namespace StronglyTypedIds
         /// </param>
         public StronglyTypedIdDefaultsAttribute(string templateName)
         {
-            TemplateName = templateName;
         }
 
         /// <summary>
-        /// The default template to use to generate the strongly-typed ID value.
+        /// Set the default template to use for strongly typed IDs
         /// </summary>
-        public global::StronglyTypedIds.Template? Template { get; }
-
-        /// <summary>
-        /// The default template to use to generate the strongly-typed ID value.
-        /// </summary>
-        public string? TemplateName { get; }
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(string templateName, params string[] templateNames)
+        {
+        }
     }
 }
 #endif

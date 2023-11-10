@@ -6,29 +6,19 @@ namespace StronglyTypedIds;
 
 internal readonly record struct StructToGenerate
 {
-    public StructToGenerate(string name, string nameSpace, string? templateName, ParentClass? parent, LocationInfo templateLocation)
+    public StructToGenerate(string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
     {
         Name = name;
         NameSpace = nameSpace;
-        TemplateName = templateName;
-        Template = null;
+        TemplateNames = templateNames is null ? EquatableArray<string>.Empty : new EquatableArray<string>(templateNames);
+        Template = template;
         Parent = parent;
         TemplateLocation = templateLocation;
     }
 
-    public StructToGenerate(string name, string nameSpace, Template template, ParentClass? parent)
-    {
-        Name = name;
-        NameSpace = nameSpace;
-        TemplateName = null;
-        Template = template;
-        Parent = parent;
-        TemplateLocation = null;
-    }
-
     public string Name { get; }
     public string NameSpace { get; }
-    public string? TemplateName { get; }
+    public EquatableArray<string> TemplateNames { get; }
     public Template? Template { get; }
     public ParentClass? Parent { get; }
     public LocationInfo? TemplateLocation { get; }
@@ -44,23 +34,15 @@ internal sealed record Result<TValue>(TValue Value, EquatableArray<DiagnosticInf
 
 internal readonly record struct Defaults
 {
-    public Defaults(string templateName, LocationInfo location, bool hasMultiple)
+    public Defaults(Template? template, string[]? templateNames, LocationInfo location, bool hasMultiple)
     {
-        TemplateName = templateName;
+        TemplateNames = templateNames is null ? EquatableArray<string>.Empty : new EquatableArray<string>(templateNames);
         HasMultiple = hasMultiple;
-        Template = null;
+        Template = template;
         TemplateLocation = location;
     }
 
-    public Defaults(Template template, bool hasMultiple)
-    {
-        TemplateName = null;
-        Template = template;
-        HasMultiple = hasMultiple;
-        TemplateLocation = null;
-    }
-
-    public string? TemplateName { get; }
+    public EquatableArray<string> TemplateNames { get; }
     public Template? Template { get; }
     public LocationInfo? TemplateLocation { get; }
     public bool HasMultiple { get; }

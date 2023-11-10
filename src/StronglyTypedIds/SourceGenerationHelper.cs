@@ -85,9 +85,10 @@ namespace StronglyTypedIds
             return sb.ToString();
         }
 
-        internal static string CreateSourceName(string nameSpace, ParentClass? parent, string name)
+        internal static string CreateSourceName(StringBuilder sb, string nameSpace, ParentClass? parent, string name, string template)
         {
-            var sb = new StringBuilder(nameSpace).Append('.');
+            sb.Clear();
+            sb.Append(nameSpace).Append('.');
             while (parent is { } p)
             {
                 var s = p.Name
@@ -98,7 +99,14 @@ namespace StronglyTypedIds
                 sb.Append(s).Append('.');
                 parent = p.Child;
             }
-            return sb.Append(name).Append(".g.cs").ToString();
+            
+            sb.Append(name);
+            if (!string.IsNullOrEmpty(template))
+            {
+                sb.Append(template).Append('.');
+            }
+
+            return sb.Append(".g.cs").ToString();
         }
     }
 }
