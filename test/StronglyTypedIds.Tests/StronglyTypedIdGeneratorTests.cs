@@ -258,5 +258,71 @@ namespace MyContracts.V2
             return Verifier.Verify(output)
                 .UseDirectory("Snapshots");
         }
+
+        [Theory]
+        [InlineData(false, "Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "template: Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "Template.Guid, templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        [InlineData(true, "Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(true, "template: Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(true, "Template.Guid, templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        public Task CanGenerateMultipleTemplatesWithBuiltIn(bool useDefault, string template)
+        {
+            var defaultAttr = useDefault
+                ? $"[assembly:StronglyTypedIdDefaults({template})]"
+                : string.Empty;
+
+            var templateAttr = useDefault ? string.Empty : template;
+                
+            var input = $$"""
+                        using StronglyTypedIds;
+                        {{defaultAttr}}
+                        
+                        [StronglyTypedId({{templateAttr}})]
+                        public partial struct MyId {}
+                        """;
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Theory]
+        [InlineData(false, "\"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        [InlineData(true, "\"guid-dapper\", \"guid-efcore\"")]
+        [InlineData(true, "\"guid-dapper\", new [] {\"guid-efcore\"}")]
+        [InlineData(true, "\"guid-dapper\", templateNames: new [] {\"guid-efcore\"}")]
+        [InlineData(true, "templateName: \"guid-dapper\", templateNames: new [] {\"guid-efcore\"}")]
+        public Task CanGenerateMultipleTemplatesWithoutBuiltIn(bool useDefault, string template)
+        {
+            var defaultAttr = useDefault
+                ? $"[assembly:StronglyTypedIdDefaults({template})]"
+                : string.Empty;
+
+            var templateAttr = useDefault ? string.Empty : template;
+                
+            var input = $$"""
+                          using StronglyTypedIds;
+                          {{defaultAttr}}
+
+                          [StronglyTypedId({{templateAttr}})]
+                          public partial struct MyId {}
+                          """;
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
     }
 }

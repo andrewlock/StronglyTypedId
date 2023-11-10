@@ -103,7 +103,7 @@ namespace StronglyTypedIds
             sb.Append(name);
             if (!string.IsNullOrEmpty(template))
             {
-                sb.Append(template).Append('.');
+                sb.Append('.').Append(template);
             }
 
             return sb.Append(".g.cs").ToString();
