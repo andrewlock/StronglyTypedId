@@ -28,11 +28,17 @@ partial struct IntId { }
 [StronglyTypedId("int-full")]
 partial struct ConvertersIntId { }
 
+[StronglyTypedId(Template.Int, "int-efcore", "int-dapper", "int-newtonsoftjson")]
+partial struct ConvertersIntId2 { }
+
 [StronglyTypedId(Template.Long)]
 partial struct LongId { }
 
 [StronglyTypedId("long-full")]
 partial struct ConvertersLongId { }
+
+[StronglyTypedId(Template.Long, "long-efcore", "long-dapper", "long-newtonsoftjson")]
+partial struct ConvertersLongId2 { }
 
 [StronglyTypedId("newid-full")]
 partial struct NewIdId1 { }
