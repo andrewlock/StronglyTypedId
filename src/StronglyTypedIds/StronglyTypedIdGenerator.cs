@@ -2,7 +2,9 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -69,69 +71,7 @@ namespace StronglyTypedIds
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
                 .Combine(templates)
-                .Select((all, _) =>
-                {
-                    if (all.Left.IsDefaultOrEmpty)
-                    {
-                        // no default attributes, valid, but no content
-                        return (EquatableArray<(string Name, string Content)>.Empty, true, null);
-                    }
-
-                    // technically we can never have more than one `Defaults` here
-                    // but check for it just in case
-                    if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
-                    {
-                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
-                    }
-
-                    var defaults = all.Left[0];
-                    if (defaults.HasMultiple)
-                    {
-                        // not valid
-                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
-                    }
-
-                    (string, string)? builtInTemplate = null;
-                    if (defaults.Template is { } templateId)
-                    {
-                        // Explicit template
-                        builtInTemplate = (string.Empty, EmbeddedSources.GetTemplate(templateId));
-                    }
-
-                    var templateNames = defaults.TemplateNames.GetArray();
-                    if (templateNames is null or {Length: 0})
-                    {
-                        if (builtInTemplate.HasValue)
-                        {
-                            // valid, only built-in
-                            var template = new EquatableArray<(string Name, string Content)>(new[] {builtInTemplate.Value});
-                            return (template, true, (DiagnosticInfo?) null);
-                        }
-
-                        // not valid, need something
-                        return (EquatableArray<(string Name, string Content)>.Empty, false, null);
-                    }
-
-                    // We have already checked for null/empty template name and flagged it as an error
-                    if (!GetContent(
-                            templateNames,
-                            defaults.TemplateLocation!,
-                            builtInTemplate.HasValue,
-                            in all.Right,
-                            out var contents, 
-                            out var diagnostic))
-                    {
-                        return (EquatableArray<(string Name, string Content)>.Empty, false, diagnostic);
-                    }
-
-                    if (builtInTemplate.HasValue)
-                    {
-                        contents[^1] = builtInTemplate.Value;
-                    }
-
-                    // Ok, we have all the templates
-                    return (new EquatableArray<(string Name, string Content)>(contents), true, null);                        
-                });
+                .Select(ProcessDefaults);
 
             var structsWithDefaultsAndTemplates = structs
                 .Combine(templates)
@@ -140,14 +80,12 @@ namespace StronglyTypedIds
             context.RegisterSourceOutput(structsWithDefaultsAndTemplates,
                 static (spc, source) => Execute(source.Left.Left, source.Left.Right, source.Right, spc));
         }
-
         private static void Execute(
             StructToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
             SourceProductionContext context)
         {
-            var sb = new StringBuilder();
             if (defaults.Diagnostic is { } diagnostic)
             {
                 // report error with the default template
@@ -159,7 +97,8 @@ namespace StronglyTypedIds
                 return;
             }
 
-            foreach (var (name, content) in templateContents)
+            var sb = new StringBuilder();
+            foreach (var (name, content) in templateContents.Distinct())
             {
                 var result = SourceGenerationHelper.CreateId(
                     idToGenerate.NameSpace,
@@ -178,6 +117,65 @@ namespace StronglyTypedIds
 
                 context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
             }
+        }
+
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessDefaults((ImmutableArray<Defaults> Left, ImmutableArray<(string Path, string Name, string? Content)> Right) all, CancellationToken _)
+        {
+            if (all.Left.IsDefaultOrEmpty)
+            {
+                // no default attributes, valid, but no content
+                return (EquatableArray<(string Name, string Content)>.Empty, true, null);
+            }
+
+            // technically we can never have more than one `Defaults` here
+            // but check for it just in case
+            if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
+            {
+                return (EquatableArray<(string Name, string Content)>.Empty, false, null);
+            }
+
+            var defaults = all.Left[0];
+            if (defaults.HasMultiple)
+            {
+                // not valid
+                return (EquatableArray<(string Name, string Content)>.Empty, false, null);
+            }
+
+            (string, string)? builtInTemplate = null;
+            if (defaults.Template is { } templateId)
+            {
+                // Explicit template
+                builtInTemplate = (string.Empty, EmbeddedSources.GetTemplate(templateId));
+            }
+
+            var templateNames = defaults.TemplateNames.GetArray();
+            if (templateNames is null or {Length: 0})
+            {
+                if (builtInTemplate.HasValue)
+                {
+                    // valid, only built-in
+                    var template = new EquatableArray<(string Name, string Content)>(new[] {builtInTemplate.Value});
+                    return (template, true, (DiagnosticInfo?) null);
+                }
+
+                // not valid, need something
+                return (EquatableArray<(string Name, string Content)>.Empty, false, null);
+            }
+
+            // We have already checked for null/empty template name and flagged it as an error
+            if (!GetContent(templateNames, defaults.TemplateLocation!, builtInTemplate.HasValue, in all.Right, out var contents, out var diagnostic))
+            {
+                return (EquatableArray<(string Name, string Content)>.Empty, false, diagnostic);
+            }
+
+            if (builtInTemplate.HasValue)
+            {
+                contents[^1] = builtInTemplate.Value;
+            }
+
+            // Ok, we have all the templates
+            return (new EquatableArray<(string Name, string Content)>(contents), true, null);
         }
 
         private static bool TryGetTemplateContent(
