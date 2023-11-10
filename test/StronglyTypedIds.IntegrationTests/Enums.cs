@@ -16,6 +16,9 @@ partial struct GuidId1 { }
 [StronglyTypedId("guid-full")]
 partial struct ConvertersGuidId { }
 
+[StronglyTypedId(Template.Guid, "guid-efcore", "guid-dapper", "guid-newtonsoftjson")]
+partial struct ConvertersGuidId2 { }
+
 [StronglyTypedId(Template.Guid)]
 public partial struct GuidId2 { }
 
