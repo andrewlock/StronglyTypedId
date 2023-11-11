@@ -77,7 +77,7 @@ internal class UnknownTemplateCodeFixProvider : CodeFixProvider
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    $"Add {templateName}.typedid template to the project",
+                    $"Add '{templateName}.typedid' template to the project",
                     cancellationToken => GetTransformedSolutionAsync(context.Document, templateName, cancellationToken),
                     nameof(UnknownTemplateCodeFixProvider)),
                 diagnostic);
