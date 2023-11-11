@@ -4,7 +4,7 @@ namespace StronglyTypedIds.Diagnostics;
 
 internal static class InvalidTemplateNameDiagnostic
 {
-    internal const string Id = "STI8";
+    internal const string Id = "STRONGID001";
     internal const string Message = "The template name must not be null or whitespace.";
     internal const string Title = "Invalid template name";
 

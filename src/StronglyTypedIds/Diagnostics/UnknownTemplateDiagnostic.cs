@@ -4,7 +4,7 @@ namespace StronglyTypedIds.Diagnostics;
 
 internal static class UnknownTemplateDiagnostic
 {
-    internal const string Id = "STI7";
+    internal const string Id = "STRONGID002";
     internal const string Title = "Unknown .typedid template";
     internal const string TemplateName = nameof(TemplateName);
 
