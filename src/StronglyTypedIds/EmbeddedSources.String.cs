@@ -54,7 +54,7 @@ internal static partial class EmbeddedSources
                     (_, _) => Value.CompareTo(other.Value),
                 };
     
-            class PLACEHOLDERIDTypeConverter : global::System.ComponentModel.TypeConverter
+            public class PLACEHOLDERIDTypeConverter : global::System.ComponentModel.TypeConverter
             {
                 public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
                 {
@@ -90,7 +90,7 @@ internal static partial class EmbeddedSources
                 }
             }
     
-            class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
+            public class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
             {
                 public override bool CanConvert(global::System.Type typeToConvert)
                     => typeToConvert == typeof(string) || base.CanConvert(typeToConvert);
