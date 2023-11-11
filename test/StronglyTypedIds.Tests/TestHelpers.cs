@@ -17,7 +17,6 @@ namespace StronglyTypedIds.Tests
         public static (ImmutableArray<Diagnostic> Diagnostics, string Output) GetGeneratedOutput<T>(string source, bool includeAttributes = true)
             where T : IIncrementalGenerator, new()
         {
-            var attr = new StronglyTypedIdAttribute();
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
@@ -54,7 +53,7 @@ namespace StronglyTypedIds.Tests
             texts.AddRange(assembly.GetManifestResourceNames()
                 .Select(name => new TestAdditionalText(
                     text: LoadEmbeddedResource(assembly, name),
-                    path: $"C:\\test\\Templates\\{Path.GetExtension(Path.GetFileNameWithoutExtension(name)).Substring(1)}.typedid")));
+                    path: Path.Combine("c:", "test", "Templates", Path.GetExtension(Path.GetFileNameWithoutExtension(name)).Substring(1) + ".typedid"))));
 
             return texts.ToImmutable();
         }
