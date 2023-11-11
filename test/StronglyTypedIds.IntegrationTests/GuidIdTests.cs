@@ -141,6 +141,56 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.True(deserialized.Values.ContainsKey(guid));
             Assert.Equal("My Value", deserialized.Values[guid]);
         }
+
+        [Fact]
+        public void CanSerializeToGuid_WithSystemTextJsonProvider_WithSourceGenerator()
+        {
+            var foo = GuidId1.New();
+
+            var serializedFoo = SystemTextJsonSerializer.Serialize(foo, SystemTextJsonSerializerContext.Custom.GuidId1);
+            var serializedGuid = SystemTextJsonSerializer.Serialize(foo.Value);
+
+            Assert.Equal(serializedFoo, serializedGuid);
+        }
+
+        [Fact]
+        public void CanDeserializeFromGuid_WithSystemTextJsonProvider_WithSourceGenerator()
+        {
+            var value = Guid.NewGuid();
+            var foo = new GuidId1(value);
+            var serializedGuid = SystemTextJsonSerializer.Serialize(value);
+
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<GuidId1>(serializedGuid, SystemTextJsonSerializerContext.Custom.GuidId1);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact(Skip = "This one doesn't seem to work, but I'm not sure if it's a source-generator limitation or a bug...")]
+        public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider_WithSourceGenerator()
+        {
+            var value = new TypeWithDictionaryKeys()
+            {
+                Values = new()
+            };
+            var guid = new GuidId1(Guid.Parse("78104553-f1cd-41ec-bcb6-d3a8ff8d994d"));
+            value.Values.Add(guid, "My Value");
+            var serialized = SystemTextJsonSerializer.Serialize(value, SystemTextJsonSerializerContext.Web.TypeWithDictionaryKeys);
+
+            var expected = $$"""
+                           {
+                             "values": {
+                               "78104553-f1cd-41ec-bcb6-d3a8ff8d994d": "My Value"
+                             }
+                           }
+                           """;
+            Assert.Equal(serialized, expected);
+
+            var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, SystemTextJsonSerializerContext.Web.TypeWithDictionaryKeys);
+
+            Assert.NotNull(deserialized.Values);
+            Assert.True(deserialized.Values.ContainsKey(guid));
+            Assert.Equal("My Value", deserialized.Values[guid]);
+        }
 #endif
 
         [Fact]
