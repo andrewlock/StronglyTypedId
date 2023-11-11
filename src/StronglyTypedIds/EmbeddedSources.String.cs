@@ -28,7 +28,7 @@ internal static partial class EmbeddedSources
                     (null, null) => true,
                     (null, _) => false,
                     (_, null) => false,
-                    (_, _) => Value.Equals(other.Value),
+                    (_, _) => Value.Equals(other.Value, global::System.StringComparison.Ordinal),
                 };
 
             public override bool Equals(object? obj)
@@ -51,7 +51,7 @@ internal static partial class EmbeddedSources
                     (null, null) => 0,
                     (null, _) => -1,
                     (_, null) => 1,
-                    (_, _) => Value.CompareTo(other.Value),
+                    (_, _) => string.CompareOrdinal(Value, other.Value),
                 };
     
             public class PLACEHOLDERIDTypeConverter : global::System.ComponentModel.TypeConverter
