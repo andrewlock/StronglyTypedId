@@ -5,67 +5,67 @@ namespace StronglyTypedIds.IntegrationTests.Types;
 
 
 [StronglyTypedId]
-internal partial struct DefaultId1 { }
+public partial struct DefaultId1 { }
 
 [StronglyTypedId]
-internal partial struct DefaultId2 { }
+public partial struct DefaultId2 { }
 
 [StronglyTypedId(Template.Guid)]
-internal partial struct GuidId1 { }
+public partial struct GuidId1 { }
 
 [StronglyTypedId("guid-full")]
-internal partial struct ConvertersGuidId { }
+public partial struct ConvertersGuidId { }
 
 [StronglyTypedId(Template.Guid, "guid-efcore", "guid-dapper", "guid-newtonsoftjson")]
-internal partial struct ConvertersGuidId2 { }
+public partial struct ConvertersGuidId2 { }
 
 [StronglyTypedId(Template.Guid)]
-internal partial struct GuidId2 { }
+public partial struct GuidId2 { }
 
 [StronglyTypedId(Template.Int)]
-internal partial struct IntId { }
+public partial struct IntId { }
 
 [StronglyTypedId("int-full")]
-internal partial struct ConvertersIntId { }
+public partial struct ConvertersIntId { }
 
 [StronglyTypedId(Template.Int, "int-efcore", "int-dapper", "int-newtonsoftjson")]
-internal partial struct ConvertersIntId2 { }
+public partial struct ConvertersIntId2 { }
 
 [StronglyTypedId(Template.Long)]
-internal partial struct LongId { }
+public partial struct LongId { }
 
 [StronglyTypedId("long-full")]
-internal partial struct ConvertersLongId { }
+public partial struct ConvertersLongId { }
 
 [StronglyTypedId(Template.Long, "long-efcore", "long-dapper", "long-newtonsoftjson")]
-internal partial struct ConvertersLongId2 { }
+public partial struct ConvertersLongId2 { }
 
 [StronglyTypedId("newid-full")]
-internal partial struct NewIdId1 { }
+public partial struct NewIdId1 { }
 
 [StronglyTypedId("newid-full")]
-internal partial struct NewIdId2 { }
+public partial struct NewIdId2 { }
 
 [StronglyTypedId(Template.String)]
-internal partial struct StringId { }
+public partial struct StringId { }
 
 [StronglyTypedId("string-full")]
-internal partial struct ConvertersStringId { }
+public partial struct ConvertersStringId { }
 
 [StronglyTypedId(Template.String, "string-efcore", "string-dapper", "string-newtonsoftjson")]
-internal partial struct ConvertersStringId2 { }
+public partial struct ConvertersStringId2 { }
 
 [StronglyTypedId("nullablestring-full")]
-internal partial struct NullableStringId { }
+public partial struct NullableStringId { }
 
-internal partial class SomeType<T> where T : new()
+public partial class SomeType<T> where T : new()
 {
-    internal partial record struct NestedType<TKey, TValue>
+    public partial record struct NestedType<TKey, TValue>
     {
-        internal partial struct MoreNesting
+        public partial struct MoreNesting
         {
             [StronglyTypedId]
-            internal readonly partial struct VeryNestedId
+            public readonly partial struct VeryNestedId
             {
             }
         }
