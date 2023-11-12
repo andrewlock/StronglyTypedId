@@ -50,7 +50,7 @@
         /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
 
-        public class MyIdTypeConverter : global::System.ComponentModel.TypeConverter
+        public partial class MyIdTypeConverter : global::System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
             {
@@ -99,7 +99,7 @@
             }
         }
 
-        public class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
+        public partial class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
         {
             public override bool CanConvert(global::System.Type typeToConvert)
                 => typeToConvert == typeof(string) || typeToConvert == typeof(global::System.Guid) || base.CanConvert(typeToConvert);
@@ -215,7 +215,7 @@
             => Value.ToGuid().TryFormat(destination, out charsWritten, format);
 #endif
 
-        public class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<MyId>
+        public partial class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<MyId>
         {
             public override void SetValue(global::System.Data.IDbDataParameter parameter, MyId value)
             {
@@ -233,7 +233,7 @@
             }
         }
 
-        public class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyId, global::System.Guid>
+        public partial class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyId, global::System.Guid>
         {
             public EfCoreValueConverter() : this(null) { }
             public EfCoreValueConverter(global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints? mappingHints = null)
@@ -244,7 +244,7 @@
                 ) { }
         }
 
-        public class MyIdNewtonsoftJsonConverter : global::Newtonsoft.Json.JsonConverter
+        public partial class MyIdNewtonsoftJsonConverter : global::Newtonsoft.Json.JsonConverter
         {
             public override bool CanConvert(global::System.Type objectType)
             {

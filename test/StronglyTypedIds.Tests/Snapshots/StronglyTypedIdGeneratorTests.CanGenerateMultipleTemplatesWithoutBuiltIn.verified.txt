@@ -12,7 +12,7 @@
 #nullable enable
     partial struct MyId
     {
-        public class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyId, global::System.Guid>
+        public partial class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyId, global::System.Guid>
         {
             public EfCoreValueConverter() : this(null) { }
             public EfCoreValueConverter(global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints? mappingHints = null)
@@ -38,7 +38,7 @@
 #nullable enable
     partial struct MyId
     {
-        public class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<MyId>
+        public partial class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<MyId>
         {
             public override void SetValue(global::System.Data.IDbDataParameter parameter, MyId value)
             {
