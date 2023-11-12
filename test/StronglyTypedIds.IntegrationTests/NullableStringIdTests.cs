@@ -17,6 +17,14 @@ namespace StronglyTypedIds.IntegrationTests
     public class NullableStringIdTests
     {
         [Fact]
+        public void CanUseNull()
+        {
+            var foo1 = new NullableStringId(null);
+
+            Assert.Null(foo1.Value);
+        }
+
+        [Fact]
         public void SameValuesAreEqual()
         {
             var id = "some-value";
