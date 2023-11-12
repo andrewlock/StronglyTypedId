@@ -36,6 +36,10 @@ internal static partial class EmbeddedSources
     
             public static bool operator ==(PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
             public static bool operator !=(PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
+            public static bool operator >  (PLACEHOLDERID a, PLACEHOLDERID b) => return a.CompareTo(b) > 0;
+            public static bool operator <  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
+            public static bool operator >=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
+            public static bool operator <=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
     
             /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
             public int CompareTo(PLACEHOLDERID other) => Value.CompareTo(other.Value);
