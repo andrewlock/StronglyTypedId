@@ -40,7 +40,7 @@ namespace StronglyTypedIds
                 .Where(template => !string.IsNullOrWhiteSpace(template.Name) && template.Content is not null)
                 .Collect();
                 
-            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
+            IncrementalValuesProvider<Result<(TypeToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
                 .ForAttributeWithMetadataName(
                     Parser.StronglyTypedIdAttribute,
                     predicate: (node, _) => node is StructDeclarationSyntax,
@@ -62,7 +62,7 @@ namespace StronglyTypedIds
                 defaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
                 static (context, info) => context.ReportDiagnostic(info));
 
-            IncrementalValuesProvider<StructToGenerate> structs = structAndDiagnostics
+            IncrementalValuesProvider<TypeToGenerate> structs = structAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.info);
 
@@ -81,7 +81,7 @@ namespace StronglyTypedIds
                 static (spc, source) => Execute(source.Left.Left, source.Left.Right, source.Right, spc));
         }
         private static void Execute(
-            StructToGenerate idToGenerate,
+            TypeToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
             SourceProductionContext context)
@@ -179,7 +179,7 @@ namespace StronglyTypedIds
         }
 
         private static bool TryGetTemplateContent(
-            in StructToGenerate idToGenerate,
+            in TypeToGenerate idToGenerate,
             in ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)> Contents, bool IsValid, DiagnosticInfo? Diagnostics) defaults,
             in SourceProductionContext context,

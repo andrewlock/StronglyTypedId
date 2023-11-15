@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace StronglyTypedIds;
 
-internal readonly record struct StructToGenerate
+internal readonly record struct TypeToGenerate
 {
-    public StructToGenerate(string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
+    public TypeToGenerate(string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
     {
         Name = name;
         NameSpace = nameSpace;

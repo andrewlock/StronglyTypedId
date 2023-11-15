@@ -45,7 +45,7 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        StructToGenerate GetStruct() =>
+        TypeToGenerate GetStruct() =>
             new(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
@@ -65,7 +65,7 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        StructToGenerate GetStruct() =>
+        TypeToGenerate GetStruct() =>
             new(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
@@ -85,9 +85,9 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        StructToGenerate GetStruct()
+        TypeToGenerate GetStruct()
         {
-            return new StructToGenerate(
+            return new TypeToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -107,9 +107,9 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        static Result<(StructToGenerate, bool)> GetResult()
+        static Result<(TypeToGenerate, bool)> GetResult()
         {
-            var instance = new StructToGenerate(
+            var instance = new TypeToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -117,7 +117,7 @@ public class EqualityTests
                 parent: new ParentClass(null, "class", "b", "", null, false),
                 _templateLocation);
 
-            return new Result<(StructToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
+            return new Result<(TypeToGenerate, bool)>((instance, true), new EquatableArray<DiagnosticInfo>());
         }
     }
 
@@ -131,9 +131,9 @@ public class EqualityTests
         Assert.True(instance1.Equals(instance2));
         Assert.True(instance1 == instance2);
 
-        static Result<(StructToGenerate, bool)> GetResult()
+        static Result<(TypeToGenerate, bool)> GetResult()
         {
-            var instance = new StructToGenerate(
+            var instance = new TypeToGenerate(
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -146,7 +146,7 @@ public class EqualityTests
                 Location.Create("somepath.cs", new TextSpan(), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
 
             var errors = new EquatableArray<DiagnosticInfo>(new[] { diagnostics });
-            return new Result<(StructToGenerate, bool)>((instance, true), errors);
+            return new Result<(TypeToGenerate, bool)>((instance, true), errors);
         }
     }
 }

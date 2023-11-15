@@ -13,12 +13,12 @@ internal static class Parser
     public const string StronglyTypedIdAttribute = "StronglyTypedIds.StronglyTypedIdAttribute";
     public const string StronglyTypedIdDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdDefaultsAttribute";
 
-    public static Result<(StructToGenerate info, bool valid)> GetStructSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    public static Result<(TypeToGenerate info, bool valid)> GetStructSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         var structSymbol = ctx.TargetSymbol as INamedTypeSymbol;
         if (structSymbol is null)
         {
-            return Result<StructToGenerate>.Fail();
+            return Result<TypeToGenerate>.Fail();
         }
 
         var structSyntax = (StructDeclarationSyntax)ctx.TargetNode;
@@ -70,14 +70,14 @@ internal static class Parser
 
         if (hasMisconfiguredInput)
         {
-            return new Result<(StructToGenerate, bool)>((default, false), errors);
+            return new Result<(TypeToGenerate, bool)>((default, false), errors);
         }
 
         string nameSpace = GetNameSpace(structSyntax);
         ParentClass? parentClass = GetParentClasses(structSyntax);
         var name = structSymbol.Name;
 
-        var toGenerate =new StructToGenerate(
+        var toGenerate =new TypeToGenerate(
             name: name, 
             nameSpace: nameSpace, 
             template: template, 
@@ -85,7 +85,7 @@ internal static class Parser
             templateLocation: attributeLocation!,
             parent: parentClass);
 
-        return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
+        return new Result<(TypeToGenerate, bool)>((toGenerate, true), errors);
     }
 
     public static Result<(Defaults defaults, bool valid)> GetDefaults(
