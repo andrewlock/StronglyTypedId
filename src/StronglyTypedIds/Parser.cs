@@ -15,13 +15,13 @@ internal static class Parser
 
     public static Result<(TypeToGenerate info, bool valid)> GetStructSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
-        var structSymbol = ctx.TargetSymbol as INamedTypeSymbol;
-        if (structSymbol is null)
+        var targetSymbol = ctx.TargetSymbol as INamedTypeSymbol;
+        if (targetSymbol is null)
         {
             return Result<TypeToGenerate>.Fail();
         }
 
-        var structSyntax = (StructDeclarationSyntax)ctx.TargetNode;
+        var targetSyntax = (TypeDeclarationSyntax)ctx.TargetNode;
 
         var hasMisconfiguredInput = false;
         List<DiagnosticInfo>? diagnostics = null;
@@ -29,7 +29,7 @@ internal static class Parser
         string[]? templateNames = null;
         LocationInfo? attributeLocation = null;
 
-        foreach (AttributeData attribute in structSymbol.GetAttributes())
+        foreach (AttributeData attribute in targetSymbol.GetAttributes())
         {
             if (!((attribute.AttributeClass?.Name == "StronglyTypedIdAttribute" ||
                   attribute.AttributeClass?.Name == "StronglyTypedId") &&
@@ -49,7 +49,7 @@ internal static class Parser
         }
 
         var hasPartialModifier = false;
-        foreach (var modifier in structSyntax.Modifiers)
+        foreach (var modifier in targetSyntax.Modifiers)
         {
             if (modifier.IsKind(SyntaxKind.PartialKeyword))
             {
@@ -61,7 +61,7 @@ internal static class Parser
         if (!hasPartialModifier)
         {
             diagnostics ??= new();
-            diagnostics.Add(NotPartialDiagnostic.CreateInfo(structSyntax));
+            diagnostics.Add(NotPartialDiagnostic.CreateInfo(targetSyntax));
         }
 
         var errors = diagnostics is null
@@ -73,11 +73,12 @@ internal static class Parser
             return new Result<(TypeToGenerate, bool)>((default, false), errors);
         }
 
-        string nameSpace = GetNameSpace(structSyntax);
-        ParentClass? parentClass = GetParentClasses(structSyntax);
-        var name = structSymbol.Name;
+        string nameSpace = GetNameSpace(targetSyntax);
+        ParentClass? parentClass = GetParentClasses(targetSyntax);
+        var name = targetSymbol.Name;
 
         var toGenerate =new TypeToGenerate(
+            keyword: GetKeyword(targetSyntax),
             name: name, 
             nameSpace: nameSpace, 
             template: template, 
@@ -303,7 +304,7 @@ internal static class Parser
         }
     }
 
-    private static string GetNameSpace(StructDeclarationSyntax structSymbol)
+    private static string GetNameSpace(TypeDeclarationSyntax structSymbol)
     {
         // determine the namespace the struct is declared in, if any
         SyntaxNode? potentialNamespaceParent = structSymbol.Parent;
@@ -333,25 +334,16 @@ internal static class Parser
         return string.Empty;
     }
 
-    private static ParentClass? GetParentClasses(StructDeclarationSyntax structSymbol)
+    private static ParentClass? GetParentClasses(TypeDeclarationSyntax structSymbol)
     {
         TypeDeclarationSyntax? parentIdClass = structSymbol.Parent as TypeDeclarationSyntax;
         ParentClass? parentClass = null;
 
         while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))
         {
-            var keyword = parentIdClass is RecordDeclarationSyntax record
-                ? record.ClassOrStructKeyword.Kind() switch
-                {
-                    SyntaxKind.StructKeyword => "record struct",
-                    SyntaxKind.ClassKeyword => "record class",
-                    _ => "record",
-                }
-                : parentIdClass.Keyword.ValueText;
-
             parentClass = new ParentClass(
                 Modifiers: parentIdClass.Modifiers.ToString(),
-                Keyword: keyword,
+                Keyword: GetKeyword(parentIdClass),
                 Name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
                 Constraints: parentIdClass.ConstraintClauses.ToString(),
                 Child: parentClass,
@@ -367,5 +359,18 @@ internal static class Parser
             kind == SyntaxKind.StructDeclaration ||
             kind == SyntaxKind.RecordStructDeclaration ||
             kind == SyntaxKind.RecordDeclaration;
+    }
+
+    private static string GetKeyword(TypeDeclarationSyntax typeSyntax)
+    {
+        var keyword = typeSyntax is RecordDeclarationSyntax record
+            ? record.ClassOrStructKeyword.Kind() switch
+            {
+                SyntaxKind.StructKeyword => "record struct",
+                SyntaxKind.ClassKeyword => "record class",
+                _ => "record",
+            }
+            : typeSyntax.Keyword.ValueText;
+        return keyword;
     }
 }

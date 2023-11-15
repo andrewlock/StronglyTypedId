@@ -47,6 +47,7 @@ public class EqualityTests
 
         TypeToGenerate GetStruct() =>
             new(
+                keyword: "struct",
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -67,6 +68,7 @@ public class EqualityTests
 
         TypeToGenerate GetStruct() =>
             new(
+                keyword: "struct",
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Int,
@@ -88,6 +90,7 @@ public class EqualityTests
         TypeToGenerate GetStruct()
         {
             return new TypeToGenerate(
+                keyword: "struct",
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -110,6 +113,7 @@ public class EqualityTests
         static Result<(TypeToGenerate, bool)> GetResult()
         {
             var instance = new TypeToGenerate(
+                keyword: "struct",
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,
@@ -134,6 +138,7 @@ public class EqualityTests
         static Result<(TypeToGenerate, bool)> GetResult()
         {
             var instance = new TypeToGenerate(
+                keyword: "struct",
                 name: "MyStruct",
                 nameSpace: "MyNamespace",
                 template: Template.Guid,

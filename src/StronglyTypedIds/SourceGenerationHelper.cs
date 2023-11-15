@@ -6,6 +6,7 @@ namespace StronglyTypedIds
     internal static class SourceGenerationHelper
     {
         public static string CreateId(
+            string idKeyword,
             string idNamespace,
             string idName,
             ParentClass? parentClass,
@@ -78,6 +79,7 @@ namespace StronglyTypedIds
 
             sb.AppendLine(template);
 
+            sb.Replace("PLACEHOLDERKEYWORD", idKeyword);
             sb.Replace("PLACEHOLDERID", idName);
 
             for (int i = 0; i < parentsCount; i++)

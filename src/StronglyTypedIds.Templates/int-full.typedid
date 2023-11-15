@@ -1,7 +1,7 @@
     [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]
     [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]
     [global::Newtonsoft.Json.JsonConverter(typeof(PLACEHOLDERIDNewtonsoftJsonConverter))]
-    partial struct PLACEHOLDERID :
+    partial PLACEHOLDERKEYWORD PLACEHOLDERID :
 #if NET6_0_OR_GREATER
         global::System.ISpanFormattable,
 #endif

@@ -6,8 +6,9 @@ namespace StronglyTypedIds;
 
 internal readonly record struct TypeToGenerate
 {
-    public TypeToGenerate(string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
+    public TypeToGenerate(string keyword, string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
     {
+        Keyword = keyword;
         Name = name;
         NameSpace = nameSpace;
         TemplateNames = templateNames is null ? EquatableArray<string>.Empty : new EquatableArray<string>(templateNames);
@@ -16,6 +17,7 @@ internal readonly record struct TypeToGenerate
         TemplateLocation = templateLocation;
     }
 
+    public string Keyword { get; }
     public string Name { get; }
     public string NameSpace { get; }
     public EquatableArray<string> TemplateNames { get; }

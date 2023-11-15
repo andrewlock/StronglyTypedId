@@ -43,7 +43,7 @@ namespace StronglyTypedIds
             IncrementalValuesProvider<Result<(TypeToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
                 .ForAttributeWithMetadataName(
                     Parser.StronglyTypedIdAttribute,
-                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    predicate: (node, _) => node is TypeDeclarationSyntax,
                     transform: Parser.GetStructSemanticTarget)
                 .Where(static m => m is not null);
 
@@ -101,6 +101,7 @@ namespace StronglyTypedIds
             foreach (var (name, content) in templateContents.Distinct())
             {
                 var result = SourceGenerationHelper.CreateId(
+                    idToGenerate.Keyword,
                     idToGenerate.NameSpace,
                     idToGenerate.Name,
                     idToGenerate.Parent,

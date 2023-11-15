@@ -1,4 +1,4 @@
-    partial struct PLACEHOLDERID
+    partial PLACEHOLDERKEYWORD PLACEHOLDERID
     {
         public partial class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<PLACEHOLDERID>
         {

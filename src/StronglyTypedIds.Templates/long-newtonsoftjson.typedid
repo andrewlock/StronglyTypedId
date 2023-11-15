@@ -1,5 +1,5 @@
     [global::Newtonsoft.Json.JsonConverter(typeof(PLACEHOLDERIDNewtonsoftJsonConverter))]
-    partial struct PLACEHOLDERID
+    partial PLACEHOLDERKEYWORD PLACEHOLDERID
     {
         public partial class PLACEHOLDERIDNewtonsoftJsonConverter : global::Newtonsoft.Json.JsonConverter
         {
