@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,356 +13,294 @@ internal static class Parser
     public const string StronglyTypedIdAttribute = "StronglyTypedIds.StronglyTypedIdAttribute";
     public const string StronglyTypedIdDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdDefaultsAttribute";
 
-    public static bool IsStructTargetForGeneration(SyntaxNode node)
-        => node is StructDeclarationSyntax m && m.AttributeLists.Count > 0;
-
-    public static bool IsAttributeTargetForGeneration(SyntaxNode node)
-        => node is AttributeListSyntax attributeList
-           && attributeList.Target is not null
-           && attributeList.Target.Identifier.IsKind(SyntaxKind.AssemblyKeyword);
-
-    public static StructDeclarationSyntax? GetStructSemanticTargetForGeneration(GeneratorSyntaxContext context)
+    public static Result<(StructToGenerate info, bool valid)> GetStructSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
-        // we know the node is a EnumDeclarationSyntax thanks to IsSyntaxTargetForGeneration
-        var structDeclarationSyntax = (StructDeclarationSyntax)context.Node;
-
-        // loop through all the attributes on the method
-        foreach (AttributeListSyntax attributeListSyntax in structDeclarationSyntax.AttributeLists)
+        var structSymbol = ctx.TargetSymbol as INamedTypeSymbol;
+        if (structSymbol is null)
         {
-            foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (ModelExtensions.GetSymbolInfo(context.SemanticModel, attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                {
-                    // weird, we couldn't get the symbol, ignore it
-                    continue;
-                }
-
-                INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                string fullName = attributeContainingTypeSymbol.ToDisplayString();
-
-                // Is the attribute the [StronglyTypedId] attribute?
-                if (fullName == StronglyTypedIdAttribute)
-                {
-                    // return the enum
-                    return structDeclarationSyntax;
-                }
-            }
+            return Result<StructToGenerate>.Fail();
         }
 
-        // we didn't find the attribute we were looking for
-        return null;
-    }
+        var structSyntax = (StructDeclarationSyntax)ctx.TargetNode;
 
-    public static AttributeSyntax? GetAssemblyAttributeSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        // we know the node is a AttributeListSyntax thanks to IsSyntaxTargetForGeneration
-        var attributeListSyntax = (AttributeListSyntax)context.Node;
+        var hasMisconfiguredInput = false;
+        List<DiagnosticInfo>? diagnostics = null;
+        Template? template = null;
+        string[]? templateNames = null;
+        LocationInfo? attributeLocation = null;
 
-        // loop through all the attributes in the list
-        foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
+        foreach (AttributeData attribute in structSymbol.GetAttributes())
         {
-            if (ModelExtensions.GetSymbolInfo(context.SemanticModel, attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdAttribute" ||
+                  attribute.AttributeClass?.Name == "StronglyTypedId") &&
+                  attribute.AttributeClass.ToDisplayString() == StronglyTypedIdAttribute))
             {
-                // weird, we couldn't get the symbol, ignore it
+                // wrong attribute
                 continue;
             }
 
-            INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-            string fullName = attributeContainingTypeSymbol.ToDisplayString();
+            (var result, (template, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
 
-            // Is the attribute the [StronglyTypedIdDefaultsAttribute] attribute?
-            if (fullName == StronglyTypedIdDefaultsAttribute)
+            if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
             {
-                // return the attribute
-                return attributeSyntax;
+                attributeLocation = LocationInfo.CreateFrom(s);
             }
         }
 
-        // we didn't find the attribute we were looking for
-        return null;
-    }
-
-    public static List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)> GetTypesToGenerate(
-        Compilation compilation,
-        ImmutableArray<StructDeclarationSyntax> targets,
-        Action<Diagnostic> reportDiagnostic,
-        CancellationToken ct)
-    {
-        var idsToGenerate = new List<(string Name, string NameSpace, StronglyTypedIdConfiguration Config, ParentClass? Parent)>();
-        INamedTypeSymbol? idAttribute = compilation.GetTypeByMetadataName(StronglyTypedIdAttribute);
-        if (idAttribute == null)
+        var hasPartialModifier = false;
+        foreach (var modifier in structSyntax.Modifiers)
         {
-            // nothing to do if this type isn't available
-            return idsToGenerate;
-        }
-
-        foreach (StructDeclarationSyntax structDeclarationSyntax in targets)
-        {
-            // stop if we're asked to
-            ct.ThrowIfCancellationRequested();
-
-            SemanticModel semanticModel = compilation.GetSemanticModel(structDeclarationSyntax.SyntaxTree);
-            if (semanticModel.GetDeclaredSymbol(structDeclarationSyntax) is not INamedTypeSymbol structSymbol)
+            if (modifier.IsKind(SyntaxKind.PartialKeyword))
             {
-                // something went wrong
-                continue;
-            }
-
-            StronglyTypedIdConfiguration? config = null;
-            var hasMisconfiguredInput = false;
-
-            foreach (AttributeData attribute in structSymbol.GetAttributes())
-            {
-                if (!idAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
-                {
-                    continue;
-                }
-
-                StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default;
-                StronglyTypedIdConverter converter = StronglyTypedIdConverter.Default;
-                StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default;
-
-                if (!attribute.ConstructorArguments.IsEmpty)
-                {
-                    // make sure we don't have any errors
-                    ImmutableArray<TypedConstant> args = attribute.ConstructorArguments;
-
-                    foreach (TypedConstant arg in args)
-                    {
-                        if (arg.Kind == TypedConstantKind.Error)
-                        {
-                            // have an error, so don't try and do any generation
-                            hasMisconfiguredInput = true;
-                        }
-                    }
-
-                    switch (args.Length)
-                    {
-                        case 3:
-                            implementations = (StronglyTypedIdImplementations)args[2].Value!;
-                            goto case 2;
-                        case 2:
-                            converter = (StronglyTypedIdConverter)args[1].Value!;
-                            goto case 1;
-                        case 1:
-                            backingType = (StronglyTypedIdBackingType)args[0].Value!;
-                            break;
-                    }
-                }
-
-                if (!attribute.NamedArguments.IsEmpty)
-                {
-                    foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
-                    {
-                        TypedConstant typedConstant = arg.Value;
-                        if (typedConstant.Kind == TypedConstantKind.Error)
-                        {
-                            hasMisconfiguredInput = true;
-                        }
-                        else
-                        {
-                            switch (arg.Key)
-                            {
-                                case "backingType":
-                                    backingType = (StronglyTypedIdBackingType)typedConstant.Value!;
-                                    break;
-                                case "converters":
-                                    converter = (StronglyTypedIdConverter)typedConstant.Value!;
-                                    break;
-                                case "implementations":
-                                    implementations = (StronglyTypedIdImplementations)typedConstant.Value!;
-                                    break;
-                            }
-                        }
-                    }
-
-
-                }
-
-                if (hasMisconfiguredInput)
-                {
-                    // skip further generator execution and let compiler generate the errors
-                    break;
-                }
-
-                if (!converter.IsValidFlags())
-                {
-                    reportDiagnostic(InvalidConverterDiagnostic.Create(structDeclarationSyntax));
-                }
-
-                if (!Enum.IsDefined(typeof(StronglyTypedIdBackingType), backingType))
-                {
-                    reportDiagnostic(InvalidBackingTypeDiagnostic.Create(structDeclarationSyntax));
-                }
-
-                if (!implementations.IsValidFlags())
-                {
-                    reportDiagnostic(InvalidImplementationsDiagnostic.Create(structDeclarationSyntax));
-                }
-
-                config = new StronglyTypedIdConfiguration(backingType, converter, implementations);
+                hasPartialModifier = true;
                 break;
             }
-
-            if (config is null || hasMisconfiguredInput)
-            {
-                continue; // name clash, or error
-            }
-
-            var hasPartialModifier = false;
-            foreach (var modifier in structDeclarationSyntax.Modifiers)
-            {
-                if (modifier.IsKind(SyntaxKind.PartialKeyword))
-                {
-                    hasPartialModifier = true;
-                    break;
-                }
-            }
-
-            if (!hasPartialModifier)
-            {
-                reportDiagnostic(NotPartialDiagnostic.Create(structDeclarationSyntax));
-            }
-
-            string nameSpace = GetNameSpace(structDeclarationSyntax);
-            var parentClass = GetParentClasses(structDeclarationSyntax);
-            var name = structSymbol.Name;
-
-            idsToGenerate.Add((Name: name, NameSpace: nameSpace, Config: config.Value, Parent: parentClass));
         }
 
-        return idsToGenerate;
+        if (!hasPartialModifier)
+        {
+            diagnostics ??= new();
+            diagnostics.Add(NotPartialDiagnostic.CreateInfo(structSyntax));
+        }
+
+        var errors = diagnostics is null
+            ? EquatableArray<DiagnosticInfo>.Empty
+            : new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
+
+        if (hasMisconfiguredInput)
+        {
+            return new Result<(StructToGenerate, bool)>((default, false), errors);
+        }
+
+        string nameSpace = GetNameSpace(structSyntax);
+        ParentClass? parentClass = GetParentClasses(structSyntax);
+        var name = structSymbol.Name;
+
+        var toGenerate =new StructToGenerate(
+            name: name, 
+            nameSpace: nameSpace, 
+            template: template, 
+            templateNames: templateNames, 
+            templateLocation: attributeLocation!,
+            parent: parentClass);
+
+        return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
     }
 
-    public static StronglyTypedIdConfiguration? GetDefaults(
-        ImmutableArray<AttributeSyntax> defaults,
-        Compilation compilation,
-        Action<Diagnostic> reportDiagnostic)
+    public static Result<(Defaults defaults, bool valid)> GetDefaults(
+        GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
-        if (defaults.IsDefaultOrEmpty)
-        {
-            // No global defaults
-            return null;
-        }
-
-        var assemblyAttributes = compilation.Assembly.GetAttributes();
+        var assemblyAttributes = ctx.TargetSymbol.GetAttributes();
         if (assemblyAttributes.IsDefaultOrEmpty)
         {
-            return null;
+            return Result<Defaults>.Fail();
         }
 
-        INamedTypeSymbol? defaultsAttribute = compilation.GetTypeByMetadataName(StronglyTypedIdDefaultsAttribute);
-        if (defaultsAttribute is null)
-        {
-            // The attribute isn't part of the compilation for some reason...
-            return null;
-        }
+        // We only return the first config that we find
+        string[]? templateNames = null;
+        Template? template = null;
+        LocationInfo? attributeLocation = null;
+        List<DiagnosticInfo>? diagnostics = null;
+        bool hasMisconfiguredInput = false;
+        bool hasMultiple = false;
 
+        // if we have multiple attributes we still check them, so that we can add extra diagnostics if necessary
+        // the "first" one found won't be flagged as a duplicate though.
         foreach (AttributeData attribute in assemblyAttributes)
         {
-            if (!defaultsAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
+            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdDefaultsAttribute" ||
+                   attribute.AttributeClass?.Name == "StronglyTypedIdDefaults") &&
+                  attribute.AttributeClass.ToDisplayString() == StronglyTypedIdDefaultsAttribute))
             {
+                // wrong attribute
                 continue;
             }
 
-            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default;
-            StronglyTypedIdConverter converter = StronglyTypedIdConverter.Default;
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default;
-            bool hasMisconfiguredInput = false;
-
-            if (!attribute.ConstructorArguments.IsEmpty)
+            var syntax = attribute.ApplicationSyntaxReference?.GetSyntax();
+            if (templateNames is not null || template.HasValue || hasMisconfiguredInput)
             {
-                // make sure we don't have any errors
-                ImmutableArray<TypedConstant> args = attribute.ConstructorArguments;
-
-                foreach (TypedConstant arg in args)
+                hasMultiple = true;
+                if (syntax is not null)
                 {
-                    if (arg.Kind == TypedConstantKind.Error)
-                    {
-                        // have an error, so don't try and do any generation
-                        hasMisconfiguredInput = true;
-                    }
-                }
-
-                switch (args.Length)
-                {
-                    case 3:
-                        implementations = (StronglyTypedIdImplementations)args[2].Value!;
-                        goto case 2;
-                    case 2:
-                        converter = (StronglyTypedIdConverter)args[1].Value!;
-                        goto case 1;
-                    case 1:
-                        backingType = (StronglyTypedIdBackingType)args[0].Value!;
-                        break;
+                    diagnostics ??= new();
+                    diagnostics.Add(MultipleAssemblyAttributeDiagnostic.CreateInfo(syntax));
                 }
             }
 
-            if (!attribute.NamedArguments.IsEmpty)
+            (var result, (template, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
+
+            if (syntax is not null)
             {
-                foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
+                attributeLocation = LocationInfo.CreateFrom(syntax);
+            }
+        }
+
+        var errors = diagnostics is null
+            ? EquatableArray<DiagnosticInfo>.Empty
+            : new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
+
+        if (hasMisconfiguredInput)
+        {
+            return new Result<(Defaults, bool)>((default, false), errors);
+        }
+
+        var defaults = new Defaults(template, templateNames, attributeLocation!, hasMultiple);
+
+        return new Result<(Defaults, bool)>((defaults, true), errors);
+    }
+
+    private static (bool HasMisconfiguredInput, (Template? Template, string[]? TemplateNames)) GetConstructorValues(AttributeData attribute)
+    {
+        (Template? Template, string? Name, string[]? Names)? results1 = null;
+        (Template? Template, string? Name, string[]? Names)? results2 = null;
+
+        if (attribute.ConstructorArguments is { IsEmpty: false } args)
+        {
+            // we should have at most 2 args (params count as one arg)
+            if (args.Length > 2)
+            {
+                // have an error, so don't try and do any generation
+                return (true, default);
+            }
+
+            // Should always have at least one arg, but it might be an empty array
+            var (success, results) = TryGetTypedConstant(args[0]);
+
+            if (success)
+            {
+                results1 = results;
+            }
+            else
+            {
+                // have an error, so don't try and do any generation
+                return (true, default);
+            }
+
+            if (args.Length == 2)
+            {
+                (success, results) = TryGetTypedConstant(args[1]);
+
+                if (success)
                 {
-                    TypedConstant typedConstant = arg.Value;
-                    if (typedConstant.Kind == TypedConstantKind.Error)
+                    results2 = results;
+                }
+                else
+                {
+                    // have an error, so don't try and do any generation
+                    return (true, default);
+                }
+            }
+        }
+        
+        if (attribute.NamedArguments is { IsEmpty: false } namedArgs)
+        {
+            foreach (KeyValuePair<string, TypedConstant> arg in namedArgs)
+            {
+                // Should always have at least one arg, but it might be an empty array
+                var (success, results) = TryGetTypedConstant(arg.Value);
+
+                if (success)
+                {
+                    if (results1 is null)
                     {
-                        hasMisconfiguredInput = true;
+                        results1 = results;
+                    }
+                    else if(results2 is null)
+                    {
+                        results2 = results;
                     }
                     else
                     {
-                        switch (arg.Key)
-                        {
-                            case "backingType":
-                                backingType = (StronglyTypedIdBackingType)typedConstant.Value!;
-                                break;
-                            case "converters":
-                                converter = (StronglyTypedIdConverter)typedConstant.Value!;
-                                break;
-                            case "implementations":
-                                implementations = (StronglyTypedIdImplementations)typedConstant.Value!;
-                                break;
-                        }
+                        // must be an error
+                        return (true, default);
                     }
                 }
-            }
-
-            if (hasMisconfiguredInput)
-            {
-                // skip further generator execution and let compiler generate the errors
-                break;
-            }
-
-            SyntaxNode? syntax = null;
-            if (!converter.IsValidFlags())
-            {
-                syntax = attribute.ApplicationSyntaxReference?.GetSyntax();
-                if (syntax is not null)
+                else
                 {
-                    reportDiagnostic(InvalidConverterDiagnostic.Create(syntax));
+                    // have an error, so don't try and do any generation
+                    return (true, default);
                 }
             }
-
-            if (!Enum.IsDefined(typeof(StronglyTypedIdBackingType), backingType))
-            {
-                syntax ??= attribute.ApplicationSyntaxReference?.GetSyntax();
-                if (syntax is not null)
-                {
-                    reportDiagnostic(InvalidBackingTypeDiagnostic.Create(syntax));
-                }
-            }
-
-            if (!implementations.IsValidFlags())
-            {
-                syntax ??= attribute.ApplicationSyntaxReference?.GetSyntax();
-                if (syntax is not null)
-                {
-                    reportDiagnostic(InvalidImplementationsDiagnostic.Create(syntax));
-                }
-            }
-
-            return new StronglyTypedIdConfiguration(backingType, converter, implementations);
         }
 
-        return null;
+
+        // consolidate
+        var template = results1?.Template ?? results2?.Template;
+        var name = results1?.Name ?? results2?.Name;
+        var names = results1?.Names ?? results2?.Names;
+
+        if (name is not null)
+        {
+            if (names is {Length: > 0} ns)
+            {
+                names = new string[ns.Length + 1];
+                ns.CopyTo(names, 0);
+                names[^1] = name;
+            }
+            else
+            {
+                names = new[] {name};
+            }
+        }
+
+        return (false, (template, names));
+
+        static (bool IsValid, (Template? Template, string? Name, string[]? Names)) TryGetTypedConstant(in TypedConstant arg)
+        {
+            if (arg.Kind is TypedConstantKind.Error)
+            {
+                return (false, default);
+            }
+
+            if (arg.Kind is TypedConstantKind.Primitive
+                && arg.Value is string stringValue)
+            {
+                var name = string.IsNullOrWhiteSpace(stringValue)
+                    ? string.Empty
+                    : stringValue;
+
+                return (true, (null, name, null));
+            }
+
+            if (arg.Kind is TypedConstantKind.Enum
+                && arg.Value is int intValue)
+            {
+                return (true, ((Template) intValue, null, null));
+            }
+
+            if (arg.Kind is TypedConstantKind.Array)
+            {
+                var values = arg.Values;
+
+                // if null is passed, it's treated the same as an empty array   
+                if (values.IsDefaultOrEmpty)
+                {
+                    return (true, (null, null, Array.Empty<string>()));
+                }
+
+                var names = new string[values.Length];
+                for (var i = 0; i < values.Length; i++)
+                {
+                    if (values[i].Kind == TypedConstantKind.Error)
+                    {
+                        // Abandon generation
+                        return (false, default);
+                    }
+
+                    var value = values[i].Value as string;
+                    names[i] = string.IsNullOrWhiteSpace(value)
+                        ? string.Empty
+                        : value!;
+                }
+
+                return (true, (null, null, names));
+            }
+
+            // Some other type, weird, shouldn't be able to get this
+            return (false, default);
+        }
     }
 
     private static string GetNameSpace(StructDeclarationSyntax structSymbol)
@@ -403,11 +340,22 @@ internal static class Parser
 
         while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))
         {
+            var keyword = parentIdClass is RecordDeclarationSyntax record
+                ? record.ClassOrStructKeyword.Kind() switch
+                {
+                    SyntaxKind.StructKeyword => "record struct",
+                    SyntaxKind.ClassKeyword => "record class",
+                    _ => "record",
+                }
+                : parentIdClass.Keyword.ValueText;
+
             parentClass = new ParentClass(
-                keyword: parentIdClass.Keyword.ValueText,
-                name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
-                constraints: parentIdClass.ConstraintClauses.ToString(),
-                child: parentClass);
+                Modifiers: parentIdClass.Modifiers.ToString(),
+                Keyword: keyword,
+                Name: parentIdClass.Identifier.ToString() + parentIdClass.TypeParameterList,
+                Constraints: parentIdClass.ConstraintClauses.ToString(),
+                Child: parentClass,
+                IsGeneric: parentIdClass.Arity > 0);
 
             parentIdClass = (parentIdClass.Parent as TypeDeclarationSyntax);
         }
@@ -417,6 +365,7 @@ internal static class Parser
         static bool IsAllowedKind(SyntaxKind kind) =>
             kind == SyntaxKind.ClassDeclaration ||
             kind == SyntaxKind.StructDeclaration ||
+            kind == SyntaxKind.RecordStructDeclaration ||
             kind == SyntaxKind.RecordDeclaration;
     }
 }

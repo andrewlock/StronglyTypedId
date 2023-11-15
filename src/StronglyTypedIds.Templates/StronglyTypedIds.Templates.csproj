@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Nullable>enable</Nullable>
+    <PackageId>StronglyTypedId.Templates</PackageId>
+    <Description>A collection of templates for generating strongly-typed IDs by decorating with a [StronglyTypedId] attribute</Description>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="StronglyTypedId.Templates.targets" Pack="true" PackagePath="build" Visible="false" />
+    <None Include=".\*.typedid" Pack="true" PackagePath="build/AdditionalFiles" Visible="false" />
+  </ItemGroup>
+
+</Project>

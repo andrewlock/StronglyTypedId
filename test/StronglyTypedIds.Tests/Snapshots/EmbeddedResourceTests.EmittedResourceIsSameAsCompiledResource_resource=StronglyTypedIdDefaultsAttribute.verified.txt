@@ -9,52 +9,53 @@
 
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
+#nullable enable
 
-using System;
+#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
 
 namespace StronglyTypedIds
 {
     /// <summary>
-    /// Used to control the default Place on partial structs to make the type a strongly-typed ID
+    /// Used to control the default strongly typed ID values. Apply to an assembly using
+    /// <code>[assembly:StronglyTypedIdDefaults(Template.Int)]</code> for example
     /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
-    internal sealed class StronglyTypedIdDefaultsAttribute : Attribute
+    [global::System.AttributeUsage(global::System.AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
+    [global::System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
+    internal sealed class StronglyTypedIdDefaultsAttribute : global::System.Attribute
     {
         /// <summary>
-        /// Set the default values used for strongly typed ids
+        /// Set the default template to use for strongly typed IDs
         /// </summary>
-        /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value.
-        /// Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
-        /// <param name="converters">JSON library used to serialize/deserialize strongly-typed ID value.
-        /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
-        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
-        /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
-        public StronglyTypedIdDefaultsAttribute(
-            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
-            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
+        /// <param name="template">The built-in template to use to generate the ID.</param>
+        /// <param name="templateNames">The names of additional custom templates to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateNames"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(global::StronglyTypedIds.Template template, params string[] templateNames)
         {
-            BackingType = backingType;
-            Converters = converters;
-            Implementations = implementations;
         }
 
         /// <summary>
-        /// The default <see cref="Type"/> to use to store the strongly-typed ID values.
+        /// Set the default template to use for strongly typed IDs
         /// </summary>
-        public StronglyTypedIdBackingType BackingType { get; }
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(string templateName)
+        {
+        }
 
         /// <summary>
-        /// The default converters to create for serializing/deserializing strongly-typed ID values.
+        /// Set the default template to use for strongly typed IDs
         /// </summary>
-        public StronglyTypedIdConverter Converters { get; }
-
-        /// <summary>
-        /// Interfaces and patterns the strongly typed id should implement
-        /// </summary>
-        public StronglyTypedIdImplementations Implementations { get; }
+        /// <param name="templateName">The name of the template to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateName"/>.
+        /// </param>
+        public StronglyTypedIdDefaultsAttribute(string templateName, params string[] templateNames)
+        {
+        }
     }
 }
 #endif

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -29,7 +31,6 @@ namespace StronglyTypedIds.IntegrationTests
         {
             Assert.Equal(0, LongId.Empty.Value);
         }
-
 
         [Fact]
         public void DifferentValuesAreUnequal()
@@ -65,17 +66,6 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void CanSerializeToLong_WithNewtonsoftJsonProvider()
-        {
-            var foo = new NewtonsoftJsonLongId(123);
-
-            var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
-            var serializedLong = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
-
-            Assert.Equal(serializedFoo, serializedLong);
-        }
-
-        [Fact]
         public void CanSerializeToNullableInt_WithNewtonsoftJsonProvider()
         {
             var entity = new EntityWithNullableId { Id = null };
@@ -87,10 +77,138 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.Null(deserialize.Id);
         }
 
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider()
+        {
+            var value = new TypeWithDictionaryKeys()
+            {
+                Values = new()
+            };
+            var key = new LongId(123);
+            value.Values.Add(key, "My Value");
+            var opts = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            var serialized = SystemTextJsonSerializer.Serialize(value, opts);
+
+            var expected = $$"""
+                             {
+                               "values": {
+                                 "123": "My Value"
+                               }
+                             }
+                             """;
+            Assert.Equal(serialized, expected);
+
+            var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
+
+            Assert.NotNull(deserialized.Values);
+            Assert.True(deserialized.Values.ContainsKey(key));
+            Assert.Equal("My Value", deserialized.Values[key]);
+        }
+#endif
+
+        [Fact]
+        public void WhenNoJsonConverter_NewtonsoftSerializesWithoutValueProperty()
+        {
+            var foo = new LongId(123);
+
+            var serialized = NewtonsoftJsonSerializer.SerializeObject(foo);
+
+            var expected = $"\"{foo.Value}\"";
+
+            Assert.Equal(expected, serialized);
+        }
+
+        [Theory]
+        [InlineData(123L)]
+        [InlineData("123")]
+        public void TypeConverter_CanConvertToAndFrom(object value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(LongId));
+            var id = converter.ConvertFrom(value);
+            Assert.IsType<LongId>(id);
+            Assert.Equal(new LongId(123), id);
+
+            var reconverted = converter.ConvertTo(id, value.GetType());
+            Assert.Equal(value, reconverted);
+        }
+
+        [Fact]
+        public void CanCompareDefaults()
+        {
+            LongId original = default;
+            var other = LongId.Empty;
+
+            var compare1 = original.CompareTo(other);
+            var compare2 = other.CompareTo(original);
+            Assert.Equal(compare1, -compare2);
+        }
+
+        [Fact]
+        public void CanEquateDefaults()
+        {
+            LongId original = default;
+            var other = LongId.Empty;
+
+            var equals1 = (original as IEquatable<LongId>).Equals(other);
+            var equals2 = (other as IEquatable<LongId>).Equals(original);
+
+            Assert.Equal(equals1, equals2);
+        }
+
+        [Fact]
+        public void ImplementsInterfaces()
+        {
+            Assert.IsAssignableFrom<IEquatable<LongId>>(LongId.Empty);
+            Assert.IsAssignableFrom<IComparable<LongId>>(LongId.Empty);
+
+#pragma warning disable 184
+#pragma warning disable CS0183
+            Assert.True(LongId.Empty is IComparable<LongId>);
+            Assert.True(LongId.Empty is IEquatable<LongId>);
+#pragma warning restore CS0183
+#pragma warning restore 184
+            
+#if NET6_0_OR_GREATER
+            Assert.IsAssignableFrom<ISpanFormattable>(LongId.Empty);
+#endif
+#if NET7_0_OR_GREATER
+            // doesn't compile if doesn't implement it 
+            ParseAs<LongId>("123");
+            ParseSpan<LongId>("123".AsSpan());
+
+            T ParseAs<T>(string s) where T : IParsable<T>
+            {
+                return T.Parse(s, null);
+            }
+
+            T ParseSpan<T>(ReadOnlySpan<char> s) where T : ISpanParsable<T>
+            {
+                return T.Parse(s, null);
+            }
+#endif
+        }
+
+#region ConvertersLongId
+        [Fact]
+        public void CanSerializeToLong_WithNewtonsoftJsonProvider()
+        {
+            var foo = new ConvertersLongId(123);
+
+            var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
+            var serializedLong = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
+
+            Assert.Equal(serializedFoo, serializedLong);
+        }
+
         [Fact]
         public void CanSerializeToLong_WithSystemTextJsonProvider()
         {
-            var foo = new SystemTextJsonLongId(123L);
+            var foo = new ConvertersLongId(123L);
 
             var serializedFoo = SystemTextJsonSerializer.Serialize(foo);
             var serializedLong = SystemTextJsonSerializer.Serialize(foo.Value);
@@ -102,10 +220,10 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanDeserializeFromLong_WithNewtonsoftJsonProvider()
         {
             var value = 123L;
-            var foo = new NewtonsoftJsonLongId(value);
+            var foo = new ConvertersLongId(value);
             var serializedLong = NewtonsoftJsonSerializer.SerializeObject(value);
 
-            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<NewtonsoftJsonLongId>(serializedLong);
+            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<ConvertersLongId>(serializedLong);
 
             Assert.Equal(foo, deserializedFoo);
         }
@@ -114,65 +232,12 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanDeserializeFromLong_WithSystemTextJsonProvider()
         {
             var value = 123L;
-            var foo = new SystemTextJsonLongId(value);
+            var foo = new ConvertersLongId(value);
             var serializedLong = SystemTextJsonSerializer.Serialize(value);
 
-            var deserializedFoo = SystemTextJsonSerializer.Deserialize<SystemTextJsonLongId>(serializedLong);
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<ConvertersLongId>(serializedLong);
 
             Assert.Equal(foo, deserializedFoo);
-        }
-
-        [Fact]
-        public void CanSerializeToLong_WithBothJsonConverters()
-        {
-            var foo = new BothJsonLongId(123L);
-
-            var serializedFoo1 = NewtonsoftJsonSerializer.SerializeObject(foo);
-            var serializedLong1 = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
-
-            var serializedFoo2 = SystemTextJsonSerializer.Serialize(foo);
-            var serializedLong2 = SystemTextJsonSerializer.Serialize(foo.Value);
-
-            Assert.Equal(serializedFoo1, serializedLong1);
-            Assert.Equal(serializedFoo2, serializedLong2);
-        }
-
-        [Fact]
-        public void WhenNoJsonConverter_SystemTextJsonSerializesWithValueProperty()
-        {
-            var foo = new NoJsonLongId(123);
-
-            var serialized = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":" + foo.Value + "}";
-
-            Assert.Equal(expected, serialized);
-        }
-
-        [Fact]
-        public void WhenNoJsonConverter_NewtonsoftSerializesWithoutValueProperty()
-        {
-            var foo = new NoJsonLongId(123);
-
-            var serialized = NewtonsoftJsonSerializer.SerializeObject(foo);
-
-            var expected = $"\"{foo.Value}\"";
-
-            Assert.Equal(expected, serialized);
-        }
-
-        [Fact]
-        public void WhenNoTypeConverter_SerializesWithValueProperty()
-        {
-            var foo = new NoConverterLongId(123);
-
-            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
-            var systemText = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":" + foo.Value + "}";
-
-            Assert.Equal(expected, newtonsoft);
-            Assert.Equal(expected, systemText);
         }
 
         [Fact]
@@ -185,7 +250,7 @@ namespace StronglyTypedIds.IntegrationTests
                 .UseSqlite(connection)
                 .Options;
 
-            var original = new TestEntity { Id = new EfCoreLongId(123) };
+            var original = new TestEntity { Id = new ConvertersLongId(123) };
             using (var context = new TestDbContext(options))
             {
                 context.Database.EnsureCreated();
@@ -207,64 +272,11 @@ namespace StronglyTypedIds.IntegrationTests
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
 
-            var results = await connection.QueryAsync<DapperLongId>("SELECT 123");
+            var results = await connection.QueryAsync<ConvertersLongId>("SELECT 123");
 
             var value = Assert.Single(results);
-            Assert.Equal(value, new DapperLongId(123));
+            Assert.Equal(value, new ConvertersLongId(123));
         }
-
-        [Theory]
-        [InlineData(123L)]
-        [InlineData("123")]
-        public void TypeConverter_CanConvertToAndFrom(object value)
-        {
-            var converter = TypeDescriptor.GetConverter(typeof(NoJsonLongId));
-            var id = converter.ConvertFrom(value);
-            Assert.IsType<NoJsonLongId>(id);
-            Assert.Equal(new NoJsonLongId(123), id);
-
-            var reconverted = converter.ConvertTo(id, value.GetType());
-            Assert.Equal(value, reconverted);
-        }
-
-        [Fact]
-        public void CanCompareDefaults()
-        {
-            ComparableLongId original = default;
-            var other = ComparableLongId.Empty;
-
-            var compare1 = original.CompareTo(other);
-            var compare2 = other.CompareTo(original);
-            Assert.Equal(compare1, -compare2);
-        }
-
-        [Fact]
-        public void CanEquateDefaults()
-        {
-            EquatableLongId original = default;
-            var other = EquatableLongId.Empty;
-
-            var equals1 = (original as IEquatable<EquatableLongId>).Equals(other);
-            var equals2 = (other as IEquatable<EquatableLongId>).Equals(original);
-
-            Assert.Equal(equals1, equals2);
-        }
-
-        [Fact]
-        public void ImplementsInterfaces()
-        {
-            Assert.IsAssignableFrom<IEquatable<BothLongId>>(BothLongId.Empty);
-            Assert.IsAssignableFrom<IComparable<BothLongId>>(BothLongId.Empty);
-
-            Assert.IsAssignableFrom<IEquatable<EquatableLongId>>(EquatableLongId.Empty);
-            Assert.IsAssignableFrom<IComparable<ComparableLongId>>(ComparableLongId.Empty);
-
-#pragma warning disable 184
-            Assert.False(LongId.Empty is IComparable<LongId>);
-            Assert.False(LongId.Empty is IEquatable<LongId>);
-#pragma warning restore 184
-        }
-
 
 #if NET6_0_OR_GREATER
         [Fact]
@@ -281,7 +293,7 @@ namespace StronglyTypedIds.IntegrationTests
             {
                 context.Database.EnsureCreated();
                 context.Entities.Add(
-                    new TestEntity { Id = new EfCoreLongId(123) });
+                    new TestEntity { Id = new ConvertersLongId(123) });
                 context.SaveChanges();
             }
             using (var context = new ConventionsDbContext(options))
@@ -290,10 +302,127 @@ namespace StronglyTypedIds.IntegrationTests
                 Assert.Single(all);
             }
         }
+#endif
+#endregion
 
-        public class ConventionsDbContext : DbContext
+
+#region ConvertersLongId2
+        [Fact]
+        public void CanSerializeToLong_WithMultiTemplates_WithNewtonsoftJsonProvider()
+        {
+            var foo = new ConvertersLongId2(123);
+
+            var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
+            var serializedLong = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
+
+            Assert.Equal(serializedFoo, serializedLong);
+        }
+
+        [Fact]
+        public void CanSerializeToLong_WithMultiTemplates_WithSystemTextJsonProvider()
+        {
+            var foo = new ConvertersLongId2(123L);
+
+            var serializedFoo = SystemTextJsonSerializer.Serialize(foo);
+            var serializedLong = SystemTextJsonSerializer.Serialize(foo.Value);
+
+            Assert.Equal(serializedFoo, serializedLong);
+        }
+
+        [Fact]
+        public void CanDeserializeFromLong_WithMultiTemplates_WithNewtonsoftJsonProvider()
+        {
+            var value = 123L;
+            var foo = new ConvertersLongId2(value);
+            var serializedLong = NewtonsoftJsonSerializer.SerializeObject(value);
+
+            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<ConvertersLongId2>(serializedLong);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact]
+        public void CanDeserializeFromLong_WithMultiTemplates_WithSystemTextJsonProvider()
+        {
+            var value = 123L;
+            var foo = new ConvertersLongId2(value);
+            var serializedLong = SystemTextJsonSerializer.Serialize(value);
+
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<ConvertersLongId2>(serializedLong);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact]
+        public void WhenEfCoreValueConverter_WithMultiTemplates_UsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<TestDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var original = new TestEntity2 { Id = new ConvertersLongId2(123) };
+            using (var context = new TestDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities2.Add(original);
+                context.SaveChanges();
+            }
+
+            using (var context = new TestDbContext(options))
+            {
+                var all = context.Entities2.ToList();
+                var retrieved = Assert.Single(all);
+                Assert.Equal(original.Id, retrieved.Id);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDapperValueConverter_WithMultiTemplates_UsesValueConverter()
+        {
+            using var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync();
+
+            var results = await connection.QueryAsync<ConvertersLongId2>("SELECT 123");
+
+            var value = Assert.Single(results);
+            Assert.Equal(value, new ConvertersLongId2(123));
+        }
+
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverter_WithMultiTemplates_UsesValueConverter()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            var options = new DbContextOptionsBuilder<ConventionsDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ConventionsDbContext(options))
+            {
+                context.Database.EnsureCreated();
+                context.Entities2.Add(
+                    new TestEntity2 { Id = new ConvertersLongId2(123) });
+                context.SaveChanges();
+            }
+            using (var context = new ConventionsDbContext(options))
+            {
+                var all = context.Entities2.ToList();
+                Assert.Single(all);
+            }
+        }
+#endif
+#endregion
+        
+#if NET6_0_OR_GREATER
+        internal class ConventionsDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
+            public DbSet<TestEntity2> Entities2 { get; set; }
 
             public ConventionsDbContext(DbContextOptions options) : base(options)
             {
@@ -302,8 +431,11 @@ namespace StronglyTypedIds.IntegrationTests
             protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
             {
                 configurationBuilder
-                    .Properties<EfCoreLongId>()
-                    .HaveConversion<EfCoreLongId.EfCoreValueConverter>();
+                    .Properties<ConvertersLongId>()
+                    .HaveConversion<ConvertersLongId.EfCoreValueConverter>();
+                configurationBuilder
+                    .Properties<ConvertersLongId2>()
+                    .HaveConversion<ConvertersLongId2.EfCoreValueConverter>();
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -315,13 +447,21 @@ namespace StronglyTypedIds.IntegrationTests
                             .Property(x => x.Id)
                             .ValueGeneratedNever();
                     });
+                modelBuilder
+                    .Entity<TestEntity2>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
             }
         }
 #endif
 
-        public class TestDbContext : DbContext
+        internal class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
+            public DbSet<TestEntity2> Entities2 { get; set; }
 
             public TestDbContext(DbContextOptions options) : base(options)
             {
@@ -334,20 +474,43 @@ namespace StronglyTypedIds.IntegrationTests
                     {
                         builder
                             .Property(x => x.Id)
-                            .HasConversion(new EfCoreLongId.EfCoreValueConverter())
+                            .HasConversion(new ConvertersLongId.EfCoreValueConverter())
+                            .ValueGeneratedNever();
+                    });
+                modelBuilder
+                    .Entity<TestEntity2>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .HasConversion(new ConvertersLongId2.EfCoreValueConverter())
                             .ValueGeneratedNever();
                     });
             }
         }
 
-        public class TestEntity
+        internal class TestEntity
         {
-            public EfCoreLongId Id { get; set; }
+            public ConvertersLongId Id { get; set; }
         }
 
-        public class EntityWithNullableId
+        internal class EntityWithNullableId
         {
-            public NewtonsoftJsonLongId? Id { get; set; }
+            public ConvertersLongId? Id { get; set; }
+        }
+
+        internal class TestEntity2
+        {
+            public ConvertersLongId2 Id { get; set; }
+        }
+
+        internal class EntityWithNullableId2
+        {
+            public ConvertersLongId2? Id { get; set; }
+        }
+
+        internal class TypeWithDictionaryKeys
+        {
+            public Dictionary<LongId, string> Values { get; set; }
         }
     }
 }

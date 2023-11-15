@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\StronglyTypedIds.IntegrationTests\*.cs" Link="%(Filename)%(Extension)" />
-    <Compile Include="..\StronglyTypedIds.IntegrationTests\Types\*.cs" Link="Types\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="StronglyTypedId" Version="$(Version)" PrivateAssets="all" />
+    <PackageReference Include="StronglyTypedId.Templates" Version="$(Version)" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />

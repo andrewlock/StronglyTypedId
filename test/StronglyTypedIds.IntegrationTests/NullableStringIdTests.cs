@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -14,6 +16,14 @@ namespace StronglyTypedIds.IntegrationTests
 {
     public class NullableStringIdTests
     {
+        [Fact]
+        public void CanUseNull()
+        {
+            var foo1 = new NullableStringId(null);
+
+            Assert.Null(foo1.Value);
+        }
+
         [Fact]
         public void SameValuesAreEqual()
         {
@@ -67,7 +77,7 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanSerializeToString_WithNewtonsoftJsonProvider()
         {
-            var foo = new NewtonsoftJsonNullableStringId("123");
+            var foo = new NullableStringId("123");
 
             var serializedFoo = NewtonsoftJsonSerializer.SerializeObject(foo);
             var serializedString = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
@@ -92,7 +102,7 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanSerializeToString_WithSystemTextJsonProvider()
         {
-            var foo = new SystemTextJsonNullableStringId("123");
+            var foo = new NullableStringId("123");
 
             var serializedFoo = SystemTextJsonSerializer.Serialize(foo);
             var serializedString = SystemTextJsonSerializer.Serialize(foo.Value);
@@ -100,14 +110,48 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.Equal(serializedFoo, serializedString);
         }
 
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider()
+        {
+            var value = new TypeWithDictionaryKeys()
+            {
+                Values = new()
+            };
+
+            var key = new NullableStringId("78104553-f1cd-41ec-bcb6-d3a8ff8d994d");
+            value.Values.Add(key, "My Value");
+            var opts = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            var serialized = SystemTextJsonSerializer.Serialize(value, opts);
+
+            var expected = $$"""
+                             {
+                               "values": {
+                                 "78104553-f1cd-41ec-bcb6-d3a8ff8d994d": "My Value"
+                               }
+                             }
+                             """;
+            Assert.Equal(serialized, expected);
+
+            var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
+
+            Assert.NotNull(deserialized.Values);
+            Assert.True(deserialized.Values.ContainsKey(key));
+            Assert.Equal("My Value", deserialized.Values[key]);
+        }
+#endif
         [Fact]
         public void CanDeserializeFromString_WithNewtonsoftJsonProvider()
         {
             var value = "123";
-            var foo = new NewtonsoftJsonNullableStringId(value);
+            var foo = new NullableStringId(value);
             var serializedString = NewtonsoftJsonSerializer.SerializeObject(value);
 
-            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<NewtonsoftJsonNullableStringId>(serializedString);
+            var deserializedFoo = NewtonsoftJsonSerializer.DeserializeObject<NullableStringId>(serializedString);
 
             Assert.Equal(foo, deserializedFoo);
         }
@@ -116,65 +160,24 @@ namespace StronglyTypedIds.IntegrationTests
         public void CanDeserializeFromString_WithSystemTextJsonProvider()
         {
             var value = "123";
-            var foo = new SystemTextJsonNullableStringId(value);
+            var foo = new NullableStringId(value);
             var serializedString = SystemTextJsonSerializer.Serialize(value);
 
-            var deserializedFoo = SystemTextJsonSerializer.Deserialize<SystemTextJsonNullableStringId>(serializedString);
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<NullableStringId>(serializedString);
 
             Assert.Equal(foo, deserializedFoo);
         }
 
         [Fact]
-        public void CanSerializeToString_WithBothJsonConverters()
-        {
-            var foo = new BothJsonNullableStringId("123");
-
-            var serializedFoo1 = NewtonsoftJsonSerializer.SerializeObject(foo);
-            var serializedString1 = NewtonsoftJsonSerializer.SerializeObject(foo.Value);
-
-            var serializedFoo2 = SystemTextJsonSerializer.Serialize(foo);
-            var serializedString2 = SystemTextJsonSerializer.Serialize(foo.Value);
-
-            Assert.Equal(serializedFoo1, serializedString1);
-            Assert.Equal(serializedFoo2, serializedString2);
-        }
-
-        [Fact]
-        public void WhenNoJsonConverter_SystemTextJsonSerializesWithValueProperty()
-        {
-            var foo = new NoJsonNullableStringId("123");
-
-            var serialized = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":\"" + foo.Value + "\"}";
-
-            Assert.Equal(expected, serialized);
-        }
-
-        [Fact]
         public void WhenNoJsonConverter_NewtonsoftSerializesWithoutValueProperty()
         {
-            var foo = new NoJsonNullableStringId("123");
+            var foo = new NullableStringId("123");
 
             var serialized = NewtonsoftJsonSerializer.SerializeObject(foo);
 
             var expected = "\"" + foo.Value + "\"";
 
             Assert.Equal(expected, serialized);
-        }
-
-        [Fact]
-        public void WhenNoTypeConverter_SerializesWithValueProperty()
-        {
-            var foo = new NoConvertersNullableStringId("123");
-
-            var newtonsoft = SystemTextJsonSerializer.Serialize(foo);
-            var systemText = SystemTextJsonSerializer.Serialize(foo);
-
-            var expected = "{\"Value\":\"" + foo.Value + "\"}";
-
-            Assert.Equal(expected, newtonsoft);
-            Assert.Equal(expected, systemText);
         }
 
         [Fact]
@@ -187,7 +190,7 @@ namespace StronglyTypedIds.IntegrationTests
                 .UseSqlite(connection)
                 .Options;
 
-            var original = new TestEntity { Id = Guid.NewGuid(), Name = new EfCoreNullableStringId("some name") };
+            var original = new TestEntity { Id = Guid.NewGuid(), Name = new NullableStringId("some name") };
             using (var context = new TestDbContext(options))
             {
                 context.Database.EnsureCreated();
@@ -210,10 +213,10 @@ namespace StronglyTypedIds.IntegrationTests
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
 
-            var results = await connection.QueryAsync<DapperNullableStringId>("SELECT 'this is a value'");
+            var results = await connection.QueryAsync<NullableStringId>("SELECT 'this is a value'");
 
             var value = Assert.Single(results);
-            Assert.Equal(value, new DapperNullableStringId("this is a value"));
+            Assert.Equal(value, new NullableStringId("this is a value"));
         }
 
         [Theory]
@@ -221,10 +224,10 @@ namespace StronglyTypedIds.IntegrationTests
         [InlineData("some value")]
         public void TypeConverter_CanConvertToAndFrom(object value)
         {
-            var converter = TypeDescriptor.GetConverter(typeof(NoJsonNullableStringId));
+            var converter = TypeDescriptor.GetConverter(typeof(NullableStringId));
             var id = converter.ConvertFrom(value);
-            Assert.IsType<NoJsonNullableStringId>(id);
-            Assert.Equal(new NoJsonNullableStringId(value?.ToString()), id);
+            Assert.IsType<NullableStringId>(id);
+            Assert.Equal(new NullableStringId(value?.ToString()), id);
 
             var reconverted = converter.ConvertTo(id, value.GetType());
             Assert.Equal(value, reconverted);
@@ -233,8 +236,8 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanCompareDefaults()
         {
-            ComparableNullableStringId original = default;
-            var other = ComparableNullableStringId.Empty;
+            NullableStringId original = default;
+            var other = NullableStringId.Empty;
 
             var compare1 = original.CompareTo(other);
             var compare2 = other.CompareTo(original);
@@ -244,11 +247,11 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void CanEquateDefaults()
         {
-            EquatableNullableStringId original = default;
-            var other = EquatableNullableStringId.Empty;
+            NullableStringId original = default;
+            var other = NullableStringId.Empty;
 
-            var equals1 = (original as IEquatable<EquatableNullableStringId>).Equals(other);
-            var equals2 = (other as IEquatable<EquatableNullableStringId>).Equals(original);
+            var equals1 = (original as IEquatable<NullableStringId>).Equals(other);
+            var equals2 = (other as IEquatable<NullableStringId>).Equals(original);
 
             Assert.Equal(equals1, equals2);
         }
@@ -256,16 +259,34 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void ImplementsInterfaces()
         {
-            Assert.IsAssignableFrom<IEquatable<BothNullableStringId>>(BothNullableStringId.Empty);
-            Assert.IsAssignableFrom<IComparable<BothNullableStringId>>(BothNullableStringId.Empty);
-
-            Assert.IsAssignableFrom<IEquatable<EquatableNullableStringId>>(EquatableNullableStringId.Empty);
-            Assert.IsAssignableFrom<IComparable<ComparableNullableStringId>>(ComparableNullableStringId.Empty);
+            Assert.IsAssignableFrom<IEquatable<NullableStringId>>(NullableStringId.Empty);
+            Assert.IsAssignableFrom<IComparable<NullableStringId>>(NullableStringId.Empty);
 
 #pragma warning disable 184
-            Assert.False(NullableStringId.Empty is IComparable<NullableStringId>);
-            Assert.False(NullableStringId.Empty is IEquatable<NullableStringId>);
+#pragma warning disable CS0183
+            Assert.True(NullableStringId.Empty is IComparable<NullableStringId>);
+            Assert.True(NullableStringId.Empty is IEquatable<NullableStringId>);
+#pragma warning restore CS0183
 #pragma warning restore 184
+
+#if NET6_0_OR_GREATER
+            Assert.IsAssignableFrom<ISpanFormattable>(NullableStringId.Empty);
+#endif
+#if NET7_0_OR_GREATER
+            // doesn't compile if doesn't implement it 
+            ParseAs<NullableStringId>("123");
+            ParseSpan<NullableStringId>("123".AsSpan());
+
+            T ParseAs<T>(string s) where T : IParsable<T>
+            {
+                return T.Parse(s, null);
+            }
+
+            T ParseSpan<T>(ReadOnlySpan<char> s) where T : ISpanParsable<T>
+            {
+                return T.Parse(s, null);
+            }
+#endif
         }
 
         [Fact]
@@ -304,22 +325,10 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public void NullSerializesAsExpectedWithoutConverters()
-        {
-            var expected = "{\"Value\":null}";
-            var value = new NoConvertersNullableStringId(null);
-
-            var json = SystemTextJsonSerializer.Serialize(value);
-            var systemText = SystemTextJsonSerializer.Serialize(value);
-            Assert.Equal(expected, json);
-            Assert.Equal(expected, systemText);
-        }
-
-        [Fact]
         public void NullSerializesAsExpectedWithConverters()
         {
             var expected = "null";
-            var value = new BothJsonNullableStringId(null);
+            var value = new NullableStringId(null);
 
             var json = SystemTextJsonSerializer.Serialize(value);
             var systemText = SystemTextJsonSerializer.Serialize(value);
@@ -330,10 +339,10 @@ namespace StronglyTypedIds.IntegrationTests
         [Fact]
         public void TypeConverterConvertsNullAsExpected()
         {
-            var converter = TypeDescriptor.GetConverter(typeof(NoJsonNullableStringId));
+            var converter = TypeDescriptor.GetConverter(typeof(NullableStringId));
             var id = converter.ConvertFrom(null);
-            Assert.IsType<NoJsonNullableStringId>(id);
-            Assert.Equal(new NoJsonNullableStringId(null), id);
+            Assert.IsType<NullableStringId>(id);
+            Assert.Equal(new NullableStringId(null), id);
 
             var reconverted = converter.ConvertTo(id, typeof(string));
             Assert.Null(reconverted);
@@ -350,7 +359,7 @@ namespace StronglyTypedIds.IntegrationTests
                 .UseSqlite(connection)
                 .Options;
 
-            var original = new TestEntity { Id = Guid.NewGuid(), Name = new EfCoreNullableStringId("some name") };
+            var original = new TestEntity { Id = Guid.NewGuid(), Name = new NullableStringId("some name") };
             using (var context = new ConventionsDbContext(options))
             {
                 context.Database.EnsureCreated();
@@ -367,7 +376,7 @@ namespace StronglyTypedIds.IntegrationTests
             }
         }
 
-        public class ConventionsDbContext : DbContext
+        internal class ConventionsDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
 
@@ -378,8 +387,8 @@ namespace StronglyTypedIds.IntegrationTests
             protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
             {
                 configurationBuilder
-                    .Properties<EfCoreNullableStringId>()
-                    .HaveConversion<EfCoreNullableStringId.EfCoreValueConverter>();
+                    .Properties<NullableStringId>()
+                    .HaveConversion<NullableStringId.EfCoreValueConverter>();
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -395,7 +404,7 @@ namespace StronglyTypedIds.IntegrationTests
         }
 #endif
 
-        public class TestDbContext : DbContext
+        internal class TestDbContext : DbContext
         {
             public DbSet<TestEntity> Entities { get; set; }
 
@@ -410,22 +419,27 @@ namespace StronglyTypedIds.IntegrationTests
                     {
                         builder
                             .Property(x => x.Name)
-                            .HasConversion(new EfCoreNullableStringId.EfCoreValueConverter())
+                            .HasConversion(new NullableStringId.EfCoreValueConverter())
                             .ValueGeneratedNever();
                     });
             }
         }
 
-        public class TestEntity
+        internal class TestEntity
         {
             public Guid Id { get; set; }
-            public EfCoreNullableStringId Name { get; set; }
+            public NullableStringId Name { get; set; }
         }
         
         
-        public class EntityWithNullableId
+        internal class EntityWithNullableId
         {
-            public NewtonsoftJsonNullableStringId? Id { get; set; }
+            public NullableStringId? Id { get; set; }
+        }
+
+        internal class TypeWithDictionaryKeys
+        {
+            public Dictionary<NullableStringId, string> Values { get; set; }
         }
     }
 }

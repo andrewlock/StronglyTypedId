@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -14,6 +14,7 @@
   
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />

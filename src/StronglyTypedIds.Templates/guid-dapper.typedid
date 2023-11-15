@@ -1,0 +1,20 @@
+    partial struct PLACEHOLDERID
+    {
+        public partial class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<PLACEHOLDERID>
+        {
+            public override void SetValue(global::System.Data.IDbDataParameter parameter, PLACEHOLDERID value)
+            {
+                parameter.Value = value.Value;
+            }
+
+            public override PLACEHOLDERID Parse(object value)
+            {
+                return value switch
+                {
+                    global::System.Guid guidValue => new PLACEHOLDERID(guidValue),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new PLACEHOLDERID(result),
+                    _ => throw new global::System.InvalidCastException($"Unable to cast object of type {value.GetType()} to PLACEHOLDERID"),
+                };
+            }
+        }
+    }

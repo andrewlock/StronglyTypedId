@@ -1,222 +1,4 @@
-﻿#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Place on partial structs to make the type a strongly-typed ID
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
-    internal sealed class StronglyTypedIdAttribute : Attribute
-    {
-        /// <summary>
-        /// Make the struct a strongly typed ID
-        /// </summary>
-        /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value.
-        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.BackingType"/>, which defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
-        /// <param name="converters">Converters to create for serializing/deserializing the strongly-typed ID value.
-        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Converters"/>, which defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/>
-        /// and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
-        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
-        /// If not set, uses <see cref="StronglyTypedIdDefaultsAttribute.Implementations"/>, which defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/>
-        /// and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
-        public StronglyTypedIdAttribute(
-            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
-            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
-        {
-            BackingType = backingType;
-            Converters = converters;
-            Implementations = implementations;
-        }
-
-        /// <summary>
-        /// The <see cref="Type"/> to use to store the strongly-typed ID value
-        /// </summary>
-        public StronglyTypedIdBackingType BackingType { get; }
-
-        /// <summary>
-        /// JSON library used to serialize/deserialize strongly-typed ID value
-        /// </summary>
-        public StronglyTypedIdConverter Converters { get; }
-
-        /// <summary>
-        /// Interfaces and patterns the strongly typed id should implement
-        /// </summary>
-        public StronglyTypedIdImplementations Implementations { get; }
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Used to control the default Place on partial structs to make the type a strongly-typed ID
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
-    internal sealed class StronglyTypedIdDefaultsAttribute : Attribute
-    {
-        /// <summary>
-        /// Set the default values used for strongly typed ids
-        /// </summary>
-        /// <param name="backingType">The <see cref="Type"/> to use to store the strongly-typed ID value.
-        /// Defaults to <see cref="StronglyTypedIdBackingType.Guid"/></param>
-        /// <param name="converters">JSON library used to serialize/deserialize strongly-typed ID value.
-        /// Defaults to <see cref="StronglyTypedIdConverter.NewtonsoftJson"/> and <see cref="StronglyTypedIdConverter.TypeConverter"/></param>
-        /// <param name="implementations">Interfaces and patterns the strongly typed id should implement
-        /// Defaults to <see cref="StronglyTypedIdImplementations.IEquatable"/> and <see cref="StronglyTypedIdImplementations.IComparable"/></param>
-        public StronglyTypedIdDefaultsAttribute(
-            StronglyTypedIdBackingType backingType = StronglyTypedIdBackingType.Default,
-            StronglyTypedIdConverter converters = StronglyTypedIdConverter.Default,
-            StronglyTypedIdImplementations implementations = StronglyTypedIdImplementations.Default)
-        {
-            BackingType = backingType;
-            Converters = converters;
-            Implementations = implementations;
-        }
-
-        /// <summary>
-        /// The default <see cref="Type"/> to use to store the strongly-typed ID values.
-        /// </summary>
-        public StronglyTypedIdBackingType BackingType { get; }
-
-        /// <summary>
-        /// The default converters to create for serializing/deserializing strongly-typed ID values.
-        /// </summary>
-        public StronglyTypedIdConverter Converters { get; }
-
-        /// <summary>
-        /// Interfaces and patterns the strongly typed id should implement
-        /// </summary>
-        public StronglyTypedIdImplementations Implementations { get; }
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// The <see cref="Type"/> to use to store the value of a strongly-typed ID
-    /// </summary>
-    internal enum StronglyTypedIdBackingType
-    {
-        /// <summary>
-        /// Use the default backing type (either the globally configured default, or Guid)
-        /// </summary>
-        Default = 0,
-        
-        Guid = 1,
-        Int = 2,
-        String = 3,
-        Long = 4,
-        NullableString = 5,
-        MassTransitNewId = 6,
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Converters used to to serialize/deserialize strongly-typed ID values
-    /// </summary>
-    [Flags]
-    internal enum StronglyTypedIdConverter
-    {
-        // Used with HasFlag, so needs to be 1, 2, 4 etc
-
-        /// <summary>
-        /// Don't create any converters for the strongly typed ID
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// Use the default converters for the strongly typed Id.
-        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
-        /// <see cref="TypeConverter"/> and <see cref="NewtonsoftJson"/>
-        /// </summary>
-        Default = 1,
-
-        /// <summary>
-        /// Creates a <see cref="TypeConverter"/> for converting from the strongly typed ID to and from a string
-        /// </summary>
-        TypeConverter = 2,
-
-        /// <summary>
-        /// Creates a Newtonsoft.Json.JsonConverter for serializing the strongly typed id to its primitive value
-        /// </summary>
-        NewtonsoftJson = 4,
-
-        /// <summary>
-        /// Creates a System.Text.Json.Serialization.JsonConverter for serializing the strongly typed id to its primitive value
-        /// </summary>
-        SystemTextJson = 8,
-
-        /// <summary>
-        /// Creates an EF Core Value Converter for extracting the primitive value
-        /// </summary>
-        EfCoreValueConverter = 16,
-
-        /// <summary>
-        /// Creates a Dapper TypeHandler for converting to and from the type
-        /// </summary>
-        DapperTypeHandler = 32,
-    }
-}
-#endif
-#if STRONGLY_TYPED_ID_EMBED_ATTRIBUTES
-
-using System;
-
-namespace StronglyTypedIds
-{
-    /// <summary>
-    /// Interfaces and patterns the strongly typed id should implement
-    /// </summary>
-    [Flags]
-    internal enum StronglyTypedIdImplementations
-    {
-        // Used with HasFlag, so needs to be 1, 2, 4 etc
-
-        /// <summary>
-        /// Don't implement any additional members for the strongly typed ID
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// Use the default implementations for the strongly typed Id.
-        /// This will be the value provided in the <see cref="StronglyTypedIdDefaultsAttribute"/>, which falls back to
-        /// <see cref="IEquatable"/> and <see cref="IComparable"/>
-        /// </summary>
-        Default = 1,
-
-        // ReSharper disable once InconsistentNaming
-        /// <summary>
-        /// Implement the <see cref="IEquatable{T}"/> interface
-        /// </summary>
-        IEquatable = 2,
-
-        // ReSharper disable once InconsistentNaming
-        /// <summary>
-        /// Implement the <see cref="IComparable{T}"/> interface
-        /// </summary>
-        IComparable = 4,
-    }
-}
-#endif
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 // <auto-generated>
 //     This code was generated by the StronglyTypedId source generator
 //
@@ -227,30 +9,39 @@ namespace StronglyTypedIds
 
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
+#nullable enable
 namespace SomeNamespace
 {
-    partial class ParentClass<T> where T: new()
+    public partial class ParentClass 
     {
-    partial record InnerClass<TKey, TValue> 
+    internal partial record InnerClass 
     {
-    partial struct InnerStruct 
+    public readonly partial record struct InnerStruct 
     {
-    [Newtonsoft.Json.JsonConverter(typeof(MyIdNewtonsoftJsonConverter))]
-    [System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
-    readonly partial struct MyId : System.IComparable<MyId>, System.IEquatable<MyId>
+    [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
+    [global::System.Text.Json.Serialization.JsonConverter(typeof(MyIdSystemTextJsonConverter))]
+    partial struct MyId :
+#if NET6_0_OR_GREATER
+        global::System.ISpanFormattable,
+#endif
+#if NET7_0_OR_GREATER
+        global::System.IParsable<MyId>, global::System.ISpanParsable<MyId>,
+#endif
+    global::System.IComparable<MyId>, global::System.IEquatable<MyId>, global::System.IFormattable
     {
-        public System.Guid Value { get; }
+        public global::System.Guid Value { get; }
 
-        public MyId(System.Guid value)
+        public MyId(global::System.Guid value)
         {
             Value = value;
         }
 
-        public static MyId New() => new MyId(System.Guid.NewGuid());
-        public static readonly MyId Empty = new MyId(System.Guid.Empty);
+        public static MyId New() => new MyId(global::System.Guid.NewGuid());
+        public static readonly MyId Empty = new MyId(global::System.Guid.Empty);
 
+        /// <inheritdoc cref="global::System.IEquatable{T}"/>
         public bool Equals(MyId other) => this.Value.Equals(other.Value);
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             return obj is MyId other && Equals(other);
@@ -259,37 +50,44 @@ namespace SomeNamespace
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString();
+
         public static bool operator ==(MyId a, MyId b) => a.Equals(b);
         public static bool operator !=(MyId a, MyId b) => !(a == b);
+        public static bool operator >  (MyId a, MyId b) => a.CompareTo(b) > 0;
+        public static bool operator <  (MyId a, MyId b) => a.CompareTo(b) < 0;
+        public static bool operator >=  (MyId a, MyId b) => a.CompareTo(b) >= 0;
+        public static bool operator <=  (MyId a, MyId b) => a.CompareTo(b) <= 0;
+
+        /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
 
-        class MyIdTypeConverter : System.ComponentModel.TypeConverter
+        public partial class MyIdTypeConverter : global::System.ComponentModel.TypeConverter
         {
-            public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
             {
-                return sourceType == typeof(System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+                return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
             }
-
-            public override object ConvertFrom(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        
+            public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
             {
                 return value switch
                 {
-                    System.Guid guidValue => new MyId(guidValue),
-                    string stringValue when !string.IsNullOrEmpty(stringValue) && System.Guid.TryParse(stringValue, out var result) => new MyId(result),
+                    global::System.Guid guidValue => new MyId(guidValue),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new MyId(result),
                     _ => base.ConvertFrom(context, culture, value),
                 };
             }
 
-            public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Type sourceType)
+            public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
             {
-                return sourceType == typeof(System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+                return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
             }
 
-            public override object ConvertTo(System.ComponentModel.ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+            public override object? ConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object? value, global::System.Type destinationType)
             {
                 if (value is MyId idValue)
                 {
-                    if (destinationType == typeof(System.Guid))
+                    if (destinationType == typeof(global::System.Guid))
                     {
                         return idValue.Value;
                     }
@@ -304,25 +102,126 @@ namespace SomeNamespace
             }
         }
 
-        class MyIdNewtonsoftJsonConverter : Newtonsoft.Json.JsonConverter
+        public partial class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
         {
-            public override bool CanConvert(System.Type objectType)
+            public override bool CanConvert(global::System.Type typeToConvert)
+                => typeToConvert == typeof(global::System.Guid) || typeToConvert == typeof(string) || base.CanConvert(typeToConvert);
+
+            public override MyId Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
+                => new (reader.GetGuid());
+
+            public override void Write(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
+                => writer.WriteStringValue(value.Value);
+
+#if NET6_0_OR_GREATER
+            public override MyId ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
+                => new(global::System.Guid.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the MyId property was null")));
+
+            public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
+                => writer.WritePropertyName(value.Value.ToString());
+#endif
+        }
+
+        public static MyId Parse(string input)
+            => new(global::System.Guid.Parse(input));
+
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
+        public static MyId Parse(string input, global::System.IFormatProvider? provider)
+            => new(global::System.Guid.Parse(input, provider));
+
+        /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
+        public static bool TryParse(
+            [global::System.Diagnostics.CodeAnalysis.NotNullWhen(true)] string? input,
+            global::System.IFormatProvider? provider,
+            out MyId result)
+        {
+            if (input is null)
             {
-                return objectType == typeof(MyId);
+                result = default;
+                return false;
             }
 
-            public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+            if (global::System.Guid.TryParse(input, provider, out var guid))
             {
-                var id = (MyId)value;
-                serializer.Serialize(writer, id.Value);
+                result = new(guid);
+                return true;
             }
-
-            public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+            else
             {
-                var guid = serializer.Deserialize<System.Guid?>(reader);
-                return guid.HasValue ? new MyId(guid.Value) : null;
+                result = default;
+                return false;
             }
         }
+#endif
+
+        /// <inheritdoc cref="global::System.IFormattable"/>
+        public string ToString(
+#if NET7_0_OR_GREATER
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+#endif
+            string? format,
+            global::System.IFormatProvider? formatProvider)
+            => Value.ToString(format, formatProvider);
+
+#if NETCOREAPP2_1_OR_GREATER
+        public static MyId Parse(global::System.ReadOnlySpan<char> input)
+            => new(global::System.Guid.Parse(input));
+#endif
+
+#if NET6_0_OR_GREATER
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
+#endif
+        public static MyId Parse(global::System.ReadOnlySpan<char> input, global::System.IFormatProvider? provider)
+#if NET7_0_OR_GREATER
+            => new(global::System.Guid.Parse(input, provider));
+#else
+            => new(global::System.Guid.Parse(input));
+#endif
+        
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
+#endif
+        public static bool TryParse(global::System.ReadOnlySpan<char> input, global::System.IFormatProvider? provider, out MyId result)
+        {
+#if NET7_0_OR_GREATER
+            if (global::System.Guid.TryParse(input, provider, out var guid))
+#else
+            if (global::System.Guid.TryParse(input, out var guid))
+#endif
+            {
+                result = new(guid);
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        }
+
+        /// <inheritdoc cref="global::System.ISpanFormattable"/>
+        public bool TryFormat(
+            global::System.Span<char> destination,
+            out int charsWritten,
+#if NET7_0_OR_GREATER
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+#endif
+            global::System.ReadOnlySpan<char> format,
+            global::System.IFormatProvider? provider)
+            => Value.TryFormat(destination, out charsWritten, format);
+
+        /// <inheritdoc cref="global::System.ISpanFormattable"/>
+        public bool TryFormat(
+            global::System.Span<char> destination,
+            out int charsWritten,
+#if NET7_0_OR_GREATER
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+#endif
+            global::System.ReadOnlySpan<char> format = default)
+            => Value.TryFormat(destination, out charsWritten, format);
+#endif
     }
     }
     }

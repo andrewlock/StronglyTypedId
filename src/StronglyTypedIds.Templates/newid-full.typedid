@@ -1,0 +1,257 @@
+    [global::System.ComponentModel.TypeConverter(typeof(PLACEHOLDERIDTypeConverter))]
+    [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]
+    [global::Newtonsoft.Json.JsonConverter(typeof(PLACEHOLDERIDNewtonsoftJsonConverter))]
+    partial struct PLACEHOLDERID :
+#if NET6_0_OR_GREATER
+        global::System.ISpanFormattable,
+#endif
+#if NET7_0_OR_GREATER
+        global::System.IParsable<PLACEHOLDERID>, global::System.ISpanParsable<PLACEHOLDERID>,
+#endif
+        global::System.IComparable<PLACEHOLDERID>, global::System.IEquatable<PLACEHOLDERID>, global::System.IFormattable
+    {
+        public global::MassTransit.NewId Value { get; }
+
+        public PLACEHOLDERID(global::MassTransit.NewId value)
+        {
+            Value = value;
+        }
+
+        public static PLACEHOLDERID New() => new PLACEHOLDERID(global::MassTransit.NewId.Next());
+        public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(global::MassTransit.NewId.Empty);
+
+        /// <inheritdoc cref="global::System.IEquatable{T}"/>
+        public bool Equals(PLACEHOLDERID other) => this.Value.Equals(other.Value);
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is PLACEHOLDERID other && Equals(other);
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
+        public override string ToString() => Value.ToString();
+
+        public static bool operator ==(PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
+        public static bool operator !=(PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
+        public static bool operator >  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
+        public static bool operator <  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
+        public static bool operator >=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
+        public static bool operator <=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
+
+        /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
+        public int CompareTo(PLACEHOLDERID other) => Value.CompareTo(other.Value);
+
+        public partial class PLACEHOLDERIDTypeConverter : global::System.ComponentModel.TypeConverter
+        {
+            public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
+            {
+                return sourceType == typeof(System.Guid) || sourceType == typeof(global::MassTransit.NewId)
+                    || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+            }
+        
+            public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
+            {
+                return value switch
+                {
+                    global::MassTransit.NewId newIdValue => new PLACEHOLDERID(newIdValue),
+                    global::System.Guid guidValue => new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(guidValue)),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(result)),
+                    _ => base.ConvertFrom(context, culture, value),
+                };
+            }
+
+            public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
+            {
+                return sourceType == typeof(System.Guid) || sourceType == typeof(global::MassTransit.NewId)
+                    || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+            }
+
+            public override object? ConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object? value, global::System.Type destinationType)
+            {
+                if (value is PLACEHOLDERID idValue)
+                {
+                    if (destinationType == typeof(global::MassTransit.NewId))
+                    {
+                        return idValue.Value;
+                    }
+
+                    if (destinationType == typeof(global::System.Guid))
+                    {
+                        return idValue.Value.ToGuid();
+                    }
+
+                    if (destinationType == typeof(string))
+                    {
+                        return idValue.Value.ToGuid().ToString();
+                    }
+                }
+
+                return base.ConvertTo(context, culture, value, destinationType);
+            }
+        }
+
+        public partial class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
+        {
+            public override bool CanConvert(global::System.Type typeToConvert)
+                => typeToConvert == typeof(string) || typeToConvert == typeof(global::System.Guid) || base.CanConvert(typeToConvert);
+
+            public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
+                => new (global::MassTransit.NewId.FromGuid(reader.GetGuid()));
+
+            public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
+                => writer.WriteStringValue(value.Value.ToGuid());
+
+#if NET6_0_OR_GREATER
+            public override PLACEHOLDERID ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
+                => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the PLACEHOLDERID property was null"))));
+
+            public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
+                => writer.WritePropertyName(value.Value.ToGuid().ToString());
+#endif
+        }
+
+        public static PLACEHOLDERID Parse(string input)
+            => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(input)));
+
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
+        public static PLACEHOLDERID Parse(string input, global::System.IFormatProvider? provider)
+            => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(input, provider)));
+
+        /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
+        public static bool TryParse(
+            [global::System.Diagnostics.CodeAnalysis.NotNullWhen(true)] string? input,
+            global::System.IFormatProvider? provider,
+            out PLACEHOLDERID result)
+        {
+            if (input is null)
+            {
+                result = default;
+                return false;
+            }
+
+            if (global::System.Guid.TryParse(input, provider, out var guid))
+            {
+                result = new(global::MassTransit.NewId.FromGuid(guid));
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        }
+#endif
+
+        /// <inheritdoc cref="global::System.IFormattable"/>
+        public string ToString(string? format, global::System.IFormatProvider? formatProvider)
+            => Value.ToGuid().ToString(format, formatProvider);
+
+#if NETCOREAPP2_1_OR_GREATER
+        public static PLACEHOLDERID Parse(global::System.ReadOnlySpan<char> input)
+            => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(input)));
+#endif
+
+#if NET6_0_OR_GREATER
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
+#endif
+        public static PLACEHOLDERID Parse(global::System.ReadOnlySpan<char> input, global::System.IFormatProvider? provider)
+#if NET7_0_OR_GREATER
+            => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(input, provider)));
+#else
+            => new(global::MassTransit.NewId.FromGuid(global::System.Guid.Parse(input)));
+#endif
+
+#if NET7_0_OR_GREATER
+        /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
+#endif
+        public static bool TryParse(global::System.ReadOnlySpan<char> input, global::System.IFormatProvider? provider, out PLACEHOLDERID result)
+        {
+#if NET7_0_OR_GREATER
+            if (global::System.Guid.TryParse(input, provider, out var guid))
+#else
+            if (global::System.Guid.TryParse(input, out var guid))
+#endif
+            {
+                result = new(global::MassTransit.NewId.FromGuid(guid));
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        }
+
+        /// <inheritdoc cref="global::System.ISpanFormattable"/>
+        public bool TryFormat(
+            global::System.Span<char> destination,
+            out int charsWritten,
+#if NET7_0_OR_GREATER
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+#endif
+            global::System.ReadOnlySpan<char> format,
+            global::System.IFormatProvider? provider)
+            => Value.ToGuid().TryFormat(destination, out charsWritten, format);
+
+        /// <inheritdoc cref="global::System.ISpanFormattable"/>
+        public bool TryFormat(
+            global::System.Span<char> destination,
+            out int charsWritten,
+#if NET7_0_OR_GREATER
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+#endif
+            global::System.ReadOnlySpan<char> format = default)
+            => Value.ToGuid().TryFormat(destination, out charsWritten, format);
+#endif
+
+        public partial class DapperTypeHandler : global::Dapper.SqlMapper.TypeHandler<PLACEHOLDERID>
+        {
+            public override void SetValue(global::System.Data.IDbDataParameter parameter, PLACEHOLDERID value)
+            {
+                parameter.Value = value.Value.ToGuid();
+            }
+
+            public override PLACEHOLDERID Parse(object value)
+            {
+                return value switch
+                {
+                    global::System.Guid guidValue => new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(guidValue)),
+                    string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(result)),
+                    _ => throw new global::System.InvalidCastException($"Unable to cast object of type {value.GetType()} to PLACEHOLDERID"),
+                };
+            }
+        }
+
+        public partial class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<PLACEHOLDERID, global::System.Guid>
+        {
+            public EfCoreValueConverter() : this(null) { }
+            public EfCoreValueConverter(global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ConverterMappingHints? mappingHints = null)
+                : base(
+                    id => id.Value.ToGuid(),
+                    value => new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(value)),
+                    mappingHints
+                ) { }
+        }
+
+        public partial class PLACEHOLDERIDNewtonsoftJsonConverter : global::Newtonsoft.Json.JsonConverter
+        {
+            public override bool CanConvert(global::System.Type objectType)
+            {
+                return objectType == typeof(PLACEHOLDERID);
+            }
+
+            public override void WriteJson(global::Newtonsoft.Json.JsonWriter writer, object? value, global::Newtonsoft.Json.JsonSerializer serializer)
+            {
+                serializer.Serialize(writer, value is PLACEHOLDERID id ? id.Value : null);
+            }
+
+            public override object? ReadJson(global::Newtonsoft.Json.JsonReader reader, global::System.Type objectType, object? existingValue, global::Newtonsoft.Json.JsonSerializer serializer)
+            {
+                var guid = serializer.Deserialize<global::System.Guid?>(reader);
+                return guid.HasValue ? new PLACEHOLDERID(global::MassTransit.NewId.FromGuid(guid.Value)) : null;
+            }
+        }
+    }

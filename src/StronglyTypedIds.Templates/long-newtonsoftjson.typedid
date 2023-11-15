@@ -1,0 +1,22 @@
+    [global::Newtonsoft.Json.JsonConverter(typeof(PLACEHOLDERIDNewtonsoftJsonConverter))]
+    partial struct PLACEHOLDERID
+    {
+        public partial class PLACEHOLDERIDNewtonsoftJsonConverter : global::Newtonsoft.Json.JsonConverter
+        {
+            public override bool CanConvert(global::System.Type objectType)
+            {
+                return objectType == typeof(PLACEHOLDERID);
+            }
+
+            public override void WriteJson(global::Newtonsoft.Json.JsonWriter writer, object? value, global::Newtonsoft.Json.JsonSerializer serializer)
+            {
+                serializer.Serialize(writer, value is PLACEHOLDERID id ? id.Value : null);
+            }
+
+            public override object? ReadJson(global::Newtonsoft.Json.JsonReader reader, global::System.Type objectType, object? existingValue, global::Newtonsoft.Json.JsonSerializer serializer)
+            {
+                var result = serializer.Deserialize<long?>(reader);
+                return result.HasValue ? new PLACEHOLDERID(result.Value) : null;
+            }
+        }
+    }

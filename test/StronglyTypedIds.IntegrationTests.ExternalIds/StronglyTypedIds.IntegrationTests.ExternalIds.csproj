@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\StronglyTypedIds.IntegrationTests\*.cs" Link="%(Filename)%(Extension)" />
+    <Compile Remove="..\StronglyTypedIds.IntegrationTests\Enums.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\StronglyTypedIds.IntegrationTests.Types\StronglyTypedIds.IntegrationTests.Types.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />
+
+</Project>

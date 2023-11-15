@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using StronglyTypedIds.Diagnostics;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,7 +24,7 @@ namespace StronglyTypedIds.Tests
 
 [StronglyTypedId]
 public partial struct MyId {}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -31,21 +32,70 @@ public partial struct MyId {}";
                 .UseDirectory("Snapshots");
         }
 
-        [Fact]
-        public Task CanGenerateIdInNamespace()
+        [Theory]
+        [InlineData("")]
+        [InlineData("Template.Guid")]
+        [InlineData("template: Template.Guid")]
+        public Task CanGenerateIdInNamespace(string template)
         {
-            const string input = @"using StronglyTypedIds;
-
-namespace SomeNamespace
-{
-    [StronglyTypedId]
-    public partial struct MyId {}
-}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var input = $$"""
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId({{template}})]
+                    public partial struct MyId {}
+                }
+                """;
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Theory]
+        [InlineData("Template.Int")]
+        [InlineData("template: Template.Int")]
+        public Task CanGenerateNonDefaultIdInNamespace(string template)
+        {
+            var input = $$"""
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId({{template}})]
+                    public partial struct MyId {}
+                }
+                """;
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Theory]
+        [InlineData("\"newid-full\"")]
+        [InlineData("templateNames: \"newid-full\"")]
+        public Task CanGenerateForCustomTemplate(string templateName)
+        {
+            var input = $$"""
+                using StronglyTypedIds;
+                namespace SomeNamespace
+                {
+                    [StronglyTypedId({{templateName}})]
+                    public partial struct MyId {}
+                }
+                """;
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 
@@ -57,7 +107,7 @@ namespace SomeNamespace
 namespace SomeNamespace;
 [StronglyTypedId]
 public partial struct MyId {}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -77,7 +127,7 @@ public class ParentClass
     [StronglyTypedId]
     public partial struct MyId {}
 }";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -87,6 +137,32 @@ public class ParentClass
 
         [Fact]
         public Task CanGenerateVeryNestedIdInFileScopeNamespace()
+        {
+            const string input = @"using StronglyTypedIds;
+
+namespace SomeNamespace;
+
+public partial class ParentClass
+{
+    internal partial record InnerClass
+    {
+        public readonly partial record struct InnerStruct
+        {
+            [StronglyTypedId]
+            public readonly partial struct MyId {}
+        }
+    }
+}";
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseDirectory("Snapshots");
+        }
+
+        [Fact]
+        public Task CanGenerateGenericVeryNestedIdInFileScopeNamespace()
         {
             const string input = @"using StronglyTypedIds;
 
@@ -104,23 +180,7 @@ public class ParentClass<T>
         }
     }
 }";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
-
-            Assert.Empty(diagnostics);
-
-            return Verifier.Verify(output)
-                .UseDirectory("Snapshots");
-        }
-
-        [Fact]
-        public Task CanOverrideDefaultsUsingGlobalAttribute()
-        {
-            const string input = @"using StronglyTypedIds;
-[assembly:StronglyTypedIdDefaults(backingType: StronglyTypedIdBackingType.Int, converters: StronglyTypedIdConverter.None)]
-
-[StronglyTypedId]
-public partial struct MyId {}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -129,56 +189,46 @@ public partial struct MyId {}";
         }
 
         [Theory]
-        [MemberData(nameof(GetData))]
-        public Task CanGenerateIdWithNamedParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdConverter? converter)
+        [InlineData("Template.Int")]
+        [InlineData("template: Template.Int")]
+        public Task CanOverrideDefaultsWithTemplateUsingGlobalAttribute(string template)
         {
-            var type = $"backingType: {nameof(StronglyTypedIdBackingType)}.{backingType.ToString()}";
-            var converters = converter.HasValue
-                ? $", converters: {ToArgument(converter.Value)}"
-                : string.Empty;
-            var attribute = $"[StronglyTypedId({type}{converters})]";
+            var input = $$"""
+                using StronglyTypedIds;
+                [assembly:StronglyTypedIdDefaults({{template}})]
+                
+                [StronglyTypedId]
+                public partial struct MyId {}
+                """;
 
-            _output.WriteLine(attribute);
-
-            var input = @"using StronglyTypedIds;
-
-namespace MyTests.TestNameSpace
-{
-    " + attribute + @"
-    public partial struct MyId {}
-}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
-                .UseParameters(backingType, converter)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 
         [Theory]
-        [MemberData(nameof(GetData))]
-        public Task CanGenerateIdWithPositionalParameters(StronglyTypedIdBackingType backingType, StronglyTypedIdConverter? converter)
+        [InlineData("\"newid-full\"")]
+        [InlineData("templateName: \"newid-full\"")]
+        public Task CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute(string templateNames)
         {
-            var type = $"{nameof(StronglyTypedIdBackingType)}.{backingType.ToString()}";
-            var args = converter.HasValue ? $"{type}, {ToArgument(converter.Value)}" : $"{type}";
-            var attribute = $"[StronglyTypedId({args})]";
+            var input = $$"""
+                using StronglyTypedIds;
+                [assembly:StronglyTypedIdDefaults({{templateNames}})]
+                
+                [StronglyTypedId]
+                public partial struct MyId {}
+                """;
 
-            _output.WriteLine(attribute);
-
-            var input = @"using StronglyTypedIds;
-
-namespace MyTests.TestNameSpace
-{
-    " + attribute + @"
-    public partial struct MyId {}
-}";
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
-                .UseParameters(backingType, converter)
+                .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
 
@@ -201,7 +251,7 @@ namespace MyContracts.V2
 }";
 
             // This only includes the last ID but that's good enough for this
-            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input);
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
@@ -209,25 +259,70 @@ namespace MyContracts.V2
                 .UseDirectory("Snapshots");
         }
 
-        public static TheoryData<StronglyTypedIdBackingType, StronglyTypedIdConverter?> GetData => new()
+        [Theory]
+        [InlineData(false, "Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "template: Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "Template.Guid, templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        [InlineData(true, "Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(true, "template: Template.Guid, \"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(true, "Template.Guid, templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        public Task CanGenerateMultipleTemplatesWithBuiltIn(bool useDefault, string template)
         {
-            {StronglyTypedIdBackingType.Guid, null},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.NewtonsoftJson},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.SystemTextJson},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.TypeConverter},
-            {StronglyTypedIdBackingType.Guid, StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson},
-        };
+            var defaultAttr = useDefault
+                ? $"[assembly:StronglyTypedIdDefaults({template})]"
+                : string.Empty;
 
-        public static string ToArgument(StronglyTypedIdConverter converter) =>
-            converter switch
-            {
-                StronglyTypedIdConverter.NewtonsoftJson => "StronglyTypedIdConverter.NewtonsoftJson",
-                StronglyTypedIdConverter.SystemTextJson => "StronglyTypedIdConverter.SystemTextJson",
-                StronglyTypedIdConverter.TypeConverter => "StronglyTypedIdConverter.TypeConverter",
-                _ when converter.HasFlag(StronglyTypedIdConverter.NewtonsoftJson) &&
-                       converter.HasFlag(StronglyTypedIdConverter.SystemTextJson) =>
-                    "StronglyTypedIdConverter.NewtonsoftJson | StronglyTypedIdConverter.SystemTextJson",
-                _ => throw new InvalidOperationException("Unknown converter " + converter),
-            };
+            var templateAttr = useDefault ? string.Empty : template;
+                
+            var input = $$"""
+                        using StronglyTypedIds;
+                        {{defaultAttr}}
+                        
+                        [StronglyTypedId({{templateAttr}})]
+                        public partial struct MyId {}
+                        """;
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
+
+        [Theory]
+        [InlineData(false, "\"guid-efcore\", \"guid-dapper\"")]
+        [InlineData(false, "templateNames: new [] {\"guid-efcore\", \"guid-dapper\"}")]
+        [InlineData(true, "\"guid-dapper\", \"guid-efcore\"")]
+        [InlineData(true, "\"guid-dapper\", new [] {\"guid-efcore\"}")]
+        [InlineData(true, "\"guid-dapper\", templateNames: new [] {\"guid-efcore\"}")]
+        [InlineData(true, "templateName: \"guid-dapper\", templateNames: new [] {\"guid-efcore\"}")]
+        public Task CanGenerateMultipleTemplatesWithoutBuiltIn(bool useDefault, string template)
+        {
+            var defaultAttr = useDefault
+                ? $"[assembly:StronglyTypedIdDefaults({template})]"
+                : string.Empty;
+
+            var templateAttr = useDefault ? string.Empty : template;
+                
+            var input = $$"""
+                          using StronglyTypedIds;
+                          {{defaultAttr}}
+
+                          [StronglyTypedId({{templateAttr}})]
+                          public partial struct MyId {}
+                          """;
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .DisableRequireUniquePrefix()
+                .UseDirectory("Snapshots");
+        }
     }
 }

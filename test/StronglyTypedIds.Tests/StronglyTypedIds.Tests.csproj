@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
@@ -19,8 +19,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" />
     <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateVeryNestedIdInFileScopeNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateNestedIdInFileScopeNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace.DotNet7_0.received.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Snapshots\" />
   </ItemGroup>
 
 </Project>
