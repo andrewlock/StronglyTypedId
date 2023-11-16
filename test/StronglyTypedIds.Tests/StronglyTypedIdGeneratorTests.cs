@@ -324,5 +324,30 @@ namespace MyContracts.V2
                 .DisableRequireUniquePrefix()
                 .UseDirectory("Snapshots");
         }
+
+        [Theory]
+        [InlineData("struct")]
+        [InlineData("class")]
+        [InlineData("record")]
+        [InlineData("record class")]
+        [InlineData("record struct")]
+        public Task CanGenerateForMultipleKeywords(string keyword)
+        {
+            var input = $$"""
+                          using StronglyTypedIds;
+
+                          [StronglyTypedId("guid-efcore")]
+                          public partial {{keyword}} MyId {}
+                          """;
+
+            // This only includes the last ID but that's good enough for this
+            var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+
+            Assert.Empty(diagnostics);
+
+            return Verifier.Verify(output)
+                .UseParameters(keyword.Replace(" ", ""))
+                .UseDirectory("Snapshots");
+        }
     }
 }

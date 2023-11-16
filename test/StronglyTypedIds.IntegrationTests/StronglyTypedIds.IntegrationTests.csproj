@@ -16,6 +16,13 @@
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Polyfill" Version="1.32.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)..\IntegrationLibraries.props" />
 

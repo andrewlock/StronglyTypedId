@@ -72,3 +72,11 @@ internal partial class SomeType<T> where T : new()
     }
 }
 
+[StronglyTypedId(Template.Guid, "guid-efcore", "guid-dapper", "guid-newtonsoftjson")]
+internal partial class ClassId { }
+
+[StronglyTypedId("guid-efcore", "guid-dapper", "guid-newtonsoftjson")]
+internal partial record RecordId(Guid Value) { }
+
+[StronglyTypedId("guid-efcore", "guid-dapper", "guid-newtonsoftjson")]
+internal partial record struct RecordStructId(Guid Value) { }
