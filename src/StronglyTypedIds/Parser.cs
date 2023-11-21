@@ -13,7 +13,7 @@ internal static class Parser
     public const string StronglyTypedIdAttribute = "StronglyTypedIds.StronglyTypedIdAttribute";
     public const string StronglyTypedIdDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdDefaultsAttribute";
 
-    public static Result<(StructToGenerate info, bool valid)> GetStructSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    public static Result<(StructToGenerate info, bool valid)> GetIdSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         var structSymbol = ctx.TargetSymbol as INamedTypeSymbol;
         if (structSymbol is null)
@@ -88,7 +88,7 @@ internal static class Parser
         return new Result<(StructToGenerate, bool)>((toGenerate, true), errors);
     }
 
-    public static Result<(Defaults defaults, bool valid)> GetDefaults(
+    public static Result<(Defaults defaults, bool valid)> GetIdDefaults(
         GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         var assemblyAttributes = ctx.TargetSymbol.GetAttributes();

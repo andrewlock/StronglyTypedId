@@ -31,6 +31,7 @@ namespace StronglyTypedIds
                 i.AddSource("Template.g.cs", EmbeddedSources.TemplateSource);
             });
 
+            // Templates
             IncrementalValuesProvider<(string Path, string Name, string? Content)> allTemplates = context.AdditionalTextsProvider
                 .Where(template => Path.GetExtension(template.Path).Equals(TemplateSuffix, StringComparison.OrdinalIgnoreCase))
                 .Select((template, ct) => (
@@ -41,45 +42,49 @@ namespace StronglyTypedIds
             var templates = allTemplates
                 .Where(template => !string.IsNullOrWhiteSpace(template.Name) && template.Content is not null)
                 .Collect();
-                
-            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
-                .ForAttributeWithMetadataName(
-                    Parser.StronglyTypedIdAttribute,
-                    predicate: (node, _) => node is StructDeclarationSyntax,
-                    transform: Parser.GetStructSemanticTarget)
-                .Where(static m => m is not null);
 
-            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> defaultsAndDiagnostics = context.SyntaxProvider
+            // ID defaults
+            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> idDefaultsAndDiagnostics = context.SyntaxProvider
                 .ForAttributeWithMetadataName(
                     Parser.StronglyTypedIdDefaultsAttribute,
                     predicate: (node, _) => node is CompilationUnitSyntax,
-                    transform: Parser.GetDefaults)
+                    transform: Parser.GetIdDefaults)
                 .Where(static m => m is not null);
 
-            context.RegisterSourceOutput(
-                structAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(info));
-
-            context.RegisterSourceOutput(
-                defaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(info));
-
-            IncrementalValuesProvider<StructToGenerate> structs = structAndDiagnostics
-                .Where(static x => x.Value.valid)
-                .Select((result, _) => result.Value.info);
-
-            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
+            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> idDefaultTemplateContent = idDefaultsAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
                 .Combine(templates)
                 .Select(ProcessDefaults);
 
-            var structsWithDefaultsAndTemplates = structs
-                .Combine(templates)
-                .Combine(defaultTemplateContent);
+            context.RegisterSourceOutput(
+                idDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
 
-            context.RegisterSourceOutput(structsWithDefaultsAndTemplates,
+            // IDs
+            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> idsAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdAttribute,
+                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    transform: Parser.GetIdSemanticTarget)
+                .Where(static m => m is not null);
+
+            IncrementalValuesProvider<StructToGenerate> ids = idsAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.info);
+
+            context.RegisterSourceOutput(
+                idsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+
+            // Combined
+            var idsWithDefaultsAndTemplates = ids
+                .Combine(templates)
+                .Combine(idDefaultTemplateContent);
+
+            // Output
+            context.RegisterSourceOutput(idsWithDefaultsAndTemplates,
                 static (spc, source) => Execute(source.Left.Left, source.Left.Right, source.Right, spc));
         }
         private static void Execute(
