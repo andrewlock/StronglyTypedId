@@ -85,9 +85,10 @@ namespace StronglyTypedIds
 
             // Output
             context.RegisterSourceOutput(idsWithDefaultsAndTemplates,
-                static (spc, source) => Execute(source.Left.Left, source.Left.Right, source.Right, spc));
+                static (spc, source) => GenerateIds(source.Left.Left, source.Left.Right, source.Right, spc));
         }
-        private static void Execute(
+
+        private static void GenerateIds(
             StructToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
@@ -99,7 +100,7 @@ namespace StronglyTypedIds
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (!TryGetTemplateContent(idToGenerate, templates, defaults, in context, out var templateContents))
+            if (!TryGetTemplateContent(idToGenerate.Template, idToGenerate.TemplateNames, idToGenerate.TemplateLocation, templates, defaults, in context, out var templateContents))
             {
                 return;
             }
@@ -111,6 +112,7 @@ namespace StronglyTypedIds
                 var result = SourceGenerationHelper.CreateId(
                     idToGenerate.NameSpace,
                     idToGenerate.Name,
+                    idToGenerate.Name, // same type
                     idToGenerate.Parent,
                     content,
                     addDefaultAttributes: string.IsNullOrEmpty(name),
@@ -190,26 +192,28 @@ namespace StronglyTypedIds
         }
 
         private static bool TryGetTemplateContent(
-            in StructToGenerate idToGenerate,
+            Template? selectedTemplate,
+            EquatableArray<string> selectedTemplateNames,
+            LocationInfo? attributeLocation,
             in ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)> Contents, bool IsValid, DiagnosticInfo? Diagnostics) defaults,
             in SourceProductionContext context,
             [NotNullWhen(true)] out (string Name, string Content)[]? templateContents)
         {
             (string, string)? builtIn = null;
-            if (idToGenerate.Template is { } templateId)
+            if (selectedTemplate is { } templateId)
             {
                 // built-in template specified
                 var content = EmbeddedSources.GetTemplate(templateId);
                 builtIn = (string.Empty, content);
             }
 
-            if (idToGenerate.TemplateNames.GetArray() is {Length: > 0} templateNames)
+            if (selectedTemplateNames.GetArray() is {Length: > 0} templateNames)
             {
                 // custom template specified
                 if (GetContent(
                         templateNames,
-                        idToGenerate.TemplateLocation,
+                        attributeLocation,
                         builtIn.HasValue,
                         in templates,
                         out templateContents,
