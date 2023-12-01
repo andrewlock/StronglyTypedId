@@ -66,6 +66,22 @@ public class IntIdTests
         Assert.NotEqual((object) bar, (object) foo);
     }
 
+#if NET8_0_OR_GREATER
+    [Fact]
+    public void CanRoundTripUtf8()
+    {
+        var id = new IntId(123);
+
+        var actual = new byte[16].AsSpan();
+        Assert.True(id.TryFormat(actual, out var charsWritten));
+
+        var success = IntId.TryParse(actual.Slice(0, charsWritten), provider: null, out var result);
+
+        Assert.True(success);
+        Assert.Equal(id, result);
+    }
+#endif
+
     [Fact]
     public void CanSerializeToNullableInt_WithNewtonsoftJsonProvider()
     {

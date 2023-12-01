@@ -10,6 +10,9 @@ internal static partial class EmbeddedSources
     #if NET7_0_OR_GREATER
             global::System.IParsable<PLACEHOLDERID>, global::System.ISpanParsable<PLACEHOLDERID>,
     #endif
+    #if NET8_0_OR_GREATER
+            global::System.IUtf8SpanParsable<PLACEHOLDERID>, global::System.IUtf8SpanFormattable,
+    #endif
             global::System.IComparable<PLACEHOLDERID>, global::System.IEquatable<PLACEHOLDERID>, global::System.IFormattable
         {
             public int Value { get; }
@@ -184,7 +187,7 @@ internal static partial class EmbeddedSources
                 global::System.Span<char> destination,
                 out int charsWritten,
     #if NET7_0_OR_GREATER
-                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat)]
     #endif
                 global::System.ReadOnlySpan<char> format,
                 global::System.IFormatProvider? provider)
@@ -195,10 +198,37 @@ internal static partial class EmbeddedSources
                 global::System.Span<char> destination,
                 out int charsWritten,
     #if NET7_0_OR_GREATER
-                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat)]
     #endif
                 global::System.ReadOnlySpan<char> format = default)
                 => Value.TryFormat(destination, out charsWritten, format);
+    #endif
+    #if NET8_0_OR_GREATER
+            /// <inheritdoc cref="global::System.IUtf8SpanFormattable.TryFormat" />
+            public bool TryFormat(
+                global::System.Span<byte> utf8Destination,
+                out int bytesWritten,
+                [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat)]
+                global::System.ReadOnlySpan<char> format = default,
+                global::System.IFormatProvider? provider = null)
+                => Value.TryFormat(utf8Destination, out bytesWritten, format, provider);
+    
+            /// <inheritdoc cref="global::System.IUtf8SpanParsable{TSelf}.Parse(global::System.ReadOnlySpan{byte}, global::System.IFormatProvider?)" />
+            public static PLACEHOLDERID Parse(global::System.ReadOnlySpan<byte> utf8Text, global::System.IFormatProvider? provider)
+                => new(int.Parse(utf8Text, provider));
+    
+            /// <inheritdoc cref="global::System.IUtf8SpanParsable{TSelf}.TryParse(global::System.ReadOnlySpan{byte}, global::System.IFormatProvider?, out TSelf)" />
+            public static bool TryParse(global::System.ReadOnlySpan<byte> utf8Text, global::System.IFormatProvider? provider, out PLACEHOLDERID result)
+            {
+                if (int.TryParse(utf8Text, provider, out var intResult))
+                {
+                    result = new PLACEHOLDERID(intResult);
+                    return true;
+                }
+    
+                result = default;
+                return false;
+            }
     #endif
         }
     """;
