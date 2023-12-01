@@ -19,6 +19,9 @@
 #if NET7_0_OR_GREATER
         global::System.IParsable<MyId>, global::System.ISpanParsable<MyId>,
 #endif
+#if NET8_0_OR_GREATER
+        global::System.IUtf8SpanFormattable,
+#endif
     global::System.IComparable<MyId>, global::System.IEquatable<MyId>, global::System.IFormattable
     {
         public global::System.Guid Value { get; }
@@ -213,5 +216,15 @@
 #endif
             global::System.ReadOnlySpan<char> format = default)
             => Value.TryFormat(destination, out charsWritten, format);
+#endif
+#if NET8_0_OR_GREATER
+        /// <inheritdoc cref="global::System.IUtf8SpanFormattable.TryFormat" />
+        public bool TryFormat(
+            global::System.Span<byte> utf8Destination,
+            out int bytesWritten,
+            [global::System.Diagnostics.CodeAnalysis.StringSyntax(global::System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat)]
+            global::System.ReadOnlySpan<char> format,
+            global::System.IFormatProvider? provider)
+            => Value.TryFormat(utf8Destination, out bytesWritten, format);
 #endif
     }

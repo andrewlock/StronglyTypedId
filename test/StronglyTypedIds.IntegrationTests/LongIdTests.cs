@@ -65,6 +65,22 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.NotEqual((object)bar, (object)foo);
         }
 
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void CanRoundTripUtf8()
+        {
+            var id = new LongId(123L);
+
+            var actual = new byte[16].AsSpan();
+            Assert.True(id.TryFormat(actual, out var charsWritten));
+
+            var success = LongId.TryParse(actual.Slice(0, charsWritten), provider: null, out var result);
+
+            Assert.True(success);
+            Assert.Equal(id, result);
+        }
+#endif
+
         [Fact]
         public void CanSerializeToNullableInt_WithNewtonsoftJsonProvider()
         {

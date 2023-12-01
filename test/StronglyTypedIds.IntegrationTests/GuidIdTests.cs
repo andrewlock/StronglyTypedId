@@ -75,6 +75,23 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.NotEqual((object)bar, (object)foo);
         }
 
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void CanFormatAsUtf8()
+        {
+            var expected = "17b4c96b-023a-4050-8ab5-4511c0e7fd09"u8;
+            var id = GuidId1.Parse("17B4C96B-023A-4050-8AB5-4511C0E7FD09");
+
+            var format = "D"; // in expected format
+            var actual = new byte[expected.Length].AsSpan();
+            var success = id.TryFormat(actual, out var charsWritten, format, provider: null);
+         
+            Assert.True(success);
+            Assert.Equal(expected.Length, charsWritten);
+            Assert.True(actual.SequenceEqual(expected));
+        }
+#endif
+
         [Fact]
         public void CanSerializeToGuid_WithTypeConverter()
         {
