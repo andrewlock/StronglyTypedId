@@ -12,7 +12,9 @@
                 return value switch
                 {
                     int intValue => new PLACEHOLDERID(intValue),
-                    long longValue when longValue < int.MaxValue => new PLACEHOLDERID((int)longValue),
+                    short shortValue => new PLACEHOLDERID(shortValue),
+                    long longValue and < int.MaxValue and > int.MinValue => new PLACEHOLDERID((int)longValue),
+                    decimal decimalValue and < int.MaxValue and > int.MinValue => new PLACEHOLDERID((int)decimalValue),
                     string stringValue when !string.IsNullOrEmpty(stringValue) && int.TryParse(stringValue, out var result) => new PLACEHOLDERID(result),
                     _ => throw new global::System.InvalidCastException($"Unable to cast object of type {value.GetType()} to PLACEHOLDERID"),
                 };

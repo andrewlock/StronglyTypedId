@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -282,6 +283,27 @@ public class IntIdTests
         Assert.Equal(new ConvertersIntId(123), value);
     }
 
+    [Fact(Skip = "Requires localdb to be available")]
+    public async Task WhenDapperValueConverterUsesValueConverterWithSqlServer()
+    {
+        using var connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30");
+        await connection.OpenAsync();
+
+        var results = await connection.QueryAsync<ConvertersIntId>("SELECT CAST (123 AS numeric(38,0))");
+
+        var value = Assert.Single(results);
+        Assert.Equal(new ConvertersIntId(123), value);
+    }
+
+    [Fact]
+    public void WhenDapperValueConverterAndDecimalUsesValueConverter()
+    {
+        var handler = new ConvertersIntId.DapperTypeHandler();
+        var value = handler.Parse((decimal) 123L);
+
+        Assert.Equal(new ConvertersIntId(123), value);
+    }
+    
     [Theory]
     [InlineData(123)]
     [InlineData("123")]
