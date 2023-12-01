@@ -266,6 +266,15 @@ public class IntIdTests
         Assert.Equal(new ConvertersIntId(123), value);
     }
 
+    [Fact]
+    public void WhenDapperValueConverterAndDecimalUsesValueConverter()
+    {
+        var handler = new ConvertersIntId.DapperTypeHandler();
+        var value = handler.Parse((decimal) 123L);
+
+        Assert.Equal(new ConvertersIntId(123), value);
+    }
+    
     [Theory]
     [InlineData(123)]
     [InlineData("123")]

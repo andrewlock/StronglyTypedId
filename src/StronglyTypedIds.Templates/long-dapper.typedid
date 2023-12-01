@@ -14,6 +14,7 @@
                     long longValue => new PLACEHOLDERID(longValue),
                     int intValue => new PLACEHOLDERID(intValue),
                     short shortValue => new PLACEHOLDERID(shortValue),
+                    decimal decimalValue and < long.MaxValue and > long.MinValue => new PLACEHOLDERID((long)decimalValue),
                     string stringValue when !string.IsNullOrEmpty(stringValue) && long.TryParse(stringValue, out var result) => new PLACEHOLDERID(result),
                     _ => throw new global::System.InvalidCastException($"Unable to cast object of type {value.GetType()} to PLACEHOLDERID"),
                 };

@@ -278,6 +278,15 @@ namespace StronglyTypedIds.IntegrationTests
             Assert.Equal(value, new ConvertersLongId(123));
         }
 
+        [Fact]
+        public void WhenDapperValueConverterAndDecimalUsesValueConverter()
+        {
+            var handler = new ConvertersLongId.DapperTypeHandler();
+            var value = handler.Parse((decimal) 123L);
+
+            Assert.Equal(new ConvertersLongId(123), value);
+        }
+
 #if NET6_0_OR_GREATER
         [Fact]
         public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
