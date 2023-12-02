@@ -11,6 +11,7 @@ namespace StronglyTypedIds
             ParentClass? parentClass,
             string template,
             bool addDefaultAttributes,
+            bool addGeneratedCodeAttribute,
             StringBuilder? sb)
         {
             if (string.IsNullOrEmpty(idName))
@@ -43,6 +44,12 @@ namespace StronglyTypedIds
             }
 
             var hasGenericParent = false;
+            if (addGeneratedCodeAttribute && parentClass is not null)
+            {
+                addGeneratedCodeAttribute = false;
+                AddGeneratedCodeAttribute(sb);
+            }
+
             while (parentClass is { } parent)
             {
                 sb.Append("    ");
@@ -76,6 +83,11 @@ namespace StronglyTypedIds
                 sb.AppendLine("    [global::System.Text.Json.Serialization.JsonConverter(typeof(PLACEHOLDERIDSystemTextJsonConverter))]");
             }
 
+            if (addGeneratedCodeAttribute)
+            {
+                AddGeneratedCodeAttribute(sb);
+            }
+
             sb.AppendLine(template);
 
             sb.Replace("PLACEHOLDERID", idName);
@@ -91,6 +103,11 @@ namespace StronglyTypedIds
             }
 
             return sb.ToString();
+
+            static void AddGeneratedCodeAttribute(StringBuilder sb)
+            {
+                sb.AppendLine($"""    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "{Constants.StronglyTypedIdsVersion}")]""");
+            }
         }
 
         internal static string CreateSourceName(StringBuilder sb, string nameSpace, ParentClass? parent, string name, string template)

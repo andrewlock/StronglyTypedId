@@ -97,6 +97,7 @@ namespace StronglyTypedIds
                 return;
             }
 
+            var addGeneratedCodeAttribute = true;
             var sb = new StringBuilder();
             foreach (var (name, content) in templateContents.Distinct())
             {
@@ -106,7 +107,10 @@ namespace StronglyTypedIds
                     idToGenerate.Parent,
                     content,
                     addDefaultAttributes: string.IsNullOrEmpty(name),
+                    addGeneratedCodeAttribute: addGeneratedCodeAttribute,
                     sb);
+
+                addGeneratedCodeAttribute = false; // We can only add it once, so just add to the first rendering
 
                 var fileName = SourceGenerationHelper.CreateSourceName(
                     sb,

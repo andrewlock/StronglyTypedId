@@ -12,6 +12,7 @@
 #nullable enable
 namespace SomeNamespace
 {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
     public partial class ParentClass 
     {
     [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]

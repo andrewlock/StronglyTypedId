@@ -12,6 +12,7 @@
 #nullable enable
 namespace SomeNamespace
 {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
     [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
     [global::System.Text.Json.Serialization.JsonConverter(typeof(MyIdSystemTextJsonConverter))]
     [global::Newtonsoft.Json.JsonConverter(typeof(MyIdNewtonsoftJsonConverter))]
