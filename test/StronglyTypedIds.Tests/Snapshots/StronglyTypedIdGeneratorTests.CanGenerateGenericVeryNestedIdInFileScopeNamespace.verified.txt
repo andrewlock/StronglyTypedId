@@ -12,13 +12,13 @@
 #nullable enable
 namespace SomeNamespace
 {
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
     public partial class ParentClass<T> where T: new()
     {
     internal partial record InnerClass<TKey, TValue> 
     {
     public partial struct InnerStruct 
     {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
     partial struct MyId :
 #if NET6_0_OR_GREATER
         global::System.ISpanFormattable,
