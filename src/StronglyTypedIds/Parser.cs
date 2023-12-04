@@ -12,6 +12,8 @@ internal static class Parser
 {
     public const string StronglyTypedIdAttribute = "StronglyTypedIds.StronglyTypedIdAttribute";
     public const string StronglyTypedIdDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdDefaultsAttribute";
+    public const string StronglyTypedIdConvertersAttribute = "StronglyTypedIds.StronglyTypedIdConvertersAttribute";
+    public const string StronglyTypedIdConvertersDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdConvertersDefaultsAttribute";
 
     public static Result<(StructToGenerate info, bool valid)> GetIdSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
@@ -147,6 +149,147 @@ internal static class Parser
         }
 
         var defaults = new Defaults(template, templateNames, attributeLocation!, hasMultiple);
+
+        return new Result<(Defaults, bool)>((defaults, true), errors);
+    }
+
+    public static Result<(ConverterToGenerate info, bool valid)> GetConvertersSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    {
+        var structSymbol = ctx.TargetSymbol as INamedTypeSymbol;
+        if (structSymbol is null)
+        {
+            return Result<ConverterToGenerate>.Fail();
+        }
+
+        var structSyntax = (StructDeclarationSyntax)ctx.TargetNode;
+
+        var hasMisconfiguredInput = false;
+        List<DiagnosticInfo>? diagnostics = null;
+        string[]? templateNames = null;
+        LocationInfo? attributeLocation = null;
+        string? idName = null;
+
+        foreach (AttributeData attribute in structSymbol.GetAttributes())
+        {
+            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdAttribute" ||
+                  attribute.AttributeClass?.Name == "StronglyTypedId") &&
+                  attribute.AttributeClass.ToDisplayString() == StronglyTypedIdAttribute))
+            {
+                // wrong attribute
+                continue;
+            }
+
+            // Can never have template
+            (var result, (_, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
+
+            if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } s)
+            {
+                attributeLocation = LocationInfo.CreateFrom(s);
+            }
+
+            var typeParameter = attribute.AttributeClass.TypeArguments[0];
+            idName = typeParameter.ToString();
+        }
+
+        var hasPartialModifier = false;
+        foreach (var modifier in structSyntax.Modifiers)
+        {
+            if (modifier.IsKind(SyntaxKind.PartialKeyword))
+            {
+                hasPartialModifier = true;
+                break;
+            }
+        }
+
+        if (!hasPartialModifier)
+        {
+            diagnostics ??= new();
+            diagnostics.Add(NotPartialDiagnostic.CreateInfo(structSyntax));
+        }
+
+        var errors = diagnostics is null
+            ? EquatableArray<DiagnosticInfo>.Empty
+            : new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
+
+        if (hasMisconfiguredInput || idName is null)
+        {
+            return new Result<(ConverterToGenerate, bool)>((default, false), errors);
+        }
+
+        string nameSpace = GetNameSpace(structSyntax);
+        ParentClass? parentClass = GetParentClasses(structSyntax);
+        var name = structSymbol.Name;
+
+        var toGenerate = new ConverterToGenerate(
+            name: name,
+            nameSpace: nameSpace,
+            idName: idName,
+            templateNames: templateNames,
+            templateLocation: attributeLocation!,
+            parent: parentClass);
+
+        return new Result<(ConverterToGenerate, bool)>((toGenerate, true), errors);
+    }
+
+    public static Result<(Defaults defaults, bool valid)> GetConverterDefaults(
+        GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
+    {
+        var assemblyAttributes = ctx.TargetSymbol.GetAttributes();
+        if (assemblyAttributes.IsDefaultOrEmpty)
+        {
+            return Result<Defaults>.Fail();
+        }
+
+        // We only return the first config that we find
+        string[]? templateNames = null;
+        LocationInfo? attributeLocation = null;
+        List<DiagnosticInfo>? diagnostics = null;
+        bool hasMisconfiguredInput = false;
+        bool hasMultiple = false;
+
+        // if we have multiple attributes we still check them, so that we can add extra diagnostics if necessary
+        // the "first" one found won't be flagged as a duplicate though.
+        foreach (AttributeData attribute in assemblyAttributes)
+        {
+            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdConvertersDefaultsAttribute" ||
+                   attribute.AttributeClass?.Name == "StronglyTypedIdConvertersDefaults") &&
+                  attribute.AttributeClass.ToDisplayString() == StronglyTypedIdConvertersDefaultsAttribute))
+            {
+                // wrong attribute
+                continue;
+            }
+
+            var syntax = attribute.ApplicationSyntaxReference?.GetSyntax();
+            if (templateNames is not null || hasMisconfiguredInput)
+            {
+                hasMultiple = true;
+                if (syntax is not null)
+                {
+                    diagnostics ??= new();
+                    diagnostics.Add(MultipleAssemblyAttributeDiagnostic.CreateInfo(syntax));
+                }
+            }
+
+            (var result, (_, templateNames)) = GetConstructorValues(attribute);
+            hasMisconfiguredInput |= result;
+
+            if (syntax is not null)
+            {
+                attributeLocation = LocationInfo.CreateFrom(syntax);
+            }
+        }
+
+        var errors = diagnostics is null
+            ? EquatableArray<DiagnosticInfo>.Empty
+            : new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
+
+        if (hasMisconfiguredInput)
+        {
+            return new Result<(Defaults, bool)>((default, false), errors);
+        }
+
+        var defaults = new Defaults(template: null, templateNames, attributeLocation!, hasMultiple);
 
         return new Result<(Defaults, bool)>((defaults, true), errors);
     }
