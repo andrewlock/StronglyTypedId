@@ -48,6 +48,8 @@ class Build : NukeBuild
     [Parameter] readonly string GithubToken;
     [Parameter] readonly string NuGetToken;
     [Parameter] readonly AbsolutePath PackagesDirectory = RootDirectory / "packages";
+    [Parameter] readonly string Filter;
+    [Parameter] readonly string Framework;
 
     const string NugetOrgUrl = "https://api.nuget.org/v3/index.json";
     bool IsTag => GitHubActions.Instance?.GitHubRef?.StartsWith("refs/tags/") ?? false;
@@ -88,6 +90,8 @@ class Build : NukeBuild
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
+                .When(!string.IsNullOrEmpty(Filter), x => x.SetFilter(Filter))
+                .When(!string.IsNullOrEmpty(Framework), x => x.SetFramework(Framework))
                 .EnableNoBuild()
                 .EnableNoRestore());
         });

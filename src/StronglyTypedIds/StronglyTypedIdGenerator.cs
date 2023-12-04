@@ -78,14 +78,56 @@ namespace StronglyTypedIds
                 idsAndDiagnostics.SelectMany((x, _) => x.Errors),
                 static (context, info) => context.ReportDiagnostic(info));
 
+            // Converter defaults
+            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> converterDefaultsAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdConvertersDefaultsAttribute,
+                    predicate: (node, _) => node is CompilationUnitSyntax,
+                    transform: Parser.GetConverterDefaults)
+                .Where(static m => m is not null);
+
+            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> converterDefaultTemplateContent = converterDefaultsAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.defaults)
+                .Collect()
+                .Combine(templates)
+                .Select(ProcessDefaults);
+            
+            context.RegisterSourceOutput(
+                converterDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+            
+            // Converters
+            IncrementalValuesProvider<Result<(ConverterToGenerate info, bool valid)>> convertersAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdConvertersAttribute,
+                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    transform: Parser.GetConvertersSemanticTarget)
+                .Where(static m => m is not null);
+            
+            IncrementalValuesProvider<ConverterToGenerate> converters = convertersAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.info);
+            
+            context.RegisterSourceOutput(
+                convertersAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+
             // Combined
             var idsWithDefaultsAndTemplates = ids
                 .Combine(templates)
                 .Combine(idDefaultTemplateContent);
 
+            var convertersWithDefaultsAndTemplates = converters
+                .Combine(templates)
+                .Combine(converterDefaultTemplateContent);
+
             // Output
             context.RegisterSourceOutput(idsWithDefaultsAndTemplates,
                 static (spc, source) => GenerateIds(source.Left.Left, source.Left.Right, source.Right, spc));
+
+            context.RegisterSourceOutput(convertersWithDefaultsAndTemplates,
+                static (spc, source) => GenerateConverters(source.Left.Left, source.Left.Right, source.Right, spc));
         }
 
         private static void GenerateIds(
@@ -126,6 +168,51 @@ namespace StronglyTypedIds
                     idToGenerate.NameSpace,
                     idToGenerate.Parent,
                     idToGenerate.Name,
+                    name);
+
+                context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
+            }
+        }
+
+        private static void GenerateConverters(
+            ConverterToGenerate converterToGenerate,
+            ImmutableArray<(string Path, string Name, string? Content)> templates,
+            (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
+            SourceProductionContext context)
+        {
+            if (defaults.Diagnostic is { } diagnostic)
+            {
+                // report error with the default template
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            if (!TryGetTemplateContent(selectedTemplate: null, converterToGenerate.TemplateNames, converterToGenerate.TemplateLocation, templates, defaults, in context, out var templateContents))
+            {
+                return;
+            }
+
+            var addGeneratedCodeAttribute = true;
+
+            var sb = new StringBuilder();
+            foreach (var (name, content) in templateContents.Distinct())
+            {
+                var result = SourceGenerationHelper.CreateId(
+                    converterToGenerate.NameSpace,
+                    converterToGenerate.Name,
+                    converterToGenerate.IdName,
+                    converterToGenerate.Parent,
+                    content,
+                    addDefaultAttributes: string.IsNullOrEmpty(name),
+                    addGeneratedCodeAttribute: addGeneratedCodeAttribute,
+                    sb);
+
+                addGeneratedCodeAttribute = false; // We can only add it once, so just add to the first rendering
+
+                var fileName = SourceGenerationHelper.CreateSourceName(
+                    sb,
+                    converterToGenerate.NameSpace,
+                    converterToGenerate.Parent,
+                    converterToGenerate.Name,
                     name);
 
                 context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));

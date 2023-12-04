@@ -18,6 +18,12 @@
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
         },
+        "Filter": {
+          "type": "string"
+        },
+        "Framework": {
+          "type": "string"
+        },
         "GithubToken": {
           "type": "string"
         },
