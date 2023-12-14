@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.0.0-beta07]
+
+Breaking Changes:
+* This release contains a fundamental change in how you define your IDs
+  * For details see [the related issue](https://github.com/andrewlock/StronglyTypedId/issues/102), the [PR](https://github.com/andrewlock/StronglyTypedId/pull/117), or the [README](./README.md)
+  * The "options" enums `StronglyTypedIdBackingType`, `StronglyTypedIdConverter`, and `StronglyTypedIdImplementations` have been removed.
+  * Instead, you simply choose one of 4 different built-in templates, or use a custom template.
+
+Features
+* Adds `[GeneratedCode]` attribute to generated IDs (Fixes https://github.com/andrewlock/StronglyTypedId/issues/57)
+* Add support for parsing `SCOPE_IDENTITY()` and `@@IDENTITY` in MSSQL with `DapperTypeHandler` (Fixes https://github.com/andrewlock/StronglyTypedId/issues/118)
+* Fix exception being thrown when deserializing nullable strongly-typed id backed by string (Fixes https://github.com/andrewlock/StronglyTypedId/issues/83)
+* Allow creating multiple IDs with the same name in a project (Fixes https://github.com/andrewlock/StronglyTypedId/issues/74, [thanks @jo-goro](https://github.com/andrewlock/StronglyTypedId/pull/77)!)
+
 ## [v1.0.0-beta06]
 
 Features
