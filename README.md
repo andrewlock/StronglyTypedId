@@ -5,7 +5,7 @@
 ![Build status](https://github.com/andrewlock/StronglyTypedId/actions/workflows/BuildAndPack.yml/badge.svg)
 [![NuGet](https://img.shields.io/nuget/v/StronglyTypedId.svg)](https://www.nuget.org/packages/StronglyTypedId/)
 
-StronglyTypedId makes creating strongly-typed IDs as easy as adding an attribute! No more [accidentally passing arguments in the wrong order to methods](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem) - StronglyTypedId uses .NET 6+'s compile-time incremental source generators to generate [the boilerplate](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#a-full-example-implementation) required to use strongly-typed IDs.
+StronglyTypedId makes creating strongly-typed IDs as easy as adding an attribute! No more [accidentally passing arguments in the wrong order to methods](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-1/#an-example-of-the-problem) - StronglyTypedId uses .NET 7+'s compile-time incremental source generators to generate [the boilerplate](https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-2/#a-full-example-implementation) required to use strongly-typed IDs.
 
 Simply, [install the required package](#installing) add the `[StronglyTypedId]` attribute to a `struct` (in the `StronglyTypedIds` namespace):
 
@@ -20,7 +20,7 @@ and the source generator magically generates the backing code when you save the 
 
 <img src="https://raw.githubusercontent.com/andrewlock/StronglyTypedId/master/docs/strongly_typed_id.gif" alt="Generating a strongly-typed ID using the StronglyTypedId packages"/>
 
-> StronglyTypedId requires [the .NET Core SDK v6.0.100 or greater](https://dotnet.microsoft.com/download/dotnet/6.0).
+> StronglyTypedId requires [the .NET Core SDK v7.0.100 or greater](https://dotnet.microsoft.com/download/dotnet/7.0).
 
 
 ## Why do I need this library?
@@ -37,7 +37,7 @@ Unfortunately, taking this approach requires [a lot of boilerplate and ceremony]
 
 The StronglyTypedId NuGet package is a .NET Standard 2.0 package. 
 
-You must be using the .NET 6+ SDK (though you can compile for other target frameworks like .NET Core 2.1 and .NET Framework 4.8)
+You must be using the .NET 7+ SDK (though you can compile for other target frameworks like .NET Core 2.1 and .NET Framework 4.8)
 
 ## Installing
 
