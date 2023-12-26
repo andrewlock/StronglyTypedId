@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using StronglyTypedIds.Diagnostics;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,7 +31,7 @@ public class StronglyTypedIdConverterTests
              """;
          var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
-         Assert.Empty(diagnostics);
+         Assert.Contains(diagnostics, diagnostic => diagnostic.Id == MissingDefaultsDiagnostic.Id);
 
          return Verifier.Verify(output)
              .UseDirectory("Snapshots");
