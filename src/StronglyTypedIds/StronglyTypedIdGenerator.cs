@@ -56,7 +56,7 @@ namespace StronglyTypedIds
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
                 .Combine(templates)
-                .Select(ProcessDefaults);
+                .Select(ProcessIdDefaults);
 
             context.RegisterSourceOutput(
                 idDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
@@ -91,7 +91,7 @@ namespace StronglyTypedIds
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
                 .Combine(templates)
-                .Select(ProcessDefaults);
+                .Select(ProcessConverterDefaults);
             
             context.RegisterSourceOutput(
                 converterDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
@@ -177,13 +177,26 @@ namespace StronglyTypedIds
         private static void GenerateConverters(
             ConverterToGenerate converterToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
-            (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
+            (EquatableArray<(string Name, string Content)> Templates, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
             SourceProductionContext context)
         {
             if (defaults.Diagnostic is { } diagnostic)
             {
                 // report error with the default template
                 context.ReportDiagnostic(diagnostic);
+            }
+
+            if (converterToGenerate.TemplateNames.Count == 0
+                && defaults is { IsValid: false, Templates.Count: 0 })
+            {
+                // not allowed this, so add a diagnostic
+                if (converterToGenerate.TemplateLocation is { } l)
+                {
+                    var location = Location.Create(l.FilePath, l.TextSpan, l.LineSpan);
+                    context.ReportDiagnostic(MissingDefaultsDiagnostic.CreateInfo(location));
+                }
+
+                return;
             }
 
             if (!TryGetTemplateContent(selectedTemplate: null, converterToGenerate.TemplateNames, converterToGenerate.TemplateLocation, templates, defaults, in context, out var templateContents))
@@ -220,22 +233,40 @@ namespace StronglyTypedIds
         }
 
 
-        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessDefaults((ImmutableArray<Defaults> Left, ImmutableArray<(string Path, string Name, string? Content)> Right) all, CancellationToken _)
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessIdDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all,
+            CancellationToken _)
+            => ProcessDefaults(all, allowEmptyDefaults: true);
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessConverterDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all,
+            CancellationToken _)
+            => ProcessDefaults(all, allowEmptyDefaults: false);
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all, 
+            bool allowEmptyDefaults)
         {
-            if (all.Left.IsDefaultOrEmpty)
+            if (all.Selected.IsDefaultOrEmpty)
             {
                 // no default attributes, valid, but no content
-                return (EquatableArray<(string Name, string Content)>.Empty, true, null);
+                if (allowEmptyDefaults)
+                {
+                    return (EquatableArray<(string Name, string Content)>.Empty, true, null);
+                }
+
+                // Not allowed empty
+                return (EquatableArray<(string Name, string Content)>.Empty, false, null);
             }
 
             // technically we can never have more than one `Defaults` here
             // but check for it just in case
-            if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
+            if (all.Selected is {IsDefaultOrEmpty: false, Length: > 1})
             {
                 return (EquatableArray<(string Name, string Content)>.Empty, false, null);
             }
 
-            var defaults = all.Left[0];
+            var defaults = all.Selected[0];
             if (defaults.HasMultiple)
             {
                 // not valid
@@ -264,7 +295,7 @@ namespace StronglyTypedIds
             }
 
             // We have already checked for null/empty template name and flagged it as an error
-            if (!GetContent(templateNames, defaults.TemplateLocation!, builtInTemplate.HasValue, in all.Right, out var contents, out var diagnostic))
+            if (!GetContent(templateNames, defaults.TemplateLocation!, builtInTemplate.HasValue, in all.Templates, out var contents, out var diagnostic))
             {
                 return (EquatableArray<(string Name, string Content)>.Empty, false, diagnostic);
             }
