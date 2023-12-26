@@ -1,4 +1,4 @@
-    partial struct PLACEHOLDERID
+    partial struct TARGETTYPE
     {
         public partial class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<PLACEHOLDERID, int>
         {
