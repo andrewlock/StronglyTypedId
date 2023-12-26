@@ -15,31 +15,30 @@ public class StronglyTypedIdConverterTests
         _output = output;
     }
 
-    [Fact]
-    public Task DefaultConverterIdInGlobalNamespaceWithoutDefaultsDoesntGenerateConverters()
-    {
-        const string input =
-            """
-            using StronglyTypedIds;
+     [Fact]
+     public Task DefaultConverterIdInGlobalNamespaceWithoutDefaultsDoesntGenerateConverters()
+     {
+         const string input =
+             """
+             using StronglyTypedIds;
 
-            [StronglyTypedId]
-            public partial struct MyId {}
-            
-            [StronglyTypedIdConverters<MyId>]
-            public partial struct MyIdConverters {}
-            """;
-        var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
+             [StronglyTypedId]
+             public partial struct MyId {}
+             
+             [StronglyTypedIdConverters<MyId>]
+             public partial struct MyIdConverters {}
+             """;
+         var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
-        Assert.Empty(diagnostics);
+         Assert.Empty(diagnostics);
 
-        return Verifier.Verify(output)
-            .UseDirectory("Snapshots");
-    }
+         return Verifier.Verify(output)
+             .UseDirectory("Snapshots");
+     }
 
      [Fact]
      public Task CanGenerateDefaultConverterIdInGlobalNamespace()
      {
-         System.Diagnostics.Debugger.Launch();
          const string input =
              """
              using StronglyTypedIds;

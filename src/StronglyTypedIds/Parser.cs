@@ -12,7 +12,7 @@ internal static class Parser
 {
     public const string StronglyTypedIdAttribute = "StronglyTypedIds.StronglyTypedIdAttribute";
     public const string StronglyTypedIdDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdDefaultsAttribute";
-    public const string StronglyTypedIdConvertersAttribute = "StronglyTypedIds.StronglyTypedIdConvertersAttribute";
+    public const string StronglyTypedIdConvertersAttribute = "StronglyTypedIds.StronglyTypedIdConvertersAttribute`1";
     public const string StronglyTypedIdConvertersDefaultsAttribute = "StronglyTypedIds.StronglyTypedIdConvertersDefaultsAttribute";
 
     public static Result<(StructToGenerate info, bool valid)> GetIdSemanticTarget(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
@@ -149,7 +149,6 @@ internal static class Parser
         }
 
         var defaults = new Defaults(template, templateNames, attributeLocation!, hasMultiple);
-
         return new Result<(Defaults, bool)>((defaults, true), errors);
     }
 
@@ -171,9 +170,10 @@ internal static class Parser
 
         foreach (AttributeData attribute in structSymbol.GetAttributes())
         {
-            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdAttribute" ||
-                  attribute.AttributeClass?.Name == "StronglyTypedId") &&
-                  attribute.AttributeClass.ToDisplayString() == StronglyTypedIdAttribute))
+            if (!((attribute.AttributeClass?.Name == "StronglyTypedIdConvertersAttribute" ||
+                  attribute.AttributeClass?.Name == "StronglyTypedIdConverters") &&
+                  attribute.AttributeClass.IsGenericType &&
+                  attribute.AttributeClass.TypeArguments.Length == 1))
             {
                 // wrong attribute
                 continue;
