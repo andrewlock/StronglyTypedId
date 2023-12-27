@@ -374,20 +374,36 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public async Task WhenDapperValueConverterUsesValueConverter()
+        public Task WhenDapperValueConverterUsesValueConverter_Id()
+            => WhenDapperValueConverterUsesValueConverter(g => new ConvertersGuidId(g));
+
+        [Fact]
+        public Task WhenDapperValueConverterUsesValueConverter_Converter()
+            => WhenDapperValueConverterUsesValueConverter(g => new GuidId1(g));
+        
+        private async Task WhenDapperValueConverterUsesValueConverter<T>(Func<Guid, T> newFunc)
         {
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
         
-            var results = await connection.QueryAsync<ConvertersGuidId>("SELECT '5640dad4-862a-4738-9e3c-c76dc227eb66'");
+            var results = await connection.QueryAsync<T>("SELECT '5640dad4-862a-4738-9e3c-c76dc227eb66'");
         
             var value = Assert.Single(results);
-            Assert.Equal(value, new ConvertersGuidId(Guid.Parse("5640dad4-862a-4738-9e3c-c76dc227eb66")));
+            Assert.Equal(value, newFunc(Guid.Parse("5640dad4-862a-4738-9e3c-c76dc227eb66")));
         }
 
 #if NET6_0_OR_GREATER
         [Fact]
-        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Id()
+            => WhenConventionBasedEfCoreValueConverterUsesValueConverter(x => x.Entities,
+                new TestEntity { Id = ConvertersGuidId.New() });
+
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Converter()
+            => WhenConventionBasedEfCoreValueConverterUsesValueConverter(c => c.Entities3,
+                new TestEntity3 { Id = GuidId1.New() });
+        
+        private void WhenConventionBasedEfCoreValueConverterUsesValueConverter<T>(Func<ConventionsDbContext, DbSet<T>> dbsetFunc, T entity) where T : class
         {
             var connection = new SqliteConnection("DataSource=:memory:");
             connection.Open();
@@ -399,13 +415,12 @@ namespace StronglyTypedIds.IntegrationTests
             using (var context = new ConventionsDbContext(options))
             {
                 context.Database.EnsureCreated();
-                context.Entities.Add(
-                    new TestEntity { Id = ConvertersGuidId.New() });
+                dbsetFunc(context).Add(entity);
                 context.SaveChanges();
             }
             using (var context = new ConventionsDbContext(options))
             {
-                var all = context.Entities.ToList();
+                var all = dbsetFunc(context).ToList();
                 Assert.Single(all);
             }
         }
@@ -519,6 +534,7 @@ namespace StronglyTypedIds.IntegrationTests
         {
             public DbSet<TestEntity> Entities { get; set; }
             public DbSet<TestEntity2> Entities2 { get; set; }
+            public DbSet<TestEntity3> Entities3 { get; set; }
 
             public ConventionsDbContext(DbContextOptions options) : base(options)
             {
@@ -532,6 +548,9 @@ namespace StronglyTypedIds.IntegrationTests
                 configurationBuilder
                     .Properties<ConvertersGuidId2>()
                     .HaveConversion<ConvertersGuidId2.EfCoreValueConverter>();
+                configurationBuilder
+                    .Properties<GuidId1>()
+                    .HaveConversion<Guid1Converters.EfCoreValueConverter>();
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -545,6 +564,13 @@ namespace StronglyTypedIds.IntegrationTests
                     });
                 modelBuilder
                     .Entity<TestEntity2>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
+                modelBuilder
+                    .Entity<TestEntity3>(builder =>
                     {
                         builder
                             .Property(x => x.Id)
@@ -603,6 +629,11 @@ namespace StronglyTypedIds.IntegrationTests
         internal class TestEntity2
         {
             public ConvertersGuidId2 Id { get; set; }
+        }
+
+        internal class TestEntity3
+        {
+            public GuidId1 Id { get; set; }
         }
 
         internal class EntityWithNullableId2
