@@ -6,6 +6,15 @@
     <IsPackable>false</IsPackable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\..\src\StronglyTypedIds.Templates\*.typedid" Link="Templates\%(Filename)%(Extension)" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\StronglyTypedIds.IntegrationTests\*.cs" Link="%(Filename)%(Extension)" />
