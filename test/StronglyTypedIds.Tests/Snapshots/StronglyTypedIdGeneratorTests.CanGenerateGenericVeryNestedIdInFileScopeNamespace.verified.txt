@@ -18,7 +18,7 @@ namespace SomeNamespace
     {
     public partial struct InnerStruct 
     {
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta7")]
     partial struct MyId :
 #if NET6_0_OR_GREATER
         global::System.ISpanFormattable,
