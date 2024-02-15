@@ -10,7 +10,7 @@
 #pragma warning disable 1591 // publicly visible type or member must be documented
 
 #nullable enable
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta6")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta7")]
     partial struct MyId
     {
         public partial class EfCoreValueConverter : global::Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<MyId, global::System.Guid>
