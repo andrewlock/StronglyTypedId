@@ -272,15 +272,22 @@ public class IntIdTests
     }
 
     [Fact]
-    public async Task WhenDapperValueConverterUsesValueConverter()
+    public Task WhenDapperValueConverterUsesValueConverter_Id()
+        => WhenDapperValueConverterUsesValueConverter(g => new ConvertersIntId(g));
+
+    [Fact]
+    public Task WhenDapperValueConverterUsesValueConverter_Converter()
+        => WhenDapperValueConverterUsesValueConverter(g => new IntId(g));
+        
+    private async Task WhenDapperValueConverterUsesValueConverter<T>(Func<int, T> newFunc)
     {
         using var connection = new SqliteConnection("DataSource=:memory:");
         await connection.OpenAsync();
 
-        var results = await connection.QueryAsync<ConvertersIntId>("SELECT 123");
+        var results = await connection.QueryAsync<T>("SELECT 123");
 
         var value = Assert.Single(results);
-        Assert.Equal(new ConvertersIntId(123), value);
+        Assert.Equal(newFunc(123), value);
     }
 
     [Fact(Skip = "Requires localdb to be available")]
@@ -320,7 +327,16 @@ public class IntIdTests
 
 #if NET6_0_OR_GREATER
     [Fact]
-    public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+    public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Id()
+        => WhenConventionBasedEfCoreValueConverterUsesValueConverter(x => x.Entities,
+            new TestEntity { Id = new ConvertersIntId(123) });
+
+    [Fact]
+    public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Converter()
+        => WhenConventionBasedEfCoreValueConverterUsesValueConverter(c => c.Entities3,
+            new TestEntity3 { Id = new IntId(123) });
+        
+    private void WhenConventionBasedEfCoreValueConverterUsesValueConverter<T>(Func<ConventionsDbContext, DbSet<T>> dbsetFunc, T entity) where T : class
     {
         var connection = new SqliteConnection("DataSource=:memory:");
         connection.Open();
@@ -332,14 +348,13 @@ public class IntIdTests
         using (var context = new ConventionsDbContext(options))
         {
             context.Database.EnsureCreated();
-            context.Entities.Add(
-                new TestEntity {Id = new ConvertersIntId(123)});
+            dbsetFunc(context).Add(entity);
             context.SaveChanges();
         }
 
         using (var context = new ConventionsDbContext(options))
         {
-            var all = context.Entities.ToList();
+            var all = dbsetFunc(context).ToList();
             Assert.Single(all);
         }
     }
@@ -479,6 +494,7 @@ public class IntIdTests
     {
         public DbSet<TestEntity> Entities { get; set; }
         public DbSet<TestEntity2> Entities2 { get; set; }
+        public DbSet<TestEntity3> Entities3 { get; set; }
 
         public ConventionsDbContext(DbContextOptions options) : base(options)
         {
@@ -492,6 +508,9 @@ public class IntIdTests
             configurationBuilder
                 .Properties<ConvertersIntId2>()
                 .HaveConversion<ConvertersIntId2.EfCoreValueConverter>();
+            configurationBuilder
+                .Properties<IntId>()
+                .HaveConversion<IntConverters.EfCoreValueConverter>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -505,6 +524,13 @@ public class IntIdTests
                 });
             modelBuilder
                 .Entity<TestEntity2>(builder =>
+                {
+                    builder
+                        .Property(x => x.Id)
+                        .ValueGeneratedNever();
+                });
+            modelBuilder
+                .Entity<TestEntity3>(builder =>
                 {
                     builder
                         .Property(x => x.Id)
@@ -557,6 +583,11 @@ public class IntIdTests
     internal class TestEntity2
     {
         public ConvertersIntId2 Id { get; set; }
+    }
+
+    internal class TestEntity3
+    {
+        public IntId Id { get; set; }
     }
 
     internal class EntityWithNullableId2

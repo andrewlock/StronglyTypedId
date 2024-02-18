@@ -31,6 +31,24 @@
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateVeryNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace.DotNet7_0.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanOverrideDefaultsWithTemplateUsingGlobalAttribute.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanOverrideDefaultsWithCustomTemplateUsingGlobalAttribute.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateVeryNestedIdInFileScopeNamespace.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateVeryNestedIdInFileScopeNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateNonDefaultIdInNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateNestedIdInFileScopeNamespace.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateMultipleTemplatesWithoutBuiltIn.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateMultipleTemplatesWithBuiltIn.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateIdInNamespace.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateIdInNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateIdInFileScopedNamespace.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateIdInFileScopedNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateForCustomTemplate.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateForCustomTemplate.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateDefaultIdInGlobalNamespace.verified.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateDefaultIdInGlobalNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdConverterTests.CanGenerateDefaultConverterIdInGlobalNamespace.verified.txt" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,6 +24,26 @@ internal readonly record struct StructToGenerate
     public LocationInfo? TemplateLocation { get; }
 }
 
+internal readonly record struct ConverterToGenerate
+{
+    public ConverterToGenerate(string name, string nameSpace, string idName, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
+    {
+        Name = name;
+        NameSpace = nameSpace;
+        IdName = idName;
+        TemplateNames = templateNames is null ? EquatableArray<string>.Empty : new EquatableArray<string>(templateNames);
+        Parent = parent;
+        TemplateLocation = templateLocation;
+    }
+
+    public string Name { get; }
+    public string NameSpace { get; }
+    public string IdName { get; }
+    public EquatableArray<string> TemplateNames { get; }
+    public ParentClass? Parent { get; }
+    public LocationInfo? TemplateLocation { get; }
+}
+
 internal sealed record Result<TValue>(TValue Value, EquatableArray<DiagnosticInfo> Errors)
     where TValue : IEquatable<TValue>?
 {

@@ -11,6 +11,8 @@ namespace StronglyTypedIds.Tests
         {
             "StronglyTypedIdAttribute",
             "StronglyTypedIdDefaultsAttribute",
+            "StronglyTypedIdConvertersAttribute",
+            "StronglyTypedIdConvertersDefaultsAttribute",
             "Template",
         };
 
