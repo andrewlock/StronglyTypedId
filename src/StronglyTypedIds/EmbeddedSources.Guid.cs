@@ -90,9 +90,6 @@ internal static partial class EmbeddedSources
 
             public partial class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
             {
-                public override bool CanConvert(global::System.Type typeToConvert)
-                    => typeToConvert == typeof(global::System.Guid) || typeToConvert == typeof(string) || base.CanConvert(typeToConvert);
-    
                 public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
                     => new (reader.GetGuid());
     

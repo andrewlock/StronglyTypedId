@@ -108,9 +108,6 @@ namespace SomeNamespace
 
         public partial class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
         {
-            public override bool CanConvert(global::System.Type typeToConvert)
-                => typeToConvert == typeof(string) || typeToConvert == typeof(global::System.Guid) || base.CanConvert(typeToConvert);
-
             public override MyId Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
                 => new (global::MassTransit.NewId.FromGuid(reader.GetGuid()));
 
