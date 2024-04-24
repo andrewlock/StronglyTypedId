@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -15,7 +16,7 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
-    public class LongIdTests
+    public partial class LongIdTests
     {
         [Fact]
         public void SameValuesAreEqual()
@@ -368,6 +369,25 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanRoundTripWhenInRecord()
+        {
+            var foo = new ToSerialize()
+            {
+                Id = new ConvertersLongId(123),
+            };
+
+            var serialized = SystemTextJsonSerializer.Serialize(foo);
+            var deserialized = SystemTextJsonSerializer.Deserialize<ToSerialize>(serialized);
+            Assert.Equal(foo, deserialized);
+
+#if NET6_0_OR_GREATER
+            serialized = SystemTextJsonSerializer.Serialize(foo, SystemTextJsonSerializerContext.Custom.LongIdTests);
+            deserialized = SystemTextJsonSerializer.Deserialize<ToSerialize>(serialized, SystemTextJsonSerializerContext.Custom.LongIdTests);
+            Assert.Equal(foo, deserialized);
+#endif
+        }
+
+        [Fact]
         public void CanDeserializeFromLong_WithMultiTemplates_WithNewtonsoftJsonProvider()
         {
             var value = 123L;
@@ -549,6 +569,15 @@ namespace StronglyTypedIds.IntegrationTests
         internal class TypeWithDictionaryKeys
         {
             public Dictionary<LongId, string> Values { get; set; }
+        }
+
+        internal record ToSerialize
+        {
+            public ConvertersLongId Id { get; set; }
+            public Guid Guid { get; set; } = Guid.NewGuid();
+            public long Long { get; set; } = 123;
+            public int Int { get; set; } = 456;
+            public string String { get; set; } = "Something";
         }
     }
 }

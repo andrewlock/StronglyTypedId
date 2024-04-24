@@ -9,6 +9,10 @@ namespace StronglyTypedIds.IntegrationTests;
 [JsonSerializable(typeof(ConvertersGuidId))]
 [JsonSerializable(typeof(ConvertersGuidId2))]
 [JsonSerializable(typeof(GuidIdTests.TypeWithDictionaryKeys))]
+[JsonSerializable(typeof(GuidIdTests.ToSerialize), TypeInfoPropertyName = "GuidIdTests")]
+[JsonSerializable(typeof(IntIdTests.ToSerialize), TypeInfoPropertyName = "IntIdTests")]
+[JsonSerializable(typeof(LongIdTests.ToSerialize), TypeInfoPropertyName = "LongIdTests")]
+[JsonSerializable(typeof(StringIdTests.ToSerialize), TypeInfoPropertyName = "StringIdTests")]
 internal partial class SystemTextJsonSerializerContext : JsonSerializerContext
 {
     internal static SystemTextJsonSerializerContext Custom
@@ -19,6 +23,9 @@ internal partial class SystemTextJsonSerializerContext : JsonSerializerContext
                 new GuidId1.GuidId1SystemTextJsonConverter(),
                 new ConvertersGuidId.ConvertersGuidIdSystemTextJsonConverter(),
                 new ConvertersGuidId2.ConvertersGuidId2SystemTextJsonConverter(),
+                new ConvertersIntId.ConvertersIntIdSystemTextJsonConverter(),
+                new ConvertersLongId.ConvertersLongIdSystemTextJsonConverter(),
+                new ConvertersStringId.ConvertersStringIdSystemTextJsonConverter(),
             }
         });
 
@@ -32,6 +39,9 @@ internal partial class SystemTextJsonSerializerContext : JsonSerializerContext
                 new GuidId1.GuidId1SystemTextJsonConverter(),
                 new ConvertersGuidId.ConvertersGuidIdSystemTextJsonConverter(),
                 new ConvertersGuidId2.ConvertersGuidId2SystemTextJsonConverter(),
+                new ConvertersIntId.ConvertersIntIdSystemTextJsonConverter(),
+                new ConvertersLongId.ConvertersLongIdSystemTextJsonConverter(),
+                new ConvertersStringId.ConvertersStringIdSystemTextJsonConverter(),
             }
         });
 }
