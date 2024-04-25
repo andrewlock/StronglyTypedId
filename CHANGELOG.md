@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.0.0-beta08]
+
+Fixes
+* Fix bug in System.Text.Json converters that could cause errors when used with source generators
+
 ## [v1.0.0-beta07]
 
 Breaking Changes:

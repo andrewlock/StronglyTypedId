@@ -20,7 +20,7 @@ namespace SomeNamespace
     {
     [global::System.ComponentModel.TypeConverter(typeof(MyIdTypeConverter))]
     [global::System.Text.Json.Serialization.JsonConverter(typeof(MyIdSystemTextJsonConverter))]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta7")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("StronglyTypedId", "1.0.0-beta08")]
     partial struct MyId :
 #if NET6_0_OR_GREATER
         global::System.ISpanFormattable,

@@ -3,6 +3,11 @@
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">
       <![CDATA[
 
+## Changes in 1.0.0-beta08:
+
+Fixes
+* Fix bug in System.Text.Json converters that could cause errors when used with source generators
+
 ## Changes in 1.0.0-beta07:
 
 ⚠ WARNING ⚠ 
