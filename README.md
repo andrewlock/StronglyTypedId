@@ -44,7 +44,7 @@ You must be using the .NET 7+ SDK (though you can compile for other target frame
 To use StronglyTypedIds, install the [StronglyTypedId NuGet package](https://www.nuget.org/packages/StronglyTypedId) into your _csproj_ file, for example by running
 
 ```bash
-dotnet add package StronglyTypedId --version 1.0.0-beta07
+dotnet add package StronglyTypedId --version 1.0.0-beta08
 ```
 
 This adds a `<PackageReference>` to your project. You can additionally mark the package as `PrivateAsets="all"` and `ExcludeAssets="runtime"`.
@@ -61,7 +61,7 @@ This adds a `<PackageReference>` to your project. You can additionally mark the 
   
   <ItemGroup>
     <!-- Add the package -->
-    <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="StronglyTypedId" Version="1.0.0-beta08" PrivateAssets="all" ExcludeAssets="runtime" />
     <!-- -->
   </ItemGroup>
 
@@ -270,7 +270,7 @@ The "template-based" design of StronglyTypedId is intended to make it easy to ge
 To make it easier to share templates with multiple people, and optional _StronglyTypedId.Templates_ NuGet package is available that includes various converters and other backing types. To use these templates, add the _StronglyTypedId.Templates_ package to your project:
 
 ```bash
-dotnet add package StronglyTypedId.Templates --version 1.0.0-beta07
+dotnet add package StronglyTypedId.Templates --version 1.0.0-beta08
 ```
 
 You will then be able to reference any of the templates it includes. This includes "complete" implementations, including multiple converters, for various backing types:
@@ -327,7 +327,7 @@ Your project file should look something like this:
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" 
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta08" 
                     PrivateAssets="all"
                     ExcludeAssets="compile;runtime" />
 <!--                               ☝ Add compile to the list of excluded assets. -->
@@ -352,7 +352,7 @@ If you wish to preserve these attributes in the build output, you can define the
   </PropertyGroup>
 
   <!-- Add the package -->
-  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta07" PrivateAssets="all" />
+  <PackageReference Include="StronglyTypedId" Version="1.0.0-beta08" PrivateAssets="all" />
   <!--              ☝ You must not exclude the runtime assets in this case -->
 
 </Project>
