@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -14,7 +15,7 @@ using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
-    public class GuidIdTests
+    public partial class GuidIdTests
     {
         [Fact]
         public void SameValuesAreEqual()
@@ -112,6 +113,24 @@ namespace StronglyTypedIds.IntegrationTests
             var serializedGuid = SystemTextJsonSerializer.Serialize(foo.Value);
 
             Assert.Equal(serializedFoo, serializedGuid);
+        }
+
+        [Fact]
+        public void CanRoundTripWhenInRecord()
+        {
+            var foo = new ToSerialize()
+            {
+                Id = GuidId1.New(),
+            };
+
+            var serialized = SystemTextJsonSerializer.Serialize(foo);
+            var deserialized = SystemTextJsonSerializer.Deserialize<ToSerialize>(serialized);
+            Assert.Equal(foo, deserialized);
+#if NET6_0_OR_GREATER
+            serialized = SystemTextJsonSerializer.Serialize(foo, SystemTextJsonSerializerContext.Custom.GuidIdTests);
+            deserialized = SystemTextJsonSerializer.Deserialize<ToSerialize>(serialized, SystemTextJsonSerializerContext.Custom.GuidIdTests);
+            Assert.Equal(foo, deserialized);
+#endif
         }
 
         [Fact]
@@ -589,6 +608,15 @@ namespace StronglyTypedIds.IntegrationTests
         internal class EntityWithNullableId2
         {
             public ConvertersGuidId2? Id { get; set; }
+        }
+
+        internal record ToSerialize
+        {
+            public GuidId1 Id { get; set; }
+            public Guid Guid { get; set; } = Guid.NewGuid();
+            public long Long { get; set; } = 123;
+            public int Int { get; set; } = 456;
+            public string String { get; set; } = "Something";
         }
     }
 }
