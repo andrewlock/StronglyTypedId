@@ -26,9 +26,12 @@ namespace StronglyTypedIds
             {
                 i.AddSource("StronglyTypedIdAttribute.g.cs", EmbeddedSources.StronglyTypedIdAttributeSource);
                 i.AddSource("StronglyTypedIdDefaultsAttribute.g.cs", EmbeddedSources.StronglyTypedIdDefaultsAttributeSource);
+                i.AddSource("StronglyTypedIdConvertersAttribute.g.cs", EmbeddedSources.StronglyTypedIdConvertersAttributeSource);
+                i.AddSource("StronglyTypedIdConvertersDefaultsAttribute.g.cs", EmbeddedSources.StronglyTypedIdConvertersDefaultsAttributeSource);
                 i.AddSource("Template.g.cs", EmbeddedSources.TemplateSource);
             });
 
+            // Templates
             IncrementalValuesProvider<(string Path, string Name, string? Content)> allTemplates = context.AdditionalTextsProvider
                 .Where(template => Path.GetExtension(template.Path).Equals(TemplateSuffix, StringComparison.OrdinalIgnoreCase))
                 .Select((template, ct) => (
@@ -39,48 +42,95 @@ namespace StronglyTypedIds
             var templates = allTemplates
                 .Where(template => !string.IsNullOrWhiteSpace(template.Name) && template.Content is not null)
                 .Collect();
-                
-            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> structAndDiagnostics = context.SyntaxProvider
-                .ForAttributeWithMetadataName(
-                    Parser.StronglyTypedIdAttribute,
-                    predicate: (node, _) => node is StructDeclarationSyntax,
-                    transform: Parser.GetStructSemanticTarget)
-                .Where(static m => m is not null);
 
-            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> defaultsAndDiagnostics = context.SyntaxProvider
+            // ID defaults
+            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> idDefaultsAndDiagnostics = context.SyntaxProvider
                 .ForAttributeWithMetadataName(
                     Parser.StronglyTypedIdDefaultsAttribute,
                     predicate: (node, _) => node is CompilationUnitSyntax,
-                    transform: Parser.GetDefaults)
+                    transform: Parser.GetIdDefaults)
                 .Where(static m => m is not null);
 
-            context.RegisterSourceOutput(
-                structAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(info));
-
-            context.RegisterSourceOutput(
-                defaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
-                static (context, info) => context.ReportDiagnostic(info));
-
-            IncrementalValuesProvider<StructToGenerate> structs = structAndDiagnostics
-                .Where(static x => x.Value.valid)
-                .Select((result, _) => result.Value.info);
-
-            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> defaultTemplateContent = defaultsAndDiagnostics
+            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> idDefaultTemplateContent = idDefaultsAndDiagnostics
                 .Where(static x => x.Value.valid)
                 .Select((result, _) => result.Value.defaults)
                 .Collect()
                 .Combine(templates)
-                .Select(ProcessDefaults);
+                .Select(ProcessIdDefaults);
 
-            var structsWithDefaultsAndTemplates = structs
+            context.RegisterSourceOutput(
+                idDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+
+            // IDs
+            IncrementalValuesProvider<Result<(StructToGenerate info, bool valid)>> idsAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdAttribute,
+                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    transform: Parser.GetIdSemanticTarget)
+                .Where(static m => m is not null);
+
+            IncrementalValuesProvider<StructToGenerate> ids = idsAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.info);
+
+            context.RegisterSourceOutput(
+                idsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+
+            // Converter defaults
+            IncrementalValuesProvider<Result<(Defaults defaults, bool valid)>> converterDefaultsAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdConvertersDefaultsAttribute,
+                    predicate: (node, _) => node is CompilationUnitSyntax,
+                    transform: Parser.GetConverterDefaults)
+                .Where(static m => m is not null);
+
+            IncrementalValueProvider<(EquatableArray<(string Name, string Content)> Content, bool isValid, DiagnosticInfo? Diagnostic)> converterDefaultTemplateContent = converterDefaultsAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.defaults)
+                .Collect()
                 .Combine(templates)
-                .Combine(defaultTemplateContent);
+                .Select(ProcessConverterDefaults);
+            
+            context.RegisterSourceOutput(
+                converterDefaultsAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
+            
+            // Converters
+            IncrementalValuesProvider<Result<(ConverterToGenerate info, bool valid)>> convertersAndDiagnostics = context.SyntaxProvider
+                .ForAttributeWithMetadataName(
+                    Parser.StronglyTypedIdConvertersAttribute,
+                    predicate: (node, _) => node is StructDeclarationSyntax,
+                    transform: Parser.GetConvertersSemanticTarget)
+                .Where(static m => m is not null);
+            
+            IncrementalValuesProvider<ConverterToGenerate> converters = convertersAndDiagnostics
+                .Where(static x => x.Value.valid)
+                .Select((result, _) => result.Value.info);
+            
+            context.RegisterSourceOutput(
+                convertersAndDiagnostics.SelectMany((x, _) => x.Errors),
+                static (context, info) => context.ReportDiagnostic(info));
 
-            context.RegisterSourceOutput(structsWithDefaultsAndTemplates,
-                static (spc, source) => Execute(source.Left.Left, source.Left.Right, source.Right, spc));
+            // Combined
+            var idsWithDefaultsAndTemplates = ids
+                .Combine(templates)
+                .Combine(idDefaultTemplateContent);
+
+            var convertersWithDefaultsAndTemplates = converters
+                .Combine(templates)
+                .Combine(converterDefaultTemplateContent);
+
+            // Output
+            context.RegisterSourceOutput(idsWithDefaultsAndTemplates,
+                static (spc, source) => GenerateIds(source.Left.Left, source.Left.Right, source.Right, spc));
+
+            context.RegisterSourceOutput(convertersWithDefaultsAndTemplates,
+                static (spc, source) => GenerateConverters(source.Left.Left, source.Left.Right, source.Right, spc));
         }
-        private static void Execute(
+
+        private static void GenerateIds(
             StructToGenerate idToGenerate,
             ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)>, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
@@ -92,7 +142,7 @@ namespace StronglyTypedIds
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (!TryGetTemplateContent(idToGenerate, templates, defaults, in context, out var templateContents))
+            if (!TryGetTemplateContent(idToGenerate.Template, idToGenerate.TemplateNames, idToGenerate.TemplateLocation, templates, defaults, in context, out var templateContents))
             {
                 return;
             }
@@ -104,6 +154,7 @@ namespace StronglyTypedIds
                 var result = SourceGenerationHelper.CreateId(
                     idToGenerate.NameSpace,
                     idToGenerate.Name,
+                    idToGenerate.Name, // same type
                     idToGenerate.Parent,
                     content,
                     addDefaultAttributes: string.IsNullOrEmpty(name),
@@ -123,23 +174,99 @@ namespace StronglyTypedIds
             }
         }
 
-
-        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessDefaults((ImmutableArray<Defaults> Left, ImmutableArray<(string Path, string Name, string? Content)> Right) all, CancellationToken _)
+        private static void GenerateConverters(
+            ConverterToGenerate converterToGenerate,
+            ImmutableArray<(string Path, string Name, string? Content)> templates,
+            (EquatableArray<(string Name, string Content)> Templates, bool IsValid, DiagnosticInfo? Diagnostic) defaults, 
+            SourceProductionContext context)
         {
-            if (all.Left.IsDefaultOrEmpty)
+            if (defaults.Diagnostic is { } diagnostic)
+            {
+                // report error with the default template
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            if (converterToGenerate.TemplateNames.Count == 0
+                && defaults is { IsValid: false, Templates.Count: 0 })
+            {
+                // not allowed this, so add a diagnostic
+                if (converterToGenerate.TemplateLocation is { } l)
+                {
+                    var location = Location.Create(l.FilePath, l.TextSpan, l.LineSpan);
+                    context.ReportDiagnostic(MissingDefaultsDiagnostic.CreateInfo(location));
+                }
+
+                return;
+            }
+
+            if (!TryGetTemplateContent(selectedTemplate: null, converterToGenerate.TemplateNames, converterToGenerate.TemplateLocation, templates, defaults, in context, out var templateContents))
+            {
+                return;
+            }
+
+            var addGeneratedCodeAttribute = true;
+
+            var sb = new StringBuilder();
+            foreach (var (name, content) in templateContents.Distinct())
+            {
+                var result = SourceGenerationHelper.CreateId(
+                    converterToGenerate.NameSpace,
+                    converterToGenerate.Name,
+                    converterToGenerate.IdName,
+                    converterToGenerate.Parent,
+                    content,
+                    addDefaultAttributes: string.IsNullOrEmpty(name),
+                    addGeneratedCodeAttribute: addGeneratedCodeAttribute,
+                    sb);
+
+                addGeneratedCodeAttribute = false; // We can only add it once, so just add to the first rendering
+
+                var fileName = SourceGenerationHelper.CreateSourceName(
+                    sb,
+                    converterToGenerate.NameSpace,
+                    converterToGenerate.Parent,
+                    converterToGenerate.Name,
+                    name);
+
+                context.AddSource(fileName, SourceText.From(result, Encoding.UTF8));
+            }
+        }
+
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessIdDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all,
+            CancellationToken _)
+            => ProcessDefaults(all, allowEmptyDefaults: true);
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessConverterDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all,
+            CancellationToken _)
+            => ProcessDefaults(all, allowEmptyDefaults: false);
+
+        private static (EquatableArray<(string Name, string Content)>, bool, DiagnosticInfo?) ProcessDefaults(
+            (ImmutableArray<Defaults> Selected, ImmutableArray<(string Path, string Name, string? Content)> Templates) all, 
+            bool allowEmptyDefaults)
+        {
+            if (all.Selected.IsDefaultOrEmpty)
             {
                 // no default attributes, valid, but no content
-                return (EquatableArray<(string Name, string Content)>.Empty, true, null);
+                if (allowEmptyDefaults)
+                {
+                    return (EquatableArray<(string Name, string Content)>.Empty, true, null);
+                }
+
+                // Not allowed empty
+                return (EquatableArray<(string Name, string Content)>.Empty, false, null);
             }
 
             // technically we can never have more than one `Defaults` here
             // but check for it just in case
-            if (all.Left is {IsDefaultOrEmpty: false, Length: > 1})
+            if (all.Selected is {IsDefaultOrEmpty: false, Length: > 1})
             {
                 return (EquatableArray<(string Name, string Content)>.Empty, false, null);
             }
 
-            var defaults = all.Left[0];
+            var defaults = all.Selected[0];
             if (defaults.HasMultiple)
             {
                 // not valid
@@ -168,7 +295,7 @@ namespace StronglyTypedIds
             }
 
             // We have already checked for null/empty template name and flagged it as an error
-            if (!GetContent(templateNames, defaults.TemplateLocation!, builtInTemplate.HasValue, in all.Right, out var contents, out var diagnostic))
+            if (!GetContent(templateNames, defaults.TemplateLocation!, builtInTemplate.HasValue, in all.Templates, out var contents, out var diagnostic))
             {
                 return (EquatableArray<(string Name, string Content)>.Empty, false, diagnostic);
             }
@@ -183,26 +310,28 @@ namespace StronglyTypedIds
         }
 
         private static bool TryGetTemplateContent(
-            in StructToGenerate idToGenerate,
+            Template? selectedTemplate,
+            EquatableArray<string> selectedTemplateNames,
+            LocationInfo? attributeLocation,
             in ImmutableArray<(string Path, string Name, string? Content)> templates,
             (EquatableArray<(string Name, string Content)> Contents, bool IsValid, DiagnosticInfo? Diagnostics) defaults,
             in SourceProductionContext context,
             [NotNullWhen(true)] out (string Name, string Content)[]? templateContents)
         {
             (string, string)? builtIn = null;
-            if (idToGenerate.Template is { } templateId)
+            if (selectedTemplate is { } templateId)
             {
                 // built-in template specified
                 var content = EmbeddedSources.GetTemplate(templateId);
                 builtIn = (string.Empty, content);
             }
 
-            if (idToGenerate.TemplateNames.GetArray() is {Length: > 0} templateNames)
+            if (selectedTemplateNames.GetArray() is {Length: > 0} templateNames)
             {
                 // custom template specified
                 if (GetContent(
                         templateNames,
-                        idToGenerate.TemplateLocation,
+                        attributeLocation,
                         builtIn.HasValue,
                         in templates,
                         out templateContents,

@@ -285,15 +285,22 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
-        public async Task WhenDapperValueConverterUsesValueConverter()
+        public Task WhenDapperValueConverterUsesValueConverter_Id()
+            => WhenDapperValueConverterUsesValueConverter(g => new ConvertersLongId(g));
+
+        [Fact]
+        public Task WhenDapperValueConverterUsesValueConverter_Converter()
+            => WhenDapperValueConverterUsesValueConverter(g => new LongId(g));
+        
+        private async Task WhenDapperValueConverterUsesValueConverter<T>(Func<int, T> newFunc)
         {
             using var connection = new SqliteConnection("DataSource=:memory:");
             await connection.OpenAsync();
 
-            var results = await connection.QueryAsync<ConvertersLongId>("SELECT 123");
+            var results = await connection.QueryAsync<T>("SELECT 123");
 
             var value = Assert.Single(results);
-            Assert.Equal(value, new ConvertersLongId(123));
+            Assert.Equal(value, newFunc(123));
         }
 
         [Fact(Skip = "Requires localdb to be available")]
@@ -319,7 +326,16 @@ namespace StronglyTypedIds.IntegrationTests
 
 #if NET6_0_OR_GREATER
         [Fact]
-        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter()
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Id()
+            => WhenConventionBasedEfCoreValueConverterUsesValueConverter(x => x.Entities,
+                new TestEntity { Id = new ConvertersLongId(123) });
+
+        [Fact]
+        public void WhenConventionBasedEfCoreValueConverterUsesValueConverter_Converter()
+            => WhenConventionBasedEfCoreValueConverterUsesValueConverter(c => c.Entities3,
+                new TestEntity3 { Id = new LongId(123) });
+        
+        private void WhenConventionBasedEfCoreValueConverterUsesValueConverter<T>(Func<ConventionsDbContext, DbSet<T>> dbsetFunc, T entity) where T : class
         {
             var connection = new SqliteConnection("DataSource=:memory:");
             connection.Open();
@@ -331,13 +347,12 @@ namespace StronglyTypedIds.IntegrationTests
             using (var context = new ConventionsDbContext(options))
             {
                 context.Database.EnsureCreated();
-                context.Entities.Add(
-                    new TestEntity { Id = new ConvertersLongId(123) });
+                dbsetFunc(context).Add(entity);
                 context.SaveChanges();
             }
             using (var context = new ConventionsDbContext(options))
             {
-                var all = context.Entities.ToList();
+                var all = dbsetFunc(context).ToList();
                 Assert.Single(all);
             }
         }
@@ -481,6 +496,7 @@ namespace StronglyTypedIds.IntegrationTests
         {
             public DbSet<TestEntity> Entities { get; set; }
             public DbSet<TestEntity2> Entities2 { get; set; }
+            public DbSet<TestEntity3> Entities3 { get; set; }
 
             public ConventionsDbContext(DbContextOptions options) : base(options)
             {
@@ -494,6 +510,9 @@ namespace StronglyTypedIds.IntegrationTests
                 configurationBuilder
                     .Properties<ConvertersLongId2>()
                     .HaveConversion<ConvertersLongId2.EfCoreValueConverter>();
+                configurationBuilder
+                    .Properties<LongId>()
+                    .HaveConversion<LongConverters.EfCoreValueConverter>();
             }
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -507,6 +526,13 @@ namespace StronglyTypedIds.IntegrationTests
                     });
                 modelBuilder
                     .Entity<TestEntity2>(builder =>
+                    {
+                        builder
+                            .Property(x => x.Id)
+                            .ValueGeneratedNever();
+                    });
+                modelBuilder
+                    .Entity<TestEntity3>(builder =>
                     {
                         builder
                             .Property(x => x.Id)
@@ -559,6 +585,11 @@ namespace StronglyTypedIds.IntegrationTests
         internal class TestEntity2
         {
             public ConvertersLongId2 Id { get; set; }
+        }
+
+        internal class TestEntity3
+        {
+            public LongId Id { get; set; }
         }
 
         internal class EntityWithNullableId2

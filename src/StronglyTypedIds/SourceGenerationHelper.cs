@@ -6,7 +6,8 @@ namespace StronglyTypedIds
     internal static class SourceGenerationHelper
     {
         public static string CreateId(
-            string idNamespace,
+            string targetNamespace,
+            string targetName,
             string idName,
             ParentClass? parentClass,
             string template,
@@ -14,12 +15,12 @@ namespace StronglyTypedIds
             bool addGeneratedCodeAttribute,
             StringBuilder? sb)
         {
-            if (string.IsNullOrEmpty(idName))
+            if (string.IsNullOrEmpty(targetName))
             {
-                throw new ArgumentException("Value cannot be null or empty.", nameof(idName));
+                throw new ArgumentException("Value cannot be null or empty.", nameof(targetName));
             }
 
-            var hasNamespace = !string.IsNullOrEmpty(idNamespace);
+            var hasNamespace = !string.IsNullOrEmpty(targetNamespace);
 
             var parentsCount = 0;
 
@@ -38,7 +39,7 @@ namespace StronglyTypedIds
             {
                 sb
                     .Append("namespace ")
-                    .Append(idNamespace)
+                    .Append(targetNamespace)
                     .AppendLine(@"
 {");
             }
@@ -85,6 +86,7 @@ namespace StronglyTypedIds
 
             sb.AppendLine(template);
 
+            sb.Replace("TARGETTYPE", targetName);
             sb.Replace("PLACEHOLDERID", idName);
 
             for (int i = 0; i < parentsCount; i++)
