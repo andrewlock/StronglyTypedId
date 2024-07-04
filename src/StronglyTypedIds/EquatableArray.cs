@@ -37,7 +37,7 @@ internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnu
     /// <sinheritdoc/>
     public override bool Equals(object? obj)
     {
-        return obj is EquatableArray<T> array && Equals(this, array);
+        return obj is EquatableArray<T> array && Equals(array);
     }
 
     /// <sinheritdoc/>
