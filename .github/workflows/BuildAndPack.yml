@@ -55,9 +55,9 @@ jobs:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
           MSBuildEnableWorkloadResolver: false
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifacts-linux
           path: artifacts
   windows-latest:
     name: windows-latest
@@ -86,13 +86,13 @@ jobs:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
           MSBuildEnableWorkloadResolver: false
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifacts-windows
           path: artifacts
   macOS-latest:
-    name: macOS-latest
-    runs-on: macOS-latest
+    name: macos-13 # latest is arm64, and it breaks a bunch of stuff
+    runs-on: macos-13 # latest is arm64, and it breaks a bunch of stuff
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3
@@ -117,7 +117,7 @@ jobs:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
           MSBuildEnableWorkloadResolver: false
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifacts-macos
           path: artifacts
