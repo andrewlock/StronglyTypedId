@@ -151,10 +151,61 @@ public class EqualityTests
     }
 
     [Fact]
-    public void EquatableArrayOverridenEqualsComparesAsExpected() {
-        var instance = new EquatableArray<string>(["A"]);
-        object comparand = new EquatableArray<string>(["A"]);
+    public void EquatableArray_PrimitiveComparison()
+    {
+        int[] val1 = [1, 2, 3, 4, 5];
+        int[] val2 = [1, 2, 3, 4, 5];
 
-        Assert.True(instance.Equals(comparand));
+        var arr1 = new EquatableArray<int>(val1);
+        var arr2 = new EquatableArray<int>(val2);
+
+        Assert.True(arr1.Equals(arr2));
+    }
+
+    [Fact]
+    public void EquatableArray_RecordComparison()
+    {
+        Record[] val1 = [new(1), new(2), new(3), new(4), new(5)];
+        Record[] val2 = [new(1), new(2), new(3), new(4), new(5)];
+
+        var arr1 = new EquatableArray<Record>(val1);
+        var arr2 = new EquatableArray<Record>(val2);
+
+        Assert.True(arr1.Equals(arr2));
+    }
+
+    [Fact]
+    public void EquatableArray_NestedEquatableArrayComparison()
+    {
+        EquatableArray<int>[] val1 = [new([1]), new([2]), new([3]), new([4]), new([5])];
+        EquatableArray<int>[] val2 = [new([1]), new([2]), new([3]), new([4]), new([5])];
+
+        var arr1 = new EquatableArray<EquatableArray<int>>(val1);
+        var arr2 = new EquatableArray<EquatableArray<int>>(val2);
+
+        Assert.True(arr1.Equals(arr2));
+    }
+
+    [Fact]
+    public void EquatableArray_BoxedNestedEquatableArrayComparison()
+    {
+        EquatableArray<int>[] val1 = [new([1]), new([2]), new([3]), new([4]), new([5])];
+        EquatableArray<int>[] val2 = [new([1]), new([2]), new([3]), new([4]), new([5])];
+
+        object arr1 = new EquatableArray<EquatableArray<int>>(val1);
+        var arr2 = new EquatableArray<EquatableArray<int>>(val2);
+
+        Assert.True(arr1.Equals(arr2));
+        Assert.True(arr2.Equals(arr1));
+    }
+
+    public record Record
+    {
+        public Record(int value)
+        {
+            Value = value;
+        }
+
+        public int Value { get; }
     }
 }
