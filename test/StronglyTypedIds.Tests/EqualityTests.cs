@@ -149,4 +149,12 @@ public class EqualityTests
             return new Result<(StructToGenerate, bool)>((instance, true), errors);
         }
     }
+
+    [Fact]
+    public void EquatableArrayOverridenEqualsComparesAsExpected() {
+        var instance = new EquatableArray<string>(["A"]);
+        object comparand = new EquatableArray<string>(["A"]);
+
+        Assert.True(instance.Equals(comparand));
+    }
 }
