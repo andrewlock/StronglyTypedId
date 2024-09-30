@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <PackageId>StronglyTypedId.Templates</PackageId>
     <Description>A collection of templates for generating strongly-typed IDs by decorating with a [StronglyTypedId] attribute</Description>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

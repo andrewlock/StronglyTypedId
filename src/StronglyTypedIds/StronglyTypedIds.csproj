@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <PackageId>StronglyTypedId</PackageId>
     <Description>A source generator for creating strongly-typed IDs by decorating with a [StronglyTypedId] attribute</Description>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
