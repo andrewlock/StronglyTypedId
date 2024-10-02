@@ -16,7 +16,12 @@ internal static partial class EmbeddedSources
     
             public PLACEHOLDERID(string value)
             {
+    #if NET7_0_OR_GREATER
+                global::System.ArgumentNullException.ThrowIfNull(value);
+                Value = value;
+    #else
                 Value = value ?? throw new global::System.ArgumentNullException(nameof(value));
+    #endif
             }
     
             public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(string.Empty);
