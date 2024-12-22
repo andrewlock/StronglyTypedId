@@ -50,7 +50,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(s => s
-                .When(!string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
+                .When(_ => !string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
                 .SetProjectFile(Solution));
         });
 
@@ -61,7 +61,7 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .When(IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
+                .When(_ => IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
                 .EnableNoRestore());
         });
 
@@ -85,7 +85,7 @@ class Build : NukeBuild
             DotNetPack(s => s
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
-                .When(IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
+                .When(_ => IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
                 .EnableNoBuild()
                 .EnableNoRestore()
                 .SetProject(Solution));
@@ -110,12 +110,12 @@ class Build : NukeBuild
             }
 
             DotNetRestore(s => s
-                .When(!string.IsNullOrEmpty(PackagesDirectory), x => x.SetPackageDirectory(PackagesDirectory))
+                .When(_ => !string.IsNullOrEmpty(PackagesDirectory), x => x.SetPackageDirectory(PackagesDirectory))
                 .SetConfigFile(RootDirectory / "NuGet.integration-tests.config")
                 .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
 
             DotNetBuild(s => s
-                .When(!string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
+                .When(_ => !string.IsNullOrEmpty(PackagesDirectory), x=>x.SetPackageDirectory(PackagesDirectory))
                 .EnableNoRestore()
                 .SetConfiguration(Configuration)
                 .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
