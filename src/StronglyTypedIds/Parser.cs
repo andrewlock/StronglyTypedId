@@ -21,7 +21,23 @@ internal static class Parser
             return Result<StructToGenerate>.Fail();
         }
 
-        var structSyntax = (StructDeclarationSyntax)ctx.TargetNode;
+        var (declarationKind, structSyntax) = ctx.TargetNode switch
+        {
+            StructDeclarationSyntax syntax => (DeclarationKind.Struct, syntax),
+            ClassDeclarationSyntax syntax => (DeclarationKind.Class, syntax),
+            RecordDeclarationSyntax syntax => syntax.ClassOrStructKeyword.Kind() switch
+            {
+                SyntaxKind.StructKeyword => (DeclarationKind.RecordStruct, syntax),
+                SyntaxKind.ClassKeyword => (DeclarationKind.RecordClass, syntax),
+                _ => (DeclarationKind.Record, syntax),
+            },
+            _ => (default(DeclarationKind), default(TypeDeclarationSyntax))
+        };
+
+        if (structSyntax is null)
+        {
+            return Result<StructToGenerate>.Fail();
+        }
 
         var hasMisconfiguredInput = false;
         List<DiagnosticInfo>? diagnostics = null;
@@ -78,6 +94,7 @@ internal static class Parser
         var name = structSymbol.Name;
 
         var toGenerate =new StructToGenerate(
+            declarationKind,
             name: name, 
             nameSpace: nameSpace, 
             template: template, 
@@ -303,10 +320,10 @@ internal static class Parser
         }
     }
 
-    private static string GetNameSpace(StructDeclarationSyntax structSymbol)
+    private static string GetNameSpace(TypeDeclarationSyntax targetSymbol)
     {
         // determine the namespace the struct is declared in, if any
-        SyntaxNode? potentialNamespaceParent = structSymbol.Parent;
+        SyntaxNode? potentialNamespaceParent = targetSymbol.Parent;
         while (potentialNamespaceParent != null &&
                potentialNamespaceParent is not NamespaceDeclarationSyntax
                && potentialNamespaceParent is not FileScopedNamespaceDeclarationSyntax)
@@ -333,9 +350,9 @@ internal static class Parser
         return string.Empty;
     }
 
-    private static ParentClass? GetParentClasses(StructDeclarationSyntax structSymbol)
+    private static ParentClass? GetParentClasses(TypeDeclarationSyntax targetSymbol)
     {
-        TypeDeclarationSyntax? parentIdClass = structSymbol.Parent as TypeDeclarationSyntax;
+        TypeDeclarationSyntax? parentIdClass = targetSymbol.Parent as TypeDeclarationSyntax;
         ParentClass? parentClass = null;
 
         while (parentIdClass != null && IsAllowedKind(parentIdClass.Kind()))

@@ -58,6 +58,10 @@ internal partial struct ConvertersStringId2 { }
 [StronglyTypedId("nullablestring-full")]
 internal partial struct NullableStringId { }
 
+// Note, must be public, otherwise JsonSerializerContext can't find required public constructor
+[StronglyTypedId]
+public partial class ClassGuidId { }
+
 internal partial class SomeType<T> where T : new()
 {
     internal partial record struct NestedType<TKey, TValue>

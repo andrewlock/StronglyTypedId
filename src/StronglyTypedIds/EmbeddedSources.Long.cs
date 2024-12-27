@@ -3,7 +3,7 @@ namespace StronglyTypedIds;
 internal static partial class EmbeddedSources
 {
     private const string LongTemplate = """
-        partial struct PLACEHOLDERID :
+        partial IDTYPEKEYWORD PLACEHOLDERID :
     #if NET6_0_OR_GREATER
             global::System.ISpanFormattable,
     #endif

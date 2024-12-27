@@ -17,19 +17,28 @@ namespace StronglyTypedIds.Tests
             _output = output;
         }
 
-        [Fact]
-        public Task CanGenerateDefaultIdInGlobalNamespace()
+        [Theory]
+        [InlineData("struct")]
+        [InlineData("class")]
+        [InlineData("record")]
+        [InlineData("record struct")]
+        [InlineData("record class")]
+        public Task CanGenerateDefaultIdInGlobalNamespace(string type)
         {
-            const string input = @"using StronglyTypedIds;
+            var input =
+                $$"""
+                  using StronglyTypedIds;
 
-[StronglyTypedId]
-public partial struct MyId {}";
+                  [StronglyTypedId]
+                  public partial {{type}} MyId {}
+                  """;
             var (diagnostics, output) = TestHelpers.GetGeneratedOutput<StronglyTypedIdGenerator>(input, includeAttributes: false);
 
             Assert.Empty(diagnostics);
 
             return Verifier.Verify(output)
-                .UseDirectory("Snapshots");
+                .UseDirectory("Snapshots")
+                .UseParameters(type);
         }
 
         [Theory]

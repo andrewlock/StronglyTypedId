@@ -6,6 +6,7 @@ namespace StronglyTypedIds
     internal static class SourceGenerationHelper
     {
         public static string CreateId(
+            DeclarationKind declarationKind,
             string idNamespace,
             string idName,
             ParentClass? parentClass,
@@ -86,6 +87,17 @@ namespace StronglyTypedIds
             sb.AppendLine(template);
 
             sb.Replace("PLACEHOLDERID", idName);
+            var typeKeyword = declarationKind switch
+            {
+                DeclarationKind.Class => "class",
+                DeclarationKind.Struct => "struct",
+                DeclarationKind.Record => "record",
+                DeclarationKind.RecordClass => "record class",
+                DeclarationKind.RecordStruct => "record struct",
+                _ => throw new InvalidOperationException("Unknown declarationKind: " + declarationKind),
+            };
+
+            sb.Replace("IDTYPEKEYWORD", typeKeyword);
 
             for (int i = 0; i < parentsCount; i++)
             {

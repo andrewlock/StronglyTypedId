@@ -3,7 +3,7 @@ namespace StronglyTypedIds;
 internal static partial class EmbeddedSources
 {
     private const string GuidTemplate = """
-        partial struct PLACEHOLDERID :
+        partial IDTYPEKEYWORD PLACEHOLDERID :
     #if NET6_0_OR_GREATER
             global::System.ISpanFormattable,
     #endif
@@ -17,6 +17,9 @@ internal static partial class EmbeddedSources
         {
             public global::System.Guid Value { get; }
     
+    #if NET5_0_OR_GREATER
+            [global::System.Text.Json.Serialization.JsonConstructorAttribute]
+    #endif
             public PLACEHOLDERID(global::System.Guid value)
             {
                 Value = value;

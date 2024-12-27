@@ -30,6 +30,15 @@
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateVeryNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateNestedIdInFileScopeNamespace.Net4_8.received.txt" />
     <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace.DotNet7_0.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace_type=struct.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace_type=record.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace_type=record struct.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace_type=record class.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace_type=class.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateDefaultIdInGlobalNamespace.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateForRecordStruct.Net4_8.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateForRecordStruct.DotNet8_0.received.txt" />
+    <None Remove="Snapshots\StronglyTypedIdGeneratorTests.CanGenerateForRecordStruct.verified.txt" />
   </ItemGroup>
 
   <ItemGroup>

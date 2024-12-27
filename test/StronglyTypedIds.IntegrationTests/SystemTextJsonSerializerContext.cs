@@ -5,10 +5,13 @@ using StronglyTypedIds.IntegrationTests.Types;
 
 namespace StronglyTypedIds.IntegrationTests;
 
+[JsonSerializable(typeof(ClassGuidId))]
 [JsonSerializable(typeof(GuidId1))]
 [JsonSerializable(typeof(ConvertersGuidId))]
 [JsonSerializable(typeof(ConvertersGuidId2))]
-[JsonSerializable(typeof(GuidIdTests.TypeWithDictionaryKeys))]
+[JsonSerializable(typeof(ClassGuidIdTests.TypeWithDictionaryKeys))]
+[JsonSerializable(typeof(ClassGuidIdTests.ToSerialize), TypeInfoPropertyName = "ClassGuidIdTests")]
+[JsonSerializable(typeof(GuidIdTests.TypeWithDictionaryKeys), TypeInfoPropertyName = "ClassGuidTypeWithDictionaryKeys")]
 [JsonSerializable(typeof(GuidIdTests.ToSerialize), TypeInfoPropertyName = "GuidIdTests")]
 [JsonSerializable(typeof(IntIdTests.ToSerialize), TypeInfoPropertyName = "IntIdTests")]
 [JsonSerializable(typeof(LongIdTests.ToSerialize), TypeInfoPropertyName = "LongIdTests")]
@@ -20,6 +23,7 @@ internal partial class SystemTextJsonSerializerContext : JsonSerializerContext
         {
             Converters =
             {
+                new ClassGuidId.ClassGuidIdSystemTextJsonConverter(),
                 new GuidId1.GuidId1SystemTextJsonConverter(),
                 new ConvertersGuidId.ConvertersGuidIdSystemTextJsonConverter(),
                 new ConvertersGuidId2.ConvertersGuidId2SystemTextJsonConverter(),
@@ -36,6 +40,7 @@ internal partial class SystemTextJsonSerializerContext : JsonSerializerContext
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters =
             {
+                new ClassGuidId.ClassGuidIdSystemTextJsonConverter(),
                 new GuidId1.GuidId1SystemTextJsonConverter(),
                 new ConvertersGuidId.ConvertersGuidIdSystemTextJsonConverter(),
                 new ConvertersGuidId2.ConvertersGuidId2SystemTextJsonConverter(),

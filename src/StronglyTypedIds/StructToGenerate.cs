@@ -6,8 +6,9 @@ namespace StronglyTypedIds;
 
 internal readonly record struct StructToGenerate
 {
-    public StructToGenerate(string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
+    public StructToGenerate(DeclarationKind declarationKind, string name, string nameSpace, Template? template, string[]? templateNames, ParentClass? parent, LocationInfo templateLocation)
     {
+        DeclarationKind = declarationKind;
         Name = name;
         NameSpace = nameSpace;
         TemplateNames = templateNames is null ? EquatableArray<string>.Empty : new EquatableArray<string>(templateNames);
@@ -16,6 +17,7 @@ internal readonly record struct StructToGenerate
         TemplateLocation = templateLocation;
     }
 
+    public DeclarationKind DeclarationKind { get; }
     public string Name { get; }
     public string NameSpace { get; }
     public EquatableArray<string> TemplateNames { get; }
@@ -61,4 +63,13 @@ internal record LocationInfo(string FilePath, TextSpan TextSpan, LinePositionSpa
         // assuming that source tree is always non-null here... hopefully that's the case
         return new LocationInfo(location.SourceTree!.FilePath, location.SourceSpan, location.GetLineSpan().Span);
     }
+}
+
+internal enum DeclarationKind
+{
+    Class,
+    Struct,
+    RecordStruct,
+    RecordClass,
+    Record,
 }

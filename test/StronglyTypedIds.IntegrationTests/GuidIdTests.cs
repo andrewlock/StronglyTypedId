@@ -200,33 +200,6 @@ namespace StronglyTypedIds.IntegrationTests
 
             Assert.Equal(foo, deserializedFoo);
         }
-
-        [Fact(Skip = "This one doesn't seem to work, but I'm not sure if it's a source-generator limitation or a bug...")]
-        public void CanDeserializeDictionaryKeys_WithSystemTextJsonProvider_WithSourceGenerator()
-        {
-            var value = new TypeWithDictionaryKeys()
-            {
-                Values = new()
-            };
-            var guid = new GuidId1(Guid.Parse("78104553-f1cd-41ec-bcb6-d3a8ff8d994d"));
-            value.Values.Add(guid, "My Value");
-            var serialized = SystemTextJsonSerializer.Serialize(value, SystemTextJsonSerializerContext.Web.TypeWithDictionaryKeys);
-
-            var expected = $$"""
-                           {
-                             "values": {
-                               "78104553-f1cd-41ec-bcb6-d3a8ff8d994d": "My Value"
-                             }
-                           }
-                           """;
-            Assert.Equal(serialized, expected);
-
-            var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, SystemTextJsonSerializerContext.Web.TypeWithDictionaryKeys);
-
-            Assert.NotNull(deserialized.Values);
-            Assert.True(deserialized.Values.ContainsKey(guid));
-            Assert.Equal("My Value", deserialized.Values[guid]);
-        }
 #endif
 
         [Fact]

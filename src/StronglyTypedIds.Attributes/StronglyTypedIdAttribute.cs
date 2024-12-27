@@ -16,7 +16,7 @@ namespace StronglyTypedIds
     /// <summary>
     /// Place on partial structs to make the type a strongly-typed ID
     /// </summary>
-    [global::System.AttributeUsage(global::System.AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [global::System.AttributeUsage(global::System.AttributeTargets.Struct | global::System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     [global::System.Diagnostics.Conditional("STRONGLY_TYPED_ID_USAGES")]
     public sealed class StronglyTypedIdAttribute : global::System.Attribute
     {
