@@ -47,7 +47,7 @@ To use StronglyTypedIds, install the [StronglyTypedId NuGet package](https://www
 dotnet add package StronglyTypedId --version 1.0.0-beta08
 ```
 
-This adds a `<PackageReference>` to your project. You can additionally mark the package as `PrivateAsets="all"` and `ExcludeAssets="runtime"`.
+This adds a `<PackageReference>` to your project. You can additionally mark the package as `PrivateAssets="all"` and `ExcludeAssets="runtime"`.
 
 > Setting `PrivateAssets="all"` means any projects referencing this one will not also get a reference to the _StronglyTypedId_ package. Setting `ExcludeAssets="runtime"` ensures the _StronglyTypedId.Attributes.dll_ file is not copied to your build output (it is not required at runtime).
 
