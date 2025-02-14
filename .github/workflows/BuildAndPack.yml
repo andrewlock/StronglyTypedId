@@ -30,7 +30,7 @@ on:
 jobs:
   ubuntu-latest:
     name: ubuntu-latest
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # 24.04 can't run < net6.0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

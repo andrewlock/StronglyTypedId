@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)AdditionalFiles\**">
-      <Visible>true</Visible>
+      <Visible>$(ShowStronglyTypedIdTemplates)</Visible>
     </AdditionalFiles>
   </ItemGroup>
 </Project>
