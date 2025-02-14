@@ -58,6 +58,9 @@ internal partial struct ConvertersStringId2 { }
 [StronglyTypedId("nullablestring-full")]
 internal partial struct NullableStringId { }
 
+[StronglyTypedId("simple")]
+internal partial struct SimpleCustomId { }
+
 internal partial class SomeType<T> where T : new()
 {
     internal partial record struct NestedType<TKey, TValue>
