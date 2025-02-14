@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Include="StronglyTypedId.Templates.targets" Pack="true" PackagePath="build" Visible="false" />
+    <None Include="StronglyTypedId.Templates.props" Pack="true" PackagePath="build" Visible="false" />
     <None Include=".\*.typedid" Pack="true" PackagePath="build/AdditionalFiles" Visible="false" />
   </ItemGroup>
 
