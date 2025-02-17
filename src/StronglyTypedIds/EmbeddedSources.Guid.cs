@@ -16,12 +16,12 @@ internal static partial class EmbeddedSources
         global::System.IComparable<PLACEHOLDERID>, global::System.IEquatable<PLACEHOLDERID>, global::System.IFormattable
         {
             public global::System.Guid Value { get; }
-    
+
             public PLACEHOLDERID(global::System.Guid value) => Value = value;
-    
+
             public static PLACEHOLDERID New() => new PLACEHOLDERID(global::System.Guid.NewGuid());
             public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(global::System.Guid.Empty);
-    
+
             /// <inheritdoc cref="global::System.IEquatable{T}"/>
             public bool Equals(PLACEHOLDERID other) => this.Value.Equals(other.Value);
             public override bool Equals(object? obj)
@@ -29,28 +29,26 @@ internal static partial class EmbeddedSources
                 if (ReferenceEquals(null, obj)) return false;
                 return obj is PLACEHOLDERID other && Equals(other);
             }
-    
+
             public override int GetHashCode() => Value.GetHashCode();
-    
+
             public override string ToString() => Value.ToString();
-    
+
             public static bool operator == (PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
             public static bool operator != (PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
             public static bool operator > (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
             public static bool operator < (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
             public static bool operator >= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
             public static bool operator <= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
-    
+
             /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
             public int CompareTo(PLACEHOLDERID other) => Value.CompareTo(other.Value);
-    
+
             public partial class PLACEHOLDERIDTypeConverter : global::System.ComponentModel.TypeConverter
             {
                 public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
-                {
-                    return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
-                }
-            
+                    => sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
                 public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
                 {
                     return value switch
@@ -60,12 +58,10 @@ internal static partial class EmbeddedSources
                         _ => base.ConvertFrom(context, culture, value),
                     };
                 }
-    
+
                 public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
-                {
-                    return sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
-                }
-    
+                    => sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
+
                 public override object? ConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object? value, global::System.Type destinationType)
                 {
                     if (value is PLACEHOLDERID idValue)
@@ -74,13 +70,13 @@ internal static partial class EmbeddedSources
                         {
                             return idValue.Value;
                         }
-    
+
                         if (destinationType == typeof(string))
                         {
                             return idValue.Value.ToString();
                         }
                     }
-    
+
                     return base.ConvertTo(context, culture, value, destinationType);
                 }
             }
@@ -89,19 +85,19 @@ internal static partial class EmbeddedSources
             {
                 public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
                     => new (reader.GetGuid());
-    
+
                 public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                     => writer.WriteStringValue(value.Value);
-    
+
     #if NET6_0_OR_GREATER
                 public override PLACEHOLDERID ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
                     => new(global::System.Guid.Parse(reader.GetString() ?? throw new global::System.FormatException("The string for the PLACEHOLDERID property was null")));
-    
+
                 public override void WriteAsPropertyName(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                     => writer.WritePropertyName(value.Value.ToString());
     #endif
             }
-    
+
             public static PLACEHOLDERID Parse(string input)
                 => new(global::System.Guid.Parse(input));
 
@@ -109,7 +105,7 @@ internal static partial class EmbeddedSources
             /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
             public static PLACEHOLDERID Parse(string input, global::System.IFormatProvider? provider)
                 => new(global::System.Guid.Parse(input, provider));
-    
+
             /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
             public static bool TryParse(
                 [global::System.Diagnostics.CodeAnalysis.NotNullWhen(true)] string? input,
@@ -121,7 +117,7 @@ internal static partial class EmbeddedSources
                     result = default;
                     return false;
                 }
-    
+
                 if (global::System.Guid.TryParse(input, provider, out var guid))
                 {
                     result = new(guid);
@@ -134,7 +130,7 @@ internal static partial class EmbeddedSources
                 }
             }
     #endif
-    
+
             /// <inheritdoc cref="global::System.IFormattable"/>
             public string ToString(
     #if NET7_0_OR_GREATER
@@ -159,7 +155,7 @@ internal static partial class EmbeddedSources
     #else
                 => new(global::System.Guid.Parse(input));
     #endif
-            
+
     #if NET7_0_OR_GREATER
             /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
     #endif
@@ -180,7 +176,7 @@ internal static partial class EmbeddedSources
                     return false;
                 }
             }
-    
+
             /// <inheritdoc cref="global::System.ISpanFormattable"/>
             public bool TryFormat(
                 global::System.Span<char> destination,
@@ -191,7 +187,7 @@ internal static partial class EmbeddedSources
                 global::System.ReadOnlySpan<char> format,
                 global::System.IFormatProvider? provider)
                 => Value.TryFormat(destination, out charsWritten, format);
-    
+
             /// <inheritdoc cref="global::System.ISpanFormattable"/>
             public bool TryFormat(
                 global::System.Span<char> destination,

@@ -58,10 +58,8 @@ namespace SomeNamespace
         public partial class MyIdTypeConverter : global::System.ComponentModel.TypeConverter
         {
             public override bool CanConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type sourceType)
-            {
-                return sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
-            }
-        
+                => sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
             public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
             {
                 return value switch
@@ -73,9 +71,7 @@ namespace SomeNamespace
             }
 
             public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
-            {
-                return sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
-            }
+                => sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
 
             public override object? ConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object? value, global::System.Type destinationType)
             {
@@ -168,7 +164,7 @@ namespace SomeNamespace
 #else
             => new(int.Parse(input));
 #endif
-        
+
 #if NET7_0_OR_GREATER
         /// <inheritdoc cref="global::System.ISpanParsable{TSelf}"/>
 #endif
