@@ -17,10 +17,7 @@ internal static partial class EmbeddedSources
         {
             public global::System.Guid Value { get; }
     
-            public PLACEHOLDERID(global::System.Guid value)
-            {
-                Value = value;
-            }
+            public PLACEHOLDERID(global::System.Guid value) => Value = value;
     
             public static PLACEHOLDERID New() => new PLACEHOLDERID(global::System.Guid.NewGuid());
             public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(global::System.Guid.Empty);
@@ -37,12 +34,12 @@ internal static partial class EmbeddedSources
     
             public override string ToString() => Value.ToString();
     
-            public static bool operator ==(PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
-            public static bool operator !=(PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
-            public static bool operator >  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
-            public static bool operator <  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
-            public static bool operator >=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
-            public static bool operator <=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
+            public static bool operator == (PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
+            public static bool operator != (PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
+            public static bool operator > (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
+            public static bool operator < (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
+            public static bool operator >= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
+            public static bool operator <= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
     
             /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
             public int CompareTo(PLACEHOLDERID other) => Value.CompareTo(other.Value);

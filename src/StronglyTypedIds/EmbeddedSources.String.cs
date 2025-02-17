@@ -14,15 +14,13 @@ internal static partial class EmbeddedSources
         {
             public string Value { get; }
     
-            public PLACEHOLDERID(string value)
-            {
+            public PLACEHOLDERID(string value) =>
     #if NET7_0_OR_GREATER
                 global::System.ArgumentNullException.ThrowIfNull(value);
                 Value = value;
     #else
                 Value = value ?? throw new global::System.ArgumentNullException(nameof(value));
     #endif
-            }
     
             public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(string.Empty);
     
@@ -46,12 +44,12 @@ internal static partial class EmbeddedSources
     
             public override string ToString() => Value;
     
-            public static bool operator ==(PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
-            public static bool operator !=(PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
-            public static bool operator >  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
-            public static bool operator <  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
-            public static bool operator >=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
-            public static bool operator <=  (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
+            public static bool operator == (PLACEHOLDERID a, PLACEHOLDERID b) => a.Equals(b);
+            public static bool operator != (PLACEHOLDERID a, PLACEHOLDERID b) => !(a == b);
+            public static bool operator > (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) > 0;
+            public static bool operator < (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) < 0;
+            public static bool operator >= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) >= 0;
+            public static bool operator <= (PLACEHOLDERID a, PLACEHOLDERID b) => a.CompareTo(b) <= 0;
     
             /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
             public int CompareTo(PLACEHOLDERID other)

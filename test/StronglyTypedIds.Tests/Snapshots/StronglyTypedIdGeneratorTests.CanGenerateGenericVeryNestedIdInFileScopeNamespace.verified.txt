@@ -33,10 +33,7 @@ namespace SomeNamespace
     {
         public global::System.Guid Value { get; }
 
-        public MyId(global::System.Guid value)
-        {
-            Value = value;
-        }
+        public MyId(global::System.Guid value) => Value = value;
 
         public static MyId New() => new MyId(global::System.Guid.NewGuid());
         public static readonly MyId Empty = new MyId(global::System.Guid.Empty);
@@ -53,12 +50,12 @@ namespace SomeNamespace
 
         public override string ToString() => Value.ToString();
 
-        public static bool operator ==(MyId a, MyId b) => a.Equals(b);
-        public static bool operator !=(MyId a, MyId b) => !(a == b);
-        public static bool operator >  (MyId a, MyId b) => a.CompareTo(b) > 0;
-        public static bool operator <  (MyId a, MyId b) => a.CompareTo(b) < 0;
-        public static bool operator >=  (MyId a, MyId b) => a.CompareTo(b) >= 0;
-        public static bool operator <=  (MyId a, MyId b) => a.CompareTo(b) <= 0;
+        public static bool operator == (MyId a, MyId b) => a.Equals(b);
+        public static bool operator != (MyId a, MyId b) => !(a == b);
+        public static bool operator > (MyId a, MyId b) => a.CompareTo(b) > 0;
+        public static bool operator < (MyId a, MyId b) => a.CompareTo(b) < 0;
+        public static bool operator >= (MyId a, MyId b) => a.CompareTo(b) >= 0;
+        public static bool operator <= (MyId a, MyId b) => a.CompareTo(b) <= 0;
 
         /// <inheritdoc cref="global::System.IComparable{TSelf}"/>
         public int CompareTo(MyId other) => Value.CompareTo(other.Value);
