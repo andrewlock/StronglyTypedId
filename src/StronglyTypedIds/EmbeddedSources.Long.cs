@@ -19,7 +19,7 @@ internal static partial class EmbeddedSources
 
             public PLACEHOLDERID(long value) => Value = value;
 
-            public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(0);
+            public static readonly PLACEHOLDERID Empty = new(0);
 
             /// <inheritdoc cref="global::System.IEquatable{T}"/>
             public bool Equals(PLACEHOLDERID other) => this.Value.Equals(other.Value);
@@ -49,14 +49,12 @@ internal static partial class EmbeddedSources
                     => sourceType == typeof(long) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
                 public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
-                {
-                    return value switch
+                    => value switch
                     {
                         long longValue => new PLACEHOLDERID(longValue),
                         string stringValue when !string.IsNullOrEmpty(stringValue) && long.TryParse(stringValue, out var result) => new PLACEHOLDERID(result),
                         _ => base.ConvertFrom(context, culture, value),
                     };
-                }
 
                 public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
                     => sourceType == typeof(long) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
@@ -83,7 +81,7 @@ internal static partial class EmbeddedSources
             public partial class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
             {
                 public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                    => new (reader.GetInt64());
+                    => new(reader.GetInt64());
 
                 public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                     => writer.WriteNumberValue(value.Value);
@@ -212,7 +210,7 @@ internal static partial class EmbeddedSources
             {
                 if (long.TryParse(utf8Text, provider, out var intResult))
                 {
-                    result = new PLACEHOLDERID(intResult);
+                    result = new(intResult);
                     return true;
                 }
 

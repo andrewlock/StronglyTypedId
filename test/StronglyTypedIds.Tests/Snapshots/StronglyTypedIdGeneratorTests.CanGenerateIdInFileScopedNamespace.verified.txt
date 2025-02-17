@@ -31,8 +31,8 @@ namespace SomeNamespace
 
         public MyId(global::System.Guid value) => Value = value;
 
-        public static MyId New() => new MyId(global::System.Guid.NewGuid());
-        public static readonly MyId Empty = new MyId(global::System.Guid.Empty);
+        public static MyId New() => new(global::System.Guid.NewGuid());
+        public static readonly MyId Empty = new(global::System.Guid.Empty);
 
         /// <inheritdoc cref="global::System.IEquatable{T}"/>
         public bool Equals(MyId other) => this.Value.Equals(other.Value);
@@ -62,14 +62,12 @@ namespace SomeNamespace
                 => sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
             public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
-            {
-                return value switch
+                => value switch
                 {
                     global::System.Guid guidValue => new MyId(guidValue),
                     string stringValue when !string.IsNullOrEmpty(stringValue) && global::System.Guid.TryParse(stringValue, out var result) => new MyId(result),
                     _ => base.ConvertFrom(context, culture, value),
                 };
-            }
 
             public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
                 => sourceType == typeof(global::System.Guid) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
@@ -96,7 +94,7 @@ namespace SomeNamespace
         public partial class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
         {
             public override MyId Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                => new (reader.GetGuid());
+                => new(reader.GetGuid());
 
             public override void Write(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
                 => writer.WriteStringValue(value.Value);

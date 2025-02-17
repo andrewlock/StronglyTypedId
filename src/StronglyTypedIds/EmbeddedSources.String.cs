@@ -22,7 +22,7 @@ internal static partial class EmbeddedSources
                 Value = value ?? throw new global::System.ArgumentNullException(nameof(value));
     #endif
 
-            public static readonly PLACEHOLDERID Empty = new PLACEHOLDERID(string.Empty);
+            public static readonly PLACEHOLDERID Empty = new(string.Empty);
 
             /// <inheritdoc cref="global::System.IEquatable{T}"/>
             public bool Equals(PLACEHOLDERID other)
@@ -96,7 +96,7 @@ internal static partial class EmbeddedSources
             public partial class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
             {
                 public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                    => new (reader.GetString()!);
+                    => new(reader.GetString()!);
 
                 public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                     => writer.WriteStringValue(value.Value);

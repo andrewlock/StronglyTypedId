@@ -31,7 +31,7 @@ namespace SomeNamespace
 
         public MyId(int value) => Value = value;
 
-        public static readonly MyId Empty = new MyId(0);
+        public static readonly MyId Empty = new(0);
 
         /// <inheritdoc cref="global::System.IEquatable{T}"/>
         public bool Equals(MyId other) => this.Value.Equals(other.Value);
@@ -61,14 +61,12 @@ namespace SomeNamespace
                 => sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
             public override object? ConvertFrom(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Globalization.CultureInfo? culture, object value)
-            {
-                return value switch
+                => value switch
                 {
                     int intValue => new MyId(intValue),
                     string stringValue when !string.IsNullOrEmpty(stringValue) && int.TryParse(stringValue, out var result) => new MyId(result),
                     _ => base.ConvertFrom(context, culture, value),
                 };
-            }
 
             public override bool CanConvertTo(global::System.ComponentModel.ITypeDescriptorContext? context, global::System.Type? sourceType)
                 => sourceType == typeof(int) || sourceType == typeof(string) || base.CanConvertTo(context, sourceType);
@@ -95,7 +93,7 @@ namespace SomeNamespace
         public partial class MyIdSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<MyId>
         {
             public override MyId Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                => new (reader.GetInt32());
+                => new(reader.GetInt32());
 
             public override void Write(global::System.Text.Json.Utf8JsonWriter writer, MyId value, global::System.Text.Json.JsonSerializerOptions options)
                 => writer.WriteNumberValue(value.Value);
@@ -224,7 +222,7 @@ namespace SomeNamespace
         {
             if (int.TryParse(utf8Text, provider, out var intResult))
             {
-                result = new MyId(intResult);
+                result = new(intResult);
                 return true;
             }
 
