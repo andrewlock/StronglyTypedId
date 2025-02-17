@@ -25,6 +25,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageOutputPath>$(MSBuildThisFileDirectory)\artifacts</PackageOutputPath>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup>
