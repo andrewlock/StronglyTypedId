@@ -1,12 +1,7 @@
 using System;
 using System.ComponentModel;
-using System.Linq;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using StronglyTypedIds.IntegrationTests.Types;
 using Xunit;
-using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonConvert;
-using SystemTextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace StronglyTypedIds.IntegrationTests
 {
