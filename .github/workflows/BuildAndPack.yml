@@ -55,7 +55,6 @@ jobs:
             5.0.x
             3.1.x
 
-      # - run: dotnet new globaljson --sdk-version "8.0.402" --force
       - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v3
         with:
@@ -68,7 +67,7 @@ jobs:
       - name: Run './build.cmd Clean Test TestPackages PushToNuGet'
         run: ./build.cmd Clean Test TestPackages PushToNuGet
         env:
-          NuGetToken: ${{ secrets.NUGET_TOKEN }}
+          NuGetToken: ${{ secrets.NUGET_TOKEN || 'NOT_SET'}}
 
       - uses: actions/upload-artifact@v4
         with:
