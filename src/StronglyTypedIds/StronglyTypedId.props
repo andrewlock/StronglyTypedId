@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <None Remove="$(MSBuildProjectDirectory)\**\*.typedid" />
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)\**\*.typedid" Visible="False" />
+  </ItemGroup>
+</Project>

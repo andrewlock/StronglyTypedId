@@ -1,0 +1,9 @@
+    partial struct PLACEHOLDERID
+    {
+        public int Value { get; }
+
+        public PLACEHOLDERID(int value)
+        {
+            Value = value;
+        }
+    }

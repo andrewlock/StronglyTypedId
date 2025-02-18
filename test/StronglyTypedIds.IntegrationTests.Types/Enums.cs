@@ -58,6 +58,9 @@ public partial struct ConvertersStringId2 { }
 [StronglyTypedId("nullablestring-full")]
 public partial struct NullableStringId { }
 
+[StronglyTypedId("simple")]
+public partial struct SimpleCustomId { }
+
 public partial class SomeType<T> where T : new()
 {
     public partial record struct NestedType<TKey, TValue>
