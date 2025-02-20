@@ -1,13 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\src\StronglyTypedIds\StronglyTypedId.props" />
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;$(TargetFrameworks)</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\StronglyTypedIds\StronglyTypedIds.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\StronglyTypedIds.Attributes\StronglyTypedIds.Attributes.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
