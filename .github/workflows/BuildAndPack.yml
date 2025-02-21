@@ -28,9 +28,21 @@ on:
       - '*'
 
 jobs:
-  ubuntu-latest:
-    name: ubuntu-latest
-    runs-on: ubuntu-22.04 # 24.04 can't run < net6.0
+  build-and-test:
+    strategy:
+      matrix:
+        include:
+          - os: windows
+            vm: windows-latest
+          - os: linux
+            vm: ubuntu-latest
+          - os: macos
+            vm: macos-13  # latest is arm64, and it breaks a bunch of stuff
+    env:
+      MSBuildEnableWorkloadResolver: false
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
+    name: ${{ matrix.os}}
+    runs-on: ${{ matrix.vm}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -40,87 +52,51 @@ jobs:
             8.0.x
             7.0.x
             6.0.x
-            5.0.x
             3.1.x
+
       - name: Cache .nuke/temp, ~/.nuget/packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             .nuke/temp
             ~/.nuget/packages
             !~/.nuget/packages/stronglytypeid
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+
       - name: Run './build.cmd Clean Test TestPackages PushToNuGet'
         run: ./build.cmd Clean Test TestPackages PushToNuGet
         env:
-          GithubToken: ${{ secrets.GITHUB_TOKEN }}
-          NuGetToken: ${{ secrets.NUGET_TOKEN }}
-          MSBuildEnableWorkloadResolver: false
+          NuGetToken: ${{ secrets.NUGET_TOKEN || 'NOT_SET'}}
+
       - uses: actions/upload-artifact@v4
         with:
-          name: artifacts-linux
-          path: artifacts
-  windows-latest:
-    name: windows-latest
-    runs-on: windows-latest
+          name: packages-${{ matrix.os}}
+          path: artifacts/packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.os}}
+          path: artifacts/results
+
+  publish-test-results:
+    name: "Publish Tests Results"
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write # needed unless run with comment_mode: off
+      # contents: read # only needed for private repository
+      # issues: read # only needed for private repository
+    if: always()
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: |
-            9.0.x
-            8.0.x
-            7.0.x
-            6.0.x
-            5.0.x
-            3.1.x
-      - name: Cache .nuke/temp, ~/.nuget/packages
-        uses: actions/cache@v2
+          path: artifacts/results
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          path: |
-            .nuke/temp
-            ~/.nuget/packages
-            !~/.nuget/packages/stronglytypeid
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Clean Test TestPackages PushToNuGet'
-        run: ./build.cmd Clean Test TestPackages PushToNuGet
-        env:
-          GithubToken: ${{ secrets.GITHUB_TOKEN }}
-          NuGetToken: ${{ secrets.NUGET_TOKEN }}
-          MSBuildEnableWorkloadResolver: false
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-windows
-          path: artifacts
-  macOS-latest:
-    name: macos-13 # latest is arm64, and it breaks a bunch of stuff
-    runs-on: macos-13 # latest is arm64, and it breaks a bunch of stuff
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            9.0.x
-            8.0.x
-            7.0.x
-            6.0.x
-            5.0.x
-            3.1.x
-      - name: Cache .nuke/temp, ~/.nuget/packages
-        uses: actions/cache@v2
-        with:
-          path: |
-            .nuke/temp
-            ~/.nuget/packages
-            !~/.nuget/packages/stronglytypeid
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Clean Test TestPackages PushToNuGet'
-        run: ./build.cmd Clean Test TestPackages PushToNuGet
-        env:
-          GithubToken: ${{ secrets.GITHUB_TOKEN }}
-          NuGetToken: ${{ secrets.NUGET_TOKEN }}
-          MSBuildEnableWorkloadResolver: false
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-macos
-          path: artifacts
+          files: "artifacts/**/*.trx"
+          json_thousands_separator: ","
+          check_run_annotations_branch: "*"
