@@ -15,6 +15,7 @@
     <RepositoryUrl>https://github.com/andrewlock/StronglyTypedId</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 
   <PropertyGroup>
