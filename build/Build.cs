@@ -29,6 +29,7 @@ class Build : NukeBuild
     AbsolutePath TestsDirectory => RootDirectory / "test";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     AbsolutePath TestResultsDirectory => ArtifactsDirectory / "results";
+    AbsolutePath OutputPackagesDirectory => ArtifactsDirectory / "packages";
 
     [Parameter] readonly string GithubToken;
     [Parameter] readonly string NuGetToken;
@@ -84,12 +85,12 @@ class Build : NukeBuild
     Target Pack => _ => _
         .DependsOn(Compile)
         .After(Test)
-        .Produces(ArtifactsDirectory)
+        .Produces(OutputPackagesDirectory)
         .Executes(() =>
         {
             DotNetPack(s => s
                 .SetConfiguration(Configuration)
-                .SetOutputDirectory(ArtifactsDirectory)
+                .SetOutputDirectory(OutputPackagesDirectory)
                 .When(_ => IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
                 .EnableNoBuild()
                 .EnableNoRestore()
@@ -99,7 +100,7 @@ class Build : NukeBuild
     Target TestPackages => _ => _
         .DependsOn(Pack)
         .After(Test)
-        .Produces(ArtifactsDirectory)
+        .Produces(OutputPackagesDirectory)
         .Executes(() =>
         {
             var projectFiles = new[]
@@ -143,7 +144,7 @@ class Build : NukeBuild
         .After(Pack)
         .Executes(() =>
         {
-            var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
+            var packages = OutputPackagesDirectory.GlobFiles("*.nupkg");
             DotNetNuGetPush(s => s
                 .SetApiKey(NuGetToken)
                 .SetSource(NugetOrgUrl)
