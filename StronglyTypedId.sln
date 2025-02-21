@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		releasenotes.props = releasenotes.props
 		version.props = version.props
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StronglyTypedIds", "src\StronglyTypedIds\StronglyTypedIds.csproj", "{9C0F3A36-ED47-4D0F-B736-EFC559C9E2DA}"

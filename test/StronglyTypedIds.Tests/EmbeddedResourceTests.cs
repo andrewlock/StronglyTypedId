@@ -1,7 +1,3 @@
-using System.Threading.Tasks;
-using VerifyXunit;
-using Xunit;
-
 namespace StronglyTypedIds.Tests
 {
     [UsesVerify]
