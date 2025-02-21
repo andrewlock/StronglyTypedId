@@ -16,6 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
   </PropertyGroup>
 
   <PropertyGroup>

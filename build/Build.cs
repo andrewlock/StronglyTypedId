@@ -28,6 +28,7 @@ class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "test";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath TestResultsDirectory => ArtifactsDirectory / "results";
 
     [Parameter] readonly string GithubToken;
     [Parameter] readonly string NuGetToken;
@@ -72,6 +73,10 @@ class Build : NukeBuild
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
+                .When(_ => IsServerBuild, x => x.SetProperty("ContinuousIntegrationBuild", "true"))
+                .When(_ => IsServerBuild, x => x
+                    .SetLoggers("trx")
+                    .SetResultsDirectory(TestResultsDirectory))
                 .EnableNoBuild()
                 .EnableNoRestore());
         });
@@ -124,6 +129,9 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .EnableNoBuild()
                 .EnableNoRestore()
+                .When(_ => IsServerBuild, x => x
+                    .SetLoggers("trx")
+                    .SetResultsDirectory(TestResultsDirectory))
                 .CombineWith(projectFiles, (s, p) => s.SetProjectFile(p)));
 
         });
