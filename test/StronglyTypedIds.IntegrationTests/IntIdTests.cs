@@ -120,13 +120,40 @@ public partial class IntIdTests
                            }
                          }
                          """;
-        Assert.Equal(serialized, expected);
+        Assert.Equal(expected, serialized);
 
         var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
 
         Assert.NotNull(deserialized.Values);
         Assert.True(deserialized.Values.ContainsKey(key));
         Assert.Equal("My Value", deserialized.Values[key]);
+    }
+
+    [Fact]
+    public void CanDeserializeWhenIntIsStoredAsAString_WithSystemTextJsonProvider()
+    {
+        var opts = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+        };
+
+        var key = "My Key";
+
+        var serialized = $$"""
+                         {
+                           "values": {
+                             "My Key": "123"
+                           }
+                         }
+                         """;
+
+        var deserialized = SystemTextJsonSerializer.Deserialize<DictionaryWithTypeValue>(serialized, opts);
+
+        Assert.NotNull(deserialized.Values);
+        Assert.True(deserialized.Values.ContainsKey(key));
+        Assert.Equal(new IntId(123), deserialized.Values[key]);
     }
 #endif
 
@@ -587,6 +614,11 @@ public partial class IntIdTests
     internal class TypeWithDictionaryKeys
     {
         public Dictionary<IntId, string> Values { get; set; }
+    }
+
+    internal class DictionaryWithTypeValue
+    {
+        public Dictionary<string, IntId> Values { get; set; }
     }
 
     internal record ToSerialize

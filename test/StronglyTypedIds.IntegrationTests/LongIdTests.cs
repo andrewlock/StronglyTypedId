@@ -119,13 +119,40 @@ namespace StronglyTypedIds.IntegrationTests
                                }
                              }
                              """;
-            Assert.Equal(serialized, expected);
+            Assert.Equal(expected, serialized);
 
             var deserialized = SystemTextJsonSerializer.Deserialize<TypeWithDictionaryKeys>(serialized, opts);
 
             Assert.NotNull(deserialized.Values);
             Assert.True(deserialized.Values.ContainsKey(key));
             Assert.Equal("My Value", deserialized.Values[key]);
+        }
+
+        [Fact]
+        public void CanDeserializeWhenLongIsStoredAsAString_WithSystemTextJsonProvider()
+        {
+            var opts = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            };
+
+            var key = "My Key";
+
+            var serialized = $$"""
+                             {
+                               "values": {
+                                 "My Key": "123"
+                               }
+                             }
+                             """;
+
+            var deserialized = SystemTextJsonSerializer.Deserialize<DictionaryWithTypeValue>(serialized, opts);
+
+            Assert.NotNull(deserialized.Values);
+            Assert.True(deserialized.Values.ContainsKey(key));
+            Assert.Equal(new LongId(123), deserialized.Values[key]);
         }
 #endif
 
@@ -569,6 +596,11 @@ namespace StronglyTypedIds.IntegrationTests
         internal class TypeWithDictionaryKeys
         {
             public Dictionary<LongId, string> Values { get; set; }
+        }
+
+        internal class DictionaryWithTypeValue
+        {
+            public Dictionary<string, LongId> Values { get; set; }
         }
 
         internal record ToSerialize

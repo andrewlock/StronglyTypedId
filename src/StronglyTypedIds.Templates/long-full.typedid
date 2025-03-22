@@ -88,7 +88,20 @@
         public partial class PLACEHOLDERIDSystemTextJsonConverter : global::System.Text.Json.Serialization.JsonConverter<PLACEHOLDERID>
         {
             public override PLACEHOLDERID Read(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
-                => new (reader.GetInt32());
+            {
+#if NET6_0_OR_GREATER
+                if (options.NumberHandling.HasFlag(global::System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString) && reader.TokenType == global::System.Text.Json.JsonTokenType.String)
+                {
+                    var str = reader.GetString();
+
+                    if (!string.IsNullOrEmpty(str) && PLACEHOLDERID.TryParse(str, null, out var val)) 
+                        return val;
+                    
+                    return default;
+                }
+#endif
+                return new PLACEHOLDERID(reader.GetInt64());
+            }
 
             public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
                 => writer.WriteNumberValue(value.Value);
