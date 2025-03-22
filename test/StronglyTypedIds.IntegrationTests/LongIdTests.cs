@@ -259,6 +259,18 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void CanDeserializeFromLong_MaxLongValue_WithSystemTextJsonProvider()
+        {
+            var value = long.MaxValue;
+            var foo = new ConvertersLongId(value);
+            var serializedLong = SystemTextJsonSerializer.Serialize(value);
+
+            var deserializedFoo = SystemTextJsonSerializer.Deserialize<ConvertersLongId>(serializedLong);
+
+            Assert.Equal(foo, deserializedFoo);
+        }
+
+        [Fact]
         public void WhenEfCoreValueConverterUsesValueConverter()
         {
             var connection = new SqliteConnection("DataSource=:memory:");
