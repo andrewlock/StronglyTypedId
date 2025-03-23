@@ -116,9 +116,6 @@ internal static partial class EmbeddedSources
     #endif
             }
     
-            public static PLACEHOLDERID Parse(string input)
-                => new(input);
-    
     #if NET7_0_OR_GREATER
             /// <inheritdoc cref="global::System.IParsable{TSelf}"/>
             public static PLACEHOLDERID Parse(string input, global::System.IFormatProvider? provider)
