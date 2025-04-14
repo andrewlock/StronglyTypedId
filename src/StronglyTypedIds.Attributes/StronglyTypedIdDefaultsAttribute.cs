@@ -51,6 +51,10 @@ namespace StronglyTypedIds
         /// Templates must be added to the project using the format NAME.typedid,
         /// where NAME is the name of the template passed in <paramref name="templateName"/>.
         /// </param>
+        /// <param name="templateNames">The names of additional custom templates to use to generate the ID.
+        /// Templates must be added to the project using the format NAME.typedid,
+        /// where NAME is the name of the template passed in <paramref name="templateNames"/>.
+        /// </param>
         public StronglyTypedIdDefaultsAttribute(string templateName, params string[] templateNames)
         {
         }
