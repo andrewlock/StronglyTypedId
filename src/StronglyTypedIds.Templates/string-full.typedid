@@ -103,7 +103,9 @@
                 => new (reader.GetString()!);
 
             public override void Write(global::System.Text.Json.Utf8JsonWriter writer, PLACEHOLDERID value, global::System.Text.Json.JsonSerializerOptions options)
-                => writer.WriteStringValue(value.Value);
+            {
+                writer.WriteStringValue(value.Value ?? throw new global::System.Text.Json.JsonException("The string for the PLACEHOLDERID property was null"));
+            }
 
 #if NET6_0_OR_GREATER
             public override PLACEHOLDERID ReadAsPropertyName(ref global::System.Text.Json.Utf8JsonReader reader, global::System.Type typeToConvert, global::System.Text.Json.JsonSerializerOptions options)
