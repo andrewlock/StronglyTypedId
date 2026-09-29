@@ -42,7 +42,7 @@ internal static partial class EmbeddedSources
                 return obj is PLACEHOLDERID other && Equals(other);
             }
     
-            public override int GetHashCode() => Value.GetHashCode();
+            public override int GetHashCode() => Value is null ? 0 : Value.GetHashCode();
     
             public override string ToString() => Value;
     
