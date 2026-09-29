@@ -24,6 +24,14 @@ namespace StronglyTypedIds.IntegrationTests
         }
 
         [Fact]
+        public void GetHashCodeOnDefaultDoesNotThrow()
+        {
+            StringId id = default;
+            var exception = Record.Exception(() => id.GetHashCode());
+            Assert.Null(exception);
+        }
+
+        [Fact]
         public void SameValuesAreEqual()
         {
             var id = "some-value";
